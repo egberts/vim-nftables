@@ -4,25 +4,59 @@
 #
 # This is the part where you can add your own esoteric setting(s) if it breaks
 # the vim syntax highlighter for NFTABLES (yet `nft` takes it in just normally).
+# TODO: More todo, FIXME, FIXME: TODO: xxx XXX ARGH!
 #
-list ruleset arp
-list ruleset bridge
+include Filespec
+include 'Filespec'
+include 'Fil"espec'
+include ";;;;;;;;;;";
+include "Fil'espec"
+include "Filespec"
+include "Filespec"     
+include "Filespec";
+include "Filespec" ;
+include "Filespec";   
+include "Filespec"  ;
+include "Filespec"  ;   
+include "Filespec"# inline comment
+include "Filespec"        # inline comment
+include "Filespec";   # inline comment
+include "Filespec";      # inline comment
+include "Filespec???<>|\~`!@#$%^&*()\=+{}] /;:,._0123abcXYZ"  ;   # inline comment
+include "Filespec"  ;      # inline comment
+include "Filespec" bad stuff oppsie
+include "Filespec"  oopsie
+include "Filespec"  oopsie  ;
+
+list oopsie
+list oopsie ;
+list ruleset   
+list ruleset  ;  
 list ruleset netdev
+list ruleset netdev oopsie;
+list ruleset bridge
+list ruleset arp
 list ruleset ip
 list ruleset ip6
 list ruleset inet
-list ruleset
 
 list tables
+list tables  ;   asdf
 
-list table TABLE_NETDEV
+list table TABLE_NETDEV   ; asdf
 list table netdev TABLE_NETDEV
+list table bridge TABLE_NETDEV
+list table arp TABLE_NETDEV
+list table ip TABLE_NETDEV
+list table ip6 TABLE_NETDEV
+list table inet TABLE_NETDEV
 
 list chains
-list chain myIpTable myIpChain
-list chain arp myArp myArpchain
-list chain bridge myBridge myBridgechain
+
+list chain myIpTable myIpChain ; 
 list chain netdev myNetdev myNetdevchain
+list chain bridge myBridge myBridgechain
+list chain arp myArp myArpchain
 list chain ip myIp myIpchain
 list chain ip6 myIp6 myIp6chain
 list chain inet myInet myInetchain
@@ -31,82 +65,119 @@ list set TABLE_NETDEV SET_NETDEV
 list sets
 
 flush chain myIpTable myIpChain
-flush chain arp myArp myArpchain
-flush chain bridge myBridge myBridgechain
+flush chain myIpTable myIpChain ; flush chain netdev myNetDev X; oopsie
 flush chain netdev myNetdev myNetdevchain
+flush chain bridge myBridge myBridgechain
+flush chain arp myArp myArpchain
 flush chain ip myIp myIpchain
 flush chain ip6 myIp6 myIp6chain
 flush chain inet myInet myInetchain
 
 flush table myArpTable
-flush table arp myArpTable
 flush table netdev TABLE_NETDEV
 flush table bridge myBridgeTable
-flush table inet myInetTable
+flush table arp myArpTable
 flush table ip myIpTable
 flush table ip6 myIp6Table
+flush table inet myInetTable
 
 flush ruleset
-flush ruleset arp
-flush ruleset bridge
 flush ruleset netdev
-flush ruleset inet
+flush ruleset bridge
+flush ruleset arp
 flush ruleset ip
 flush ruleset ip6
+flush ruleset inet
 
 #  create Similar to the add command, but returns 
 #  an error if the chain already exists.
 create table myIpTable 
 create table myIpTable { flags dormant }
-create table arp myArpTable 
-create table arp myArpTable { flags dormant }
-create table bridge myBridge 
-create table bridge myBridge { flags dormant }
 create table netdev myNetdev 
 create table netdev myNetdev { flags dormant }
-create table inet myInetTable 
-create table inet myInetTable { flags dormant }
+create table bridge myBridge 
+create table bridge myBridge { flags dormant }
+create table arp myArpTable 
+create table arp myArpTable { flags dormant }
 create table ip myIpTable 
 create table ip myIpTable { flags dormant }
 create table ip6 myIp6Table 
 create table ip6 myIp6Table { flags dormant }
+create table inet myInetTable 
+create table inet myInetTable { flags dormant }
 
 add table myIpTable    # defaults to 'ip' family
-add table myIpTable { flags dormant }  # defaults to 'ip' family
+add table myIpTable { flags dormant }    # defaults to 'ip' family
+add table netdev myNetdevTable
+add table netdev myNetdevTable { flags dormant }
+add table bridge myBridgeTable
+add table bridge myBridgeTable { flags dormant }
 add table arp myArpTable 
 add table arp myArpTable { flags dormant }
-add table netdev TABLE_NETDEV
-add table netdev TABLE_NETDEV { flags dormant }
 add table ip myIpTable
 add table ip myIpTable { flags dormant }
 add table ip6 myIp6Table
 add table ip6 myIp6Table { flags dormant }
 add table inet myInetTable
-add table inet myInetTable { flags dormant; }
+add table inet myInetTable { flags dormant; };
 
 # Two kinds of a base chain for syntax handling:
 #  1. Unidentified family chain
 #  2. Explictly-identified family chain
-create chain myIpTable myIpChain 
+create chain myIpTable myIpChain
+create chain myIpTable myIpChain { type filter hook prerouting priority 0; policy drop; } ;
 create chain myIpTable myIpChain { type filter hook input priority 0; policy drop;}
+create chain myIpTable myIpChain { type filter hook forward priority 0; policy drop;}
+create chain myIpTable myIpChain { type filter hook output priority 0; policy drop;}
+create chain myIpTable myIpChain { type filter hook postrouting priority 0; policy drop;}
 create chain myIpTable myIpChain { type filter hook input device "eth0" priority 0; policy drop;}
 create chain arp myArpTable myArpChain 
 create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept}
+create chain arp myArpTable myArpChain { type filter hook output priority 0; policy accept}
 create chain arp myArpTable myArpChain { type filter hook input device "eth0" priority 0; policy accept}
 create chain bridge myBridgeTable myBridgeChain 
 create chain bridge myBridgeTable myBridgeChain { type filter hook input priority 0; policy accept}
+create chain bridge myBridgeTable myBridgeChain { type filter hook output priority 0; policy accept}
 create chain bridge myBridgeTable myBridgeChain { type filter hook input device "eth0" priority 0; policy accept}
 create chain netdev myNetdevTable myNetdevChain 
-create chain netdev myNetdevTable myNetdevChain { type filter hook input priority 0; policy accept}
-create chain netdev myNetdevTable myNetdevChain { type filter hook input device "eth0" priority 0; policy accept}
+create chain netdev myNetdevTable myNetdevChain { type filter hook ingress device "vlan0" priority 0; policy accept}
 create chain ip myIpTable myIpChain 
+create chain ip myIpTable myIpChain { type filter hook prerouting priority 0; policy accept}
 create chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept}
+create chain ip myIpTable myIpChain { type filter hook forward priority 0; policy accept}
+create chain ip myIpTable myIpChain { type filter hook output priority 0; policy accept}
+create chain ip myIpTable myIpChain { type filter hook postrouting priority 0; policy accept}
+create chain ip myIpTable myIpChain { type nat hook prerouting priority 0; policy accept}
+create chain ip myIpTable myIpChain { type nat hook input priority 0; policy accept}
+create chain ip myIpTable myIpChain { type nat hook output priority 0; policy accept}
+create chain ip myIpTable myIpChain { type nat hook postrouting priority 0; policy accept}
+create chain ip myIpTable myIpChain { type route hook output priority 0; policy accept}
+
 create chain ip myIpTable myIpChain { type filter hook input device "eth0" priority 0; policy accept}
+
 create chain ip6 myIp6Table myIp6Chain 
+create chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept}
 create chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type filter hook output priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type filter hook postrouting priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type nat hook prerouting priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type nat hook input priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept}
 create chain ip6 myIp6Table myIp6Chain { type filter hook input device "eth0" priority 0; policy accept}
 create chain inet myInetTable myInetChain 
+create chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept}
 create chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept}
+create chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept}
+create chain inet myInetTable myInetChain { type filter hook output priority 0; policy accept}
+create chain inet myInetTable myInetChain { type filter hook postrouting priority 0; policy accept}
+create chain inet myInetTable myInetChain { type nat hook prerouting priority 0; policy accept}
+create chain inet myInetTable myInetChain { type nat hook input priority 0; policy accept}
+create chain inet myInetTable myInetChain { type nat hook output priority 0; policy accept}
+create chain inet myInetTable myInetChain { type nat hook postrouting priority 0; policy accept}
+create chain inet myInetTable myInetChain { type route hook output priority 0; policy accept}
 create chain inet myInetTable myInetChain { type filter hook input device "eth0" priority 0; policy accept}
 
 add chain myIpTable myIpChain 
@@ -131,12 +202,26 @@ add chain ip myIpTable myIpChain { type filter hook input device "eth0" priority
 add chain ip6 myIp6Table myIp6Chain 
 add chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept}
 add chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept}
+add chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept}
 add chain ip6 myIp6Table myIp6Chain { type filter hook output priority 0; policy accept}
 add chain ip6 myIp6Table myIp6Chain { type filter hook postrouting priority 0; policy accept}
+add chain ip6 myIp6Table myIp6Chain { type nat hook prerouting priority 0; policy accept}
+add chain ip6 myIp6Table myIp6Chain { type nat hook input priority 0; policy accept}
+add chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy accept}
+add chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept}
 add chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept}
 add chain ip6 myIp6Table myIp6Chain { type filter hook input device "eth0" priority 0; policy drop;}
 add chain inet myInetTable myInetChain 
+add chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept}
 add chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept}
+add chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept}
+add chain inet myInetTable myInetChain { type filter hook output priority 0; policy accept}
+add chain inet myInetTable myInetChain { type filter hook postrouting priority 0; policy accept}
+add chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept}
+add chain inet myInetTable myInetChain { type nat hook input priority 0; policy accept}
+add chain inet myInetTable myInetChain { type nat hook output priority 0; policy accept}
+add chain inet myInetTable myInetChain { type nat hook postrouting priority 0; policy accept}
+add chain inet myInetTable myInetChain { type route hook output priority 0; policy accept}
 add chain inet myInetTable myInetChain { type filter hook input device "eth0" priority 0; policy drop;}
 
 export json
@@ -151,27 +236,105 @@ add map TABLE_NETDEV
 
 add rule inet mytable myin counter
 
-delete table TABLE_NETDEV
-delete table netdev TABLE_NETDEV
-delete table netdev handle HANDLE
-delete table handle HANDLE
+delete table myIpTable
+delete table netdev myNetdevTable
+delete table bridge myBridgeTable
+delete table arp myArpTable
+delete table ip myIpTable
+delete table ip6 myIp6Table
+delete table inet myInetTable
+delete table netdev handle 123
+delete table handle 4321 # comment
 
 delete chain myIpTable myIpChain
-delete chain arp myArp myArpchain
-delete chain bridge myBridge myBridgechain
 delete chain netdev myNetdev myNetdevchain
+delete chain bridge myBridge myBridgechain
+delete chain arp myArp myArpchain
 delete chain ip myIp myIpchain
 delete chain ip6 myIp6 myIp6chain
 delete chain inet myInet myInetchain
-delete chain myInet handle "myHandle"
-delete chain inet myInet handle "myHandle"
+delete chain myInet handle 123123
+delete chain inet myInet handle 42 # comment
 
-rename chain myIpChain newMyIpChain
-rename chain ip myIpChain newMyIpChain
+monitor tables
+monitor chains
+monitor sets
+monitor rules
+monitor elements
+monitor trace
+monitor tables json;
+monitor chains json
+monitor sets json
+monitor rules json
+monitor elements json
+monitor trace json
+monitor new 
+monitor new tables 
+monitor new chains
+monitor new sets
+monitor new rules
+monitor new elements 
+monitor new trace 
+monitor destroy 
+monitor destroy tables 
+monitor destroy chains
+monitor destroy sets
+monitor destroy rules
+monitor destroy elements
+monitor destroy trace 
+
+add set myIpTable mySet { type ???; flags ???; timeout ???; gc-interval ???; elements = element,element; size 1200; policy accept; auto-merge yes; }
+add set ip myIpTable mySet { type ???; flags ???; timeout ???; gc-interval ???; elements = element,element; size 1200; policy accept; auto-merge yes; }
+delete set myIpTable handle 123
+delete set ip myIpTable handle 123
+
+delete set myIpTable mySet
+delete set myIpTable handle 123
+delete set netdev myNetdevTable mySet
+delete set bridge myBridgeTable mySet
+delete set arp myArpTable mySet
+delete set ip myIpTable mySet
+delete set ip6 myIp6Table mySet
+delete set inet myInetTable mySet
+delete set inet myInetTable handle 123
+
+add element myIpTable mySet { element, element, element }
+add ip element myIpTable mySet { element, element, element }
+delete element myIpTable mySet { element, element, element }
+delete ip element myIpTable mySet { element, element, element }
+
+list set netdev myNetdevTable mySet
+list set bridge myBridgeTable mySet
+list set arp myArpTable mySet
+list set ip myIpTable mySet
+list set ip6 myIp6Table mySet
+list set inet myInetTable mySet
+list set inet myInetTable handle 123  # Intentional Syntax ERROR
+
+flush set netdev myNetdevTable mySet
+flush set bridge myBridgeTable mySet
+flush set arp myArpTable mySet
+flush set ip myIpTable mySet
+flush set ip6 myIp6Table mySet
+flush set inet myInetTable mySet
+flush set inet myInetTable handle 123  # Intentional Syntax ERROR
+
+rename chain myIpTable myIpChain newMyIpChain
+rename chain netdev myNetdevTable myNetdevChain newMyNetdevChain    ;    
+rename chain bridge myBridgeTable myBridgeChain newMyBridgeChain;
+rename chain arp myArpTable myArpChain newMyArpChain  ;
+rename chain ip myIpTable myIpChain newMyIpChain    ;    # comment
+rename chain ip6 myIp6Table myIp6Chain newMyIp6Chain  # comment
+rename chain inet myInetTable myInetChain newMyInetChain
 
 table arp ARP_TABLE {
     chain ARP_INPUT_FILTER {
        type filter hook input priority 0;
+       policy drop;
+       counter log drop
+    }
+    chain ARP_INPUT_FILTER {
+       type filter hook prerouting priority 0;
        policy drop;
        counter log drop
     }

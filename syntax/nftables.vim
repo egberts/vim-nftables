@@ -79,8 +79,8 @@ hi def link nftablesMask nftablesHL_Operator
 " We'll do error RED highlighting on all statement firstly, then later on
 " all the options, then all the clauses.
 " Uncomment following two lines for RED highlight of typos (still Beta here)
-" hi link nftables_Error nftablesHL_Error
-" syn match nftables_Error /[ a-zA-Z0-9\t]\{1,64}/
+hi link nftables_Error nftablesHL_Error
+syn match nftables_Error /[ a-zA-Z0-9\t]\{1,64}/
 
 hi link nftables_UnexpectedEOS namedHL_Error
 syn match nftables_UnexpectedEOS contained /[;\n]\+/ skipwhite
@@ -118,6 +118,7 @@ syn match nftablesInclude_Filespec contained /\'[ a-zA-Z\]\-\[0-9\._,:\;\/?<>|\"
 \    nftables_Semicolon
 \ nextgroup=nftables_EOS
 \ skipwhite 
+
 syn match nftablesInclude_Filespec contained /\"[ a-zA-Z\]\-\[0-9\._,:\;\/?<>|\'`~!@#$%\^&*\\(\\)=\+ {}]\{1,1024}\"/
 \ skipwhite 
 \ nextgroup=
@@ -132,7 +133,6 @@ syn match nftablesInclude /^\s*include/ skipwhite
 hi link nftablesAction nftablesHL_Action
 syn keyword nftablesAction contained skipwhite
 \    accept
-\    reject
 \    drop
 
 "#################################################
@@ -178,6 +178,16 @@ syn keyword nftablesType_Route contained route skipwhite
 \ nextgroup=nftablesHookKeyword
 
 " Begin of 'table arp ...'
+hi link nftablesTArpC_Policy nftablesHL_Type
+syn keyword nftablesTArpC_Policy contained skipwhite
+\    accept
+\    drop
+\ nextgroup=nftables_Semicolon,nftables_EOS
+
+hi link nftablesTArpC_PolicyKeyword nftablesHL_Statement
+syn keyword nftablesTArpC_PolicyKeyword contained policy skipwhite
+\ nextgroup=nftablesTArpC_Policy
+
 hi link nftablesTArpC_TypeKeyword nftablesHL_Statement
 syn match nftablesTArpC_TypeKeyword contained /;\s*type/ skipwhite
 \ nextgroup=
@@ -251,7 +261,7 @@ syn keyword nftablesIifnameKeyword contained skipwhite
 syn region nftablesTArpChain_Section contained start=/{/ end=/}/ 
 \ contains=
 \    nftablesTArpC_TypeKeyword,
-\    nftablesPolicyKeyword,
+\    nftablesTArpC_PolicyKeyword,
 \    nftablesCounterKeyword,
 \    nftablesLogKeyword,
 \    nftablesIifnameKeyword,
@@ -374,7 +384,6 @@ syn keyword nftablesCmdAddChainArp_TypeKeyword contained type skipwhite
 hi link nftablesCmdAddChainArp_Policy nftablesHL_Action
 syn keyword nftablesCmdAddChainArp_Policy contained skipwhite
 \    accept
-\    reject
 \    drop
 \ nextgroup=nftables_Semicolon
 
@@ -445,7 +454,6 @@ syn keyword nftablesCmdAddChainBridge_TypeKeyword contained type skipwhite
 hi link nftablesCmdAddChainBridge_Policy nftablesHL_Action
 syn keyword nftablesCmdAddChainBridge_Policy contained skipwhite
 \    accept
-\    reject
 \    drop
 \ nextgroup=nftables_Semicolon
 
@@ -510,7 +518,6 @@ syn keyword nftablesCmdAddChainNetdev_TypeKeyword contained type skipwhite
 hi link nftablesCmdAddChainNetdev_Policy nftablesHL_Action
 syn keyword nftablesCmdAddChainNetdev_Policy contained skipwhite
 \    accept
-\    reject
 \    drop
 \ nextgroup=nftables_Semicolon
 
@@ -607,7 +614,6 @@ syn keyword nftablesCmdAddChainIp_TypeKeyword contained type skipwhite
 hi link nftablesCmdAddChainIp_Policy nftablesHL_Action
 syn keyword nftablesCmdAddChainIp_Policy contained skipwhite
 \    accept
-\    reject
 \    drop
 \ nextgroup=nftables_Semicolon
 
@@ -706,7 +712,6 @@ syn keyword nftablesCmdAddChainIp6_TypeKeyword contained type skipwhite
 hi link nftablesCmdAddChainIp6_Policy nftablesHL_Action
 syn keyword nftablesCmdAddChainIp6_Policy contained skipwhite
 \    accept
-\    reject
 \    drop
 \ nextgroup=nftables_Semicolon
 
@@ -803,7 +808,6 @@ syn keyword nftablesCmdAddChainInet_TypeKeyword contained type skipwhite
 hi link nftablesCmdAddChainInet_Policy nftablesHL_Action
 syn keyword nftablesCmdAddChainInet_Policy contained skipwhite
 \    accept
-\    reject
 \    drop
 \ nextgroup=nftables_Semicolon
 
@@ -889,10 +893,12 @@ syn keyword nftablesCmdAddMap contained map skipwhite
 " Begin of 'delete table ...'
 hi link nftablesCmdDeleteTable_Handle nftablesHL_Number
 syn match nftablesCmdDeleteTable_Handle contained /[0-9]\{1,11}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS,
 
-hi link nftablesCmdDeleteTableHandleKeyword nftablesHL_Statement
-syn keyword nftablesCmdDeleteTableHandleKeyword contained skipwhite
-\    handle
+hi link nftablesCmdDeleteTable_HandleKeyword nftablesHL_Statement
+syn keyword nftablesCmdDeleteTable_HandleKeyword contained handle skipwhite
 \ nextgroup=nftablesCmdDeleteTable_Handle
 
 hi link nftablesCmdDeleteTable_Name nftablesHL_Table
@@ -907,7 +913,7 @@ syn keyword nftablesCmdDeleteTable_Family contained skipwhite
 \    ip6
 \    inet
 \ nextgroup=
-\    nftablesCmdDeleteTableHandleKeyword,
+\    nftablesCmdDeleteTable_HandleKeyword,
 \    nftablesCmdDeleteTable_Name
 
 hi link nftablesCmdDeleteTableKeyword nftablesHL_Option
@@ -915,7 +921,7 @@ syn keyword nftablesCmdDeleteTableKeyword contained table skipwhite
 \ nextgroup=
 \    nftablesCmdDeleteTable_Name,
 \    nftablesCmdDeleteTable_Family,
-\    nftablesCmdDeleteTableHandleKeyword
+\    nftablesCmdDeleteTable_HandleKeyword
 " End of 'delete table ...'
 
 " Begin of 'export table ...'
@@ -1083,30 +1089,41 @@ syn keyword nftablesCmdMonitor_Format contained skipwhite
 \    nft
 \    xml
 \    json
-\ nextgroup=nftables_EOS
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
-hi link nftablesCmdMonitor_Group nftablesHL_Statement
-syn keyword nftablesCmdMonitor_Group contained skipwhite
-\    events
+hi link nftablesCmdMonitor_Object nftablesHL_Type
+syn keyword nftablesCmdMonitor_Object contained skipwhite
 \    tables
 \    chains
-\    ruleset
-\    table
-\    chain
-\ nextgroup=nftablesCmdMonitor_Format
+\    sets
+\    rules
+\    elements
+\    trace
+\ nextgroup=
+\    nftablesCmdMonitor_Format,
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdMonitor_Action nftablesHL_Statement
-syn keyword nftablesCmdMonitor_Action contained skipwhite
-\    new
-\    destroy
+syn match nftablesCmdMonitor_Action contained /\(new\|destroy\)/ skipwhite
 \ nextgroup=
-\    nftablesCmdMonitor_Group,
-\    nftables_EOS
+\    nftablesCmdMonitor_Object,
+\    nftables_UnexpectedEOS,
+\    nftables_UnexpectedSemicolon,
 " End 'monitor'
 
 " Start of 'rename [family] <table_name> <chain_name> <new_chain_name>
+hi link nftablesCmdRenameChain_NewChain nftablesHL_Chain
+syn match nftablesCmdRenameChain_NewChain contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
 hi link nftablesCmdRenameChain_ChainName nftablesHL_Chain
 syn match nftablesCmdRenameChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdRenameChain_NewChain
 
 hi link nftablesCmdRenameChain_TableName nftablesHL_Table
 syn match nftablesCmdRenameChain_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
@@ -1198,8 +1215,8 @@ syn keyword nftablesCmdListKeyword list skipwhite
 hi link nftablesCmdMonitorKeyword nftablesHL_Statement
 syn keyword nftablesCmdMonitorKeyword monitor skipwhite
 \ nextgroup=
-\    nftablesCmdMonitor_Group,
 \    nftablesCmdMonitor_Action,
+\    nftablesCmdMonitor_Object,
 \    nftables_EOS
 
 hi link nftablesCmdRenameKeyword nftablesHL_Statement
