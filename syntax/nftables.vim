@@ -56,6 +56,17 @@ syn keyword nftables_ToDo xxx contained XXX FIXME TODO TODO: FIXME:
 hi link nftablesComment nftablesHL_Comment
 syn region nftablesComment start=/#/ end=/$/ contains=nftables_ToDo
 
+hi link nftables_Policy nftablesHL_Action
+syn keyword nftables_Policy contained skipwhite
+\    accept
+\    reject
+\    drop
+\ nextgroup=nftables_Semicolon
+
+hi link nftables_PolicyKeyword nftablesHL_Option
+syn keyword nftables_PolicyKeyword contained policy skipwhite
+\ nextgroup=nftables_Policy
+
 
 
 syn match nftablesSet contained /{.*}/ contains=nftablesSetEntry
@@ -147,6 +158,7 @@ hi link nftablesType_Route nftablesHL__Type
 syn keyword nftablesType_Route contained route skipwhite
 \ nextgroup=nftablesHookKeyword
 
+" Begin of 'table arp ...'
 hi link nftablesTArpC_TypeKeyword nftablesHL_Statement
 syn match nftablesTArpC_TypeKeyword contained /;\s*type/ skipwhite
 \ nextgroup=
@@ -163,17 +175,6 @@ syn match nftablesTArpC_TypeKeyword contained /{\s*type/ skipwhite
 \    nftablesType_Filter,
 \    nftablesType_Nat,
 \    nftablesType_Route
-
-hi link nftablesPolicy_Value nftablesHL_Action
-syn keyword nftablesPolicy_Value contained skipwhite
-\    accept
-\    reject
-\    drop
-\ nextgroup=nftables_Semicolon
-
-hi link nftablesPolicyKeyword nftablesHL_Option
-syn keyword nftablesPolicyKeyword contained policy skipwhite
-\ nextgroup=nftablesPolicy_Value
 
 hi link nftablesCounterKeyword nftablesHL_Option
 syn keyword nftablesCounterKeyword contained counter skipwhite
@@ -264,14 +265,8 @@ syn match nftablesTArp_Name contained /[A-Za-z0-9\_]\{1,64}/ skipwhite
 hi link nftablesTableFamily_Arp nftablesHL_Family
 syn keyword nftablesTableFamily_Arp contained arp skipwhite
 \ nextgroup=nftablesTArp_Name
-" \    bridge
-" \    netdev
-" \    inet
-" \    ip
-" \    ip6
+" End of 'table arp ...'
 
-
-" Commands: Add, List, Flush
 
 " Begin of 'create table ...'
 hi link nftablesCmdCreateAddTable_FlagValue nftablesHL_Type
@@ -330,30 +325,165 @@ syn keyword nftablesCmdAddTable contained table skipwhite
 
 " Begin of 'add chain ...'
 " Begin of 'add chain arp <table_name> <chain_name> { ... }
+hi link nftablesCmdAddChainArp_Priority nftablesHL_Number
+syn match nftablesCmdAddChainArp_Priority contained /[\-]\?\d\{1,5}/ skipwhite
+\ nextgroup=nftablesOpt_Semicolon
+
+hi link nftablesCmdAddChainArp_PriorityKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainArp_PriorityKeyword contained priority skipwhite
+\ nextgroup=nftablesCmdAddChainArp_Priority
+
+hi link nftablesCmdAddChainArp_Device  nftablesHL_String
+syn match nftablesCmdAddChainArp_Device contained /\S\{1,256}/ skipwhite
+\ nextgroup=nftablesCmdAddChainArp_PriorityKeyword
+
+hi link nftablesCmdAddChainArp_DeviceKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainArp_DeviceKeyword contained device skipwhite
+\ nextgroup=nftablesCmdAddChainArp_Device
+
+hi link nftablesCmdAddChainArp_Hook nftablesHL_Hook
+syn keyword nftablesCmdAddChainArp_Hook contained skipwhite
+\    input
+\    output
+\ nextgroup=
+\    nftablesCmdAddChainArp_DeviceKeyword,
+\    nftablesCmdAddChainArp_PriorityKeyword 
+
+hi link nftablesCmdAddChainArp_HookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainArp_HookKeyword contained hook skipwhite
+\ nextgroup=nftablesCmdAddChainArp_Hook
+
+hi link nftablesCmdAddChainArp_Type nftablesHL_Type
+syn keyword nftablesCmdAddChainArp_Type contained skipwhite
+\    filter
+\ nextgroup=nftablesCmdAddChainArp_HookKeyword nftablesHL_Option
+
+hi link nftablesCmdAddChainArp_TypeKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainArp_TypeKeyword contained type skipwhite
+\ nextgroup=nftablesCmdAddChainArp_Type
+
+syn region nftablesCmdAddChainArp_Section contained start=/{/ end=/}/
+\ contains=
+\    nftablesCmdAddChainArp_TypeKeyword,
+\    nftables_PolicyKeyword,
+\    nftablesOpt_Semicolon
+
+hi link nftablesCmdAddChainArp_ChainName nftablesHL_Chain
+syn match nftablesCmdAddChainArp_ChainName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainArp_Section
+
+hi link nftablesCmdAddChainArp_TableName nftablesHL_Table
+syn match nftablesCmdAddChainArp_TableName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainArp_ChainName
 " End of 'add chain arp <table_name> <chain_name> { ... }
 
 " Begin of 'add chain bridge <table_name> <chain_name> { ... }
+" Begin of 'add chain ip6 <table_name> <chain_name> { ... }
+hi link nftablesCmdAddChainBridge_Priority nftablesHL_Number
+syn match nftablesCmdAddChainBridge_Priority contained /[\-]\?\d\{1,5}/ skipwhite
+\ nextgroup=nftablesOpt_Semicolon
+
+hi link nftablesCmdAddChainBridge_PriorityKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainBridge_PriorityKeyword contained priority skipwhite
+\ nextgroup=nftablesCmdAddChainBridge_Priority
+
+hi link nftablesCmdAddChainBridge_Device  nftablesHL_String
+syn match nftablesCmdAddChainBridge_Device contained /\S\{1,256}/ skipwhite
+\ nextgroup=nftablesCmdAddChainBridge_PriorityKeyword
+
+hi link nftablesCmdAddChainBridge_DeviceKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainBridge_DeviceKeyword contained device skipwhite
+\ nextgroup=nftablesCmdAddChainBridge_Device
+
+hi link nftablesCmdAddChainBridge_Hook nftablesHL_Hook
+syn keyword nftablesCmdAddChainBridge_Hook contained skipwhite
+\    input
+\    output
+\    prerouting
+\    postrouting
+\ nextgroup=
+\    nftablesCmdAddChainBridge_DeviceKeyword,
+\    nftablesCmdAddChainBridge_PriorityKeyword 
+
+hi link nftablesCmdAddChainBridge_HookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainBridge_HookKeyword contained hook skipwhite
+\ nextgroup=nftablesCmdAddChainBridge_Hook
+
+hi link nftablesCmdAddChainBridge_Type nftablesHL_Type
+syn keyword nftablesCmdAddChainBridge_Type contained skipwhite
+\    filter
+\ nextgroup=nftablesCmdAddChainBridge_HookKeyword nftablesHL_Option
+
+hi link nftablesCmdAddChainBridge_TypeKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainBridge_TypeKeyword contained type skipwhite
+\ nextgroup=nftablesCmdAddChainBridge_Type
+
+syn region nftablesCmdAddChainBridge_Section contained start=/{/ end=/}/
+\ contains=
+\    nftablesCmdAddChainBridge_TypeKeyword,
+\    nftables_PolicyKeyword,
+\    nftablesOpt_Semicolon
+
+hi link nftablesCmdAddChainBridge_ChainName nftablesHL_Chain
+syn match nftablesCmdAddChainBridge_ChainName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainBridge_Section
+
+hi link nftablesCmdAddChainBridge_TableName nftablesHL_Table
+syn match nftablesCmdAddChainBridge_TableName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainBridge_ChainName
 " End of 'add chain bridge <table_name> <chain_name> { ... }
 
 " Begin of 'add chain netdev <table_name> <chain_name> { ... }
+hi link nftablesCmdAddChainNetdev_Priority nftablesHL_Number
+syn match nftablesCmdAddChainNetdev_Priority contained /[\-]\?\d\{1,5}/ skipwhite
+\ nextgroup=nftablesOpt_Semicolon
+
+hi link nftablesCmdAddChainNetdev_PriorityKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainNetdev_PriorityKeyword contained priority skipwhite
+\ nextgroup=nftablesCmdAddChainNetdev_Priority
+
+hi link nftablesCmdAddChainNetdev_Device  nftablesHL_String
+syn match nftablesCmdAddChainNetdev_Device contained /\S\{1,256}/ skipwhite
+\ nextgroup=nftablesCmdAddChainNetdev_PriorityKeyword
+
+hi link nftablesCmdAddChainNetdev_DeviceKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainNetdev_DeviceKeyword contained device skipwhite
+\ nextgroup=nftablesCmdAddChainNetdev_Device
+
+hi link nftablesCmdAddChainNetdev_Hook nftablesHL_Hook
+syn keyword nftablesCmdAddChainNetdev_Hook contained skipwhite
+\    ingress
+\ nextgroup=nftablesCmdAddChainNetdev_DeviceKeyword
+
+hi link nftablesCmdAddChainNetdev_HookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainNetdev_HookKeyword contained hook skipwhite
+\ nextgroup=nftablesCmdAddChainNetdev_Hook
+
+hi link nftablesCmdAddChainNetdev_Type nftablesHL_Type
+syn keyword nftablesCmdAddChainNetdev_Type contained skipwhite
+\    filter
+\ nextgroup=nftablesCmdAddChainNetdev_HookKeyword nftablesHL_Option
+
+hi link nftablesCmdAddChainNetdev_TypeKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainNetdev_TypeKeyword contained type skipwhite
+\ nextgroup=nftablesCmdAddChainNetdev_Type
+
+syn region nftablesCmdAddChainNetdev_Section contained start=/{/ end=/}/
+\ contains=
+\    nftablesCmdAddChainNetdev_TypeKeyword,
+\    nftables_PolicyKeyword,
+\    nftablesOpt_Semicolon
+
+hi link nftablesCmdAddChainNetdev_ChainName nftablesHL_Chain
+syn match nftablesCmdAddChainNetdev_ChainName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainNetdev_Section
+
+hi link nftablesCmdAddChainNetdev_TableName nftablesHL_Table
+syn match nftablesCmdAddChainNetdev_TableName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainNetdev_ChainName
 " End of 'add chain netdev <table_name> <chain_name> { ... }
 
-" Begin of 'add chain inet <table_name> <chain_name> { ... }
-" End of 'add chain inet <table_name> <chain_name> { ... }
-
 " Begin of 'add chain ip <table_name> <chain_name> { ... }
-hi link nftablesCmdAddChainIp_Policy nftablesHL_Action
-syn keyword CmdAddChainIp_Policy contained skipwhite
-\    accept
-\    reject
-\    drop
-\ nextgroup=nftables_Semicolon
-
-hi link nftablesCmdAddChainIp_PolicyKeyword nftablesHL_Option
-syn keyword nftablesCmdAddChainIp_PolicyKeyword contained policy skipwhite
-\ nextgroup=nftablesPolicyGen_Value
-
-
 hi link nftablesCmdAddChainIp_Priority nftablesHL_Number
 syn match nftablesCmdAddChainIp_Priority contained /[\-]\?\d\{1,5}/
 
@@ -371,7 +501,6 @@ syn keyword nftablesCmdAddChainIp_DeviceKeyword contained device skipwhite
 
 hi link nftablesCmdAddChainIp_Hook nftablesHL_Hook
 syn keyword nftablesCmdAddChainIp_Hook contained skipwhite
-\    all
 \    prerouting
 \    input
 \    output
@@ -399,7 +528,7 @@ syn region nftablesCmdAddChainIp_Section contained start=/{/ end=/}/ skipwhite
 \ nextgroup=nftablesOpt_Semicolon
 \ contains=
 \    nftablesCmdAddChainIp_TypeKeyword,
-\    nftablesCmdAddChainIp_PolicyKeyword
+\    nftables_PolicyKeyword
 
 hi link nftablesCmdAddChainIp_ChainName nftablesHL_Chain
 syn match nftablesCmdAddChainIp_ChainName contained /\S\{1,64}/ skipwhite
@@ -411,90 +540,157 @@ syn match nftablesCmdAddChainIp_TableName contained /\S\{1,64}/ skipwhite
 " End of 'add chain ip <table_name> <chain_name> { ... }
 
 " Begin of 'add chain ip6 <table_name> <chain_name> { ... }
-" End of 'add chain ip6 <table_name> <chain_name> { ... }
-
-" Begin of 'add chain <table_name>...' (generic, no family)
-hi link nftablesCmdAddChainGen_Priority nftablesHL_Number
-syn match nftablesCmdAddChainGen_Priority contained /[\-]\?\d\{1,5}/ skipwhite
+hi link nftablesCmdAddChainIp6_Priority nftablesHL_Number
+syn match nftablesCmdAddChainIp6_Priority contained /[\-]\?\d\{1,5}/ skipwhite
 \ nextgroup=nftablesOpt_Semicolon
 
-hi link nftablesCmdAddChainGen_PriorityKeyword nftablesHL_Option
-syn keyword nftablesCmdAddChainGen_PriorityKeyword contained priority skipwhite
-\ nextgroup=nftablesCmdAddChainGen_Priority
+hi link nftablesCmdAddChainIp6_PriorityKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainIp6_PriorityKeyword contained priority skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_Priority
 
-hi link nftablesCmdAddChainGen_Device  nftablesHL_String
-syn match nftablesCmdAddChainGen_Device contained /\S\{1,256}/ skipwhite
-\ nextgroup=nftablesCmdAddChainGen_PriorityKeyword
+hi link nftablesCmdAddChainIp6_Device  nftablesHL_String
+syn match nftablesCmdAddChainIp6_Device contained /\S\{1,256}/ skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_PriorityKeyword
 
-hi link nftablesCmdAddChainGen_DeviceKeyword nftablesHL_Option
-syn keyword nftablesCmdAddChainGen_DeviceKeyword contained device skipwhite
-\ nextgroup=nftablesCmdAddChainGen_Device
+hi link nftablesCmdAddChainIp6_DeviceKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainIp6_DeviceKeyword contained device skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_Device
 
-hi link nftablesCmdAddChainGen_Hook nftablesHL_Hook
-syn keyword nftablesCmdAddChainGen_Hook contained skipwhite
+hi link nftablesCmdAddChainIp6_FilterHook nftablesHL_Hook
+syn keyword nftablesCmdAddChainIp6_FilterHook contained skipwhite
+\    all
 \    input
 \    output
 \    prerouting
 \    postrouting
 \ nextgroup=
-\    nftablesCmdAddChainGen_DeviceKeyword,
-\    nftablesCmdAddChainGen_PriorityKeyword 
+\    nftablesCmdAddChainIp6_DeviceKeyword,
+\    nftablesCmdAddChainIp6_PriorityKeyword 
 
-hi link nftablesCmdAddChainGen_HookKeyword nftablesHL_Option
-syn keyword nftablesCmdAddChainGen_HookKeyword contained hook skipwhite
-\ nextgroup=nftablesCmdAddChainGen_Hook
+hi link nftablesCmdAddChainIp6_NatHook nftablesHL_Hook
+syn keyword nftablesCmdAddChainIp6_NatHook contained skipwhite
+\    input
+\    output
+\    prerouting
+\    postrouting
+\ nextgroup=
+\    nftablesCmdAddChainIp6_DeviceKeyword,
+\    nftablesCmdAddChainIp6_PriorityKeyword 
 
-hi link nftablesCmdAddChainGen_Type nftablesHL_Type
-syn keyword nftablesCmdAddChainGen_Type contained skipwhite
+hi link nftablesCmdAddChainIp6_RouteHook nftablesHL_Hook
+syn keyword nftablesCmdAddChainIp6_RouteHook contained skipwhite
+\    output
+\ nextgroup=
+\    nftablesCmdAddChainIp6_DeviceKeyword,
+\    nftablesCmdAddChainIp6_PriorityKeyword 
+
+hi link nftablesCmdAddChainIp6_FilterHookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainIp6_FilterHookKeyword contained hook skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_FilterHook
+hi link nftablesCmdAddChainIp6_NatHookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainIp6_NatHookKeyword contained hook skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_NatHook
+hi link nftablesCmdAddChainIp6_RouteHookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainIp6_RouteHookKeyword contained hook skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_RouteHook
+
+hi link nftablesCmdAddChainIp6_Type nftablesHL_Type
+syn keyword nftablesCmdAddChainIp6_Type contained filter skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_FilterHookKeyword 
+syn keyword nftablesCmdAddChainIp6_Type contained nat skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_NatHookKeyword 
+syn keyword nftablesCmdAddChainIp6_Type contained route skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_RouteHookKeyword 
+
+hi link nftablesCmdAddChainIp6_TypeKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainIp6_TypeKeyword contained type skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_Type
+
+syn region nftablesCmdAddChainIp6_Section contained start=/{/ end=/}/
+\ contains=
+\    nftablesCmdAddChainIp6_TypeKeyword,
+\    nftables_PolicyKeyword,
+\    nftablesOpt_Semicolon
+
+hi link nftablesCmdAddChainIp6_ChainName nftablesHL_Chain
+syn match nftablesCmdAddChainIp6_ChainName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_Section
+
+hi link nftablesCmdAddChainIp6_TableName nftablesHL_Table
+syn match nftablesCmdAddChainIp6_TableName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_ChainName
+" End of 'add chain ip6 <table_name> <chain_name> { ... }
+"
+" Begin of 'add chain inet <table_name> <chain_name> { ... }
+hi link nftablesCmdAddChainInet_Priority nftablesHL_Number
+syn match nftablesCmdAddChainInet_Priority contained /[\-]\?\d\{1,5}/ skipwhite
+\ nextgroup=nftablesOpt_Semicolon
+
+hi link nftablesCmdAddChainInet_PriorityKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainInet_PriorityKeyword contained priority skipwhite
+\ nextgroup=nftablesCmdAddChainInet_Priority
+
+hi link nftablesCmdAddChainInet_Device  nftablesHL_String
+syn match nftablesCmdAddChainInet_Device contained /\S\{1,256}/ skipwhite
+\ nextgroup=nftablesCmdAddChainInet_PriorityKeyword
+
+hi link nftablesCmdAddChainInet_DeviceKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainInet_DeviceKeyword contained device skipwhite
+\ nextgroup=nftablesCmdAddChainInet_Device
+
+hi link nftablesCmdAddChainInet_Hook nftablesHL_Hook
+syn keyword nftablesCmdAddChainInet_Hook contained skipwhite
+\    input
+\    output
+\    prerouting
+\    postrouting
+\ nextgroup=
+\    nftablesCmdAddChainInet_DeviceKeyword,
+\    nftablesCmdAddChainInet_PriorityKeyword 
+
+hi link nftablesCmdAddChainInet_HookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainInet_HookKeyword contained hook skipwhite
+\ nextgroup=nftablesCmdAddChainInet_Hook
+
+hi link nftablesCmdAddChainInet_Type nftablesHL_Type
+syn keyword nftablesCmdAddChainInet_Type contained skipwhite
 \    filter
 \    nat
 \    route
-\    inet
-\ nextgroup=nftablesCmdAddChainGen_HookKeyword nftablesHL_Option
+\ nextgroup=nftablesCmdAddChainInet_HookKeyword nftablesHL_Option
 
-hi link nftablesCmdAddChainGen_TypeKeyword nftablesHL_Option
-syn keyword nftablesCmdAddChainGen_TypeKeyword contained type skipwhite
-\ nextgroup=nftablesCmdAddChainGen_Type
+hi link nftablesCmdAddChainInet_TypeKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainInet_TypeKeyword contained type skipwhite
+\ nextgroup=nftablesCmdAddChainInet_Type
 
-hi link nftablesPolicyGen_Value nftablesHL_Action
-syn keyword nftablesPolicyGen_Value contained skipwhite
-\    accept
-\    reject
-\    drop
-\ nextgroup=nftables_Semicolon
-
-hi link nftablesCmdAddChainGen_PolicyKeyword nftablesHL_Option
-syn keyword nftablesCmdAddChainGen_PolicyKeyword contained policy skipwhite
-\ nextgroup=nftablesPolicyGen_Value
-
-syn region nftablesCmdAddChainGen_Section contained start=/{/ end=/}/
+syn region nftablesCmdAddChainInet_Section contained start=/{/ end=/}/
 \ contains=
-\    nftablesCmdAddChainGen_TypeKeyword,
-\    nftablesCmdAddChainGen_PolicyKeyword,
+\    nftablesCmdAddChainInet_TypeKeyword,
+\    nftables_PolicyKeyword,
 \    nftablesOpt_Semicolon
 
-hi link nftablesCmdAddChainGenTable_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainGenTable_ChainName contained /\S\{1,64}/ skipwhite
-\ nextgroup=nftablesCmdAddChainGen_Section
+hi link nftablesCmdAddChainInet_ChainName nftablesHL_Chain
+syn match nftablesCmdAddChainInet_ChainName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainInet_Section
 
-hi link nftablesCmdAddChainGenTableName nftablesHL_Table
-syn match nftablesCmdAddChainGenTableName contained /\S\{1,64}/ skipwhite
-\ nextgroup=nftablesCmdAddChainGenTable_ChainName
-" End of 'add chain <table_name>...' (generic, no family)
+hi link nftablesCmdAddChainInet_TableName nftablesHL_Table
+syn match nftablesCmdAddChainInet_TableName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdAddChainInet_ChainName
+" End of 'add chain inet <table_name>...' 
 
 " Begin of 'add chain <family> <table_name>...' 
 hi link nftablesCmdAddChainFamily nftablesHL_Family
 syn keyword nftablesCmdAddChainFamily contained skipwhite
 \    netdev
-\ nextgroup=nftablesCmdAddChainNetdevTableName
+\ nextgroup=nftablesCmdAddChainNetdev_TableName
 
 syn keyword nftablesCmdAddChainFamily contained skipwhite
 \    arp
-\ nextgroup=nftablesCmdAddChainArpTableName
+\ nextgroup=nftablesCmdAddChainArp_TableName
 
 syn keyword nftablesCmdAddChainFamily contained skipwhite
 \    bridge
-\ nextgroup=nftablesCmdAddChainBridgeTableName
+\ nextgroup=nftablesCmdAddChainBridge_TableName
 
 syn keyword nftablesCmdAddChainFamily contained skipwhite
 \    ip
@@ -502,18 +698,20 @@ syn keyword nftablesCmdAddChainFamily contained skipwhite
 
 syn keyword nftablesCmdAddChainFamily contained skipwhite
 \    ip6
-\ nextgroup=nftablesCmdAddChainIp6TableName
+\ nextgroup=nftablesCmdAddChainIp6_TableName
 
 syn keyword nftablesCmdAddChainFamily contained skipwhite
 \    inet
-\ nextgroup=nftablesCmdAddChainInetTableName
+\ nextgroup=nftablesCmdAddChainInet_TableName
 " End of 'add chain <family> <table_name>...' 
 
 hi link nftablesCmdAddChainKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainKeyword contained chain skipwhite
 \ nextgroup=
 \    nftablesCmdAddChainFamily,
-\    nftablesCmdAddChainGenTableName
+\    nftablesCmdAddChainIp_TableName
+" Defaults to 'ip' family, if no family is given
+"
 " End of 'add chain ...'
 
 hi link nftablesCmdAddSetElementName nftablesHL_String
