@@ -40,9 +40,15 @@ hi link nftablesHL_Statement   Keyword
 hi link nftablesHL_Option      Label     " could use a 2nd color here
 hi link nftablesHL_Type        Type
 hi link nftablesHL_Operator    Normal    " was Operator  
-hi link nftablesHL_Builtin     Special   " doesn't work, stuck on dark cyan
 hi link nftablesHL_Underlined  Underlined
 hi link nftablesHL_Error       Error
+
+hi link nftablesHL_Family      Underlined   " doesn't work, stuck on dark cyan
+hi link nftablesHL_Type        Type
+hi link nftablesHL_Hook        Type    
+hi link nftablesHL_Action      Special
+hi link nftablesHL_Table       Identifier
+hi link nftablesHL_Chain       Identifier
 
 hi link nftables_ToDo nftablesHL_ToDo
 syn keyword nftables_ToDo xxx contained XXX FIXME TODO TODO: FIXME:
@@ -91,7 +97,7 @@ syn match nftablesInclude /\s*include/
 \ nextgroup=nftables_E_Filespec_SC
 \ skipwhite skipnl skipempty
 
-hi link nftablesAction nftablesHL_Builtin
+hi link nftablesAction nftablesHL_Action
 syn keyword nftablesAction contained skipwhite
 \    accept
 \    reject
@@ -109,7 +115,7 @@ hi link nftablesPriorityKeyword nftablesHL_Statement
 syn keyword nftablesPriorityKeyword contained priority skipwhite
 \ nextgroup=nftablesPriority_Value
 
-hi link nftablesHook_IpType nftablesHL_Type
+hi link nftablesHook_IpType nftablesHL_Hook
 syn keyword nftablesHook_IpType contained skipwhite
 \    prerouting
 \    input
@@ -129,15 +135,15 @@ syn keyword nftablesHookKeyword contained hook skipwhite
 \    nftablesHook_Ip6Type,
 
 " syn keyword Constant prerouting input forward output postrouting
-hi link nftablesType_Filter nftablesHL_Builtin
+hi link nftablesType_Filter nftablesHL_Type
 syn keyword nftablesType_Filter contained filter skipwhite
 \ nextgroup=nftablesHookKeyword
 
-hi link nftablesType_Nat nftablesHL_Builtin
+hi link nftablesType_Nat nftablesHL__Type
 syn keyword nftablesType_Nat contained nat skipwhite
 \ nextgroup=nftablesHookKeyword
 
-hi link nftablesType_Route nftablesHL_Builtin
+hi link nftablesType_Route nftablesHL__Type
 syn keyword nftablesType_Route contained route skipwhite
 \ nextgroup=nftablesHookKeyword
 
@@ -158,7 +164,7 @@ syn match nftablesTArpC_TypeKeyword contained /{\s*type/ skipwhite
 \    nftablesType_Nat,
 \    nftablesType_Route
 
-hi link nftablesPolicy_Value nftablesHL_Builtin
+hi link nftablesPolicy_Value nftablesHL_Action
 syn keyword nftablesPolicy_Value contained skipwhite
 \    accept
 \    reject
@@ -237,7 +243,7 @@ syn region nftablesTArpChain_Section contained start=/{/ end=/}/ skipwhite
 \    nftablesInclude
 
 
-hi link nftablesTArpChain_Name nftablesHL_Identifier
+hi link nftablesTArpChain_Name nftablesHL_Chain
 syn match nftablesTArpChain_Name contained /[A-Za-z0-9\_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesTArpChain_Section
@@ -255,7 +261,7 @@ syn match nftablesTArp_Name contained /[A-Za-z0-9\_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesTArp_Section
 
-hi link nftablesTableFamily_Arp nftablesHL_Builtin
+hi link nftablesTableFamily_Arp nftablesHL_Family
 syn keyword nftablesTableFamily_Arp contained arp skipwhite
 \ nextgroup=nftablesTArp_Name
 " \    bridge
@@ -278,11 +284,11 @@ syn keyword nftablesCmdCreateAddTable_Flags contained flags skipwhite
 syn region nftablesCmdCreateTable_Section contained start=/{/ end=/}/ skipwhite
 \ contains=nftablesCmdCreateAddTable_Flags
 
-hi link nftablesCmdCreateTable_Name nftablesHL_Identifier
+hi link nftablesCmdCreateTable_Name nftablesHL_Table
 syn match nftablesCmdCreateTable_Name contained /\S\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdCreateTable_Section
 
-hi link nftablesCmdCreateTableFamily nftablesHL_Builtin
+hi link nftablesCmdCreateTableFamily nftablesHL_Family
 syn keyword nftablesCmdCreateTableFamily contained skipwhite
 \    netdev
 \    arp
@@ -300,12 +306,12 @@ syn keyword nftablesCmdCreateTableKeyword contained table skipwhite
 " End of 'create table ...'
 
 " Begin of 'add table'
-hi link nftablesCmdAddTableName nftablesHL_Identifier
+hi link nftablesCmdAddTableName nftablesHL_Table
 syn match nftablesCmdAddTableName contained /\S\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdCreateTable_Section
 
 
-hi link nftablesCmdAddTableFamily nftablesHL_Builtin
+hi link nftablesCmdAddTableFamily nftablesHL_Family
 syn keyword nftablesCmdAddTableFamily contained skipwhite
 \    netdev
 \    arp
@@ -336,7 +342,7 @@ syn keyword nftablesCmdAddTable contained table skipwhite
 " End of 'add chain inet <table_name> <chain_name> { ... }
 
 " Begin of 'add chain ip <table_name> <chain_name> { ... }
-hi link nftablesCmdAddChainIp_Policy nftablesHL_Builtin
+hi link nftablesCmdAddChainIp_Policy nftablesHL_Action
 syn keyword CmdAddChainIp_Policy contained skipwhite
 \    accept
 \    reject
@@ -363,7 +369,7 @@ hi link nftablesCmdAddChainIp_DeviceKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainIp_DeviceKeyword contained device skipwhite
 \ nextgroup=nftablesCmdAddChainIp_Device
 
-hi link nftablesCmdAddChainIp_Hook nftablesHL_Type
+hi link nftablesCmdAddChainIp_Hook nftablesHL_Hook
 syn keyword nftablesCmdAddChainIp_Hook contained skipwhite
 \    all
 \    prerouting
@@ -395,11 +401,11 @@ syn region nftablesCmdAddChainIp_Section contained start=/{/ end=/}/ skipwhite
 \    nftablesCmdAddChainIp_TypeKeyword,
 \    nftablesCmdAddChainIp_PolicyKeyword
 
-hi link nftablesCmdAddChainIp_ChainName nftablesHL_Identifier
+hi link nftablesCmdAddChainIp_ChainName nftablesHL_Chain
 syn match nftablesCmdAddChainIp_ChainName contained /\S\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainIp_Section
 
-hi link nftablesCmdAddChainIp_TableName nftablesHL_Identifier
+hi link nftablesCmdAddChainIp_TableName nftablesHL_Table
 syn match nftablesCmdAddChainIp_TableName contained /\S\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainIp_ChainName
 " End of 'add chain ip <table_name> <chain_name> { ... }
@@ -416,13 +422,23 @@ hi link nftablesCmdAddChainGen_PriorityKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainGen_PriorityKeyword contained priority skipwhite
 \ nextgroup=nftablesCmdAddChainGen_Priority
 
-hi link nftablesCmdAddChainGen_Hook nftablesHL_Type
+hi link nftablesCmdAddChainGen_Device  nftablesHL_String
+syn match nftablesCmdAddChainGen_Device contained /\S\{1,256}/ skipwhite
+\ nextgroup=nftablesCmdAddChainGen_PriorityKeyword
+
+hi link nftablesCmdAddChainGen_DeviceKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainGen_DeviceKeyword contained device skipwhite
+\ nextgroup=nftablesCmdAddChainGen_Device
+
+hi link nftablesCmdAddChainGen_Hook nftablesHL_Hook
 syn keyword nftablesCmdAddChainGen_Hook contained skipwhite
 \    input
 \    output
 \    prerouting
 \    postrouting
-\ nextgroup=nftablesCmdAddChainGen_PriorityKeyword nftablesHL_Identifier
+\ nextgroup=
+\    nftablesCmdAddChainGen_DeviceKeyword,
+\    nftablesCmdAddChainGen_PriorityKeyword 
 
 hi link nftablesCmdAddChainGen_HookKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainGen_HookKeyword contained hook skipwhite
@@ -440,7 +456,7 @@ hi link nftablesCmdAddChainGen_TypeKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainGen_TypeKeyword contained type skipwhite
 \ nextgroup=nftablesCmdAddChainGen_Type
 
-hi link nftablesPolicyGen_Value nftablesHL_Builtin
+hi link nftablesPolicyGen_Value nftablesHL_Action
 syn keyword nftablesPolicyGen_Value contained skipwhite
 \    accept
 \    reject
@@ -457,17 +473,17 @@ syn region nftablesCmdAddChainGen_Section contained start=/{/ end=/}/
 \    nftablesCmdAddChainGen_PolicyKeyword,
 \    nftablesOpt_Semicolon
 
-hi link nftablesCmdAddChainGenTable_ChainName nftablesHL_Identifier
+hi link nftablesCmdAddChainGenTable_ChainName nftablesHL_Chain
 syn match nftablesCmdAddChainGenTable_ChainName contained /\S\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainGen_Section
 
-hi link nftablesCmdAddChainGenTableName nftablesHL_Identifier
+hi link nftablesCmdAddChainGenTableName nftablesHL_Table
 syn match nftablesCmdAddChainGenTableName contained /\S\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainGenTable_ChainName
 " End of 'add chain <table_name>...' (generic, no family)
 
 " Begin of 'add chain <family> <table_name>...' 
-hi link nftablesCmdAddChainFamily nftablesHL_Builtin
+hi link nftablesCmdAddChainFamily nftablesHL_Family
 syn keyword nftablesCmdAddChainFamily contained skipwhite
 \    netdev
 \ nextgroup=nftablesCmdAddChainNetdevTableName
@@ -503,7 +519,7 @@ syn keyword nftablesCmdAddChainKeyword contained chain skipwhite
 hi link nftablesCmdAddSetElementName nftablesHL_String
 syn match nftablesCmdAddSetElementName contained /\S\{1,64}/ skipwhite
 
-hi link nftablesCmdAddSetElementTableName nftablesHL_Identifier
+hi link nftablesCmdAddSetElementTableName nftablesHL_Table
 syn match nftablesCmdAddSetElementTableName contained /\S\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddSetElementName
 
@@ -513,7 +529,7 @@ syn keyword nftablesCmdAddSetElement contained skipwhite
 \    element
 \ nextgroup=nftablesCmdAddSetElementTableName  nftablesHL_Identifier
 
-hi link nftablesCmdAddMapTableName nftablesHL_Identifier
+hi link nftablesCmdAddMapTableName nftablesHL_Table
 syn match nftablesCmdAddMapTableName contained /\S\{1,64}/ skipwhite
 
 
@@ -531,10 +547,10 @@ syn keyword nftablesCmdDeleteTableHandleKeyword contained skipwhite
 \    handle
 \ nextgroup=nftablesCmdDeleteTable_Handle
 
-hi link nftablesCmdDeleteTable_Name nftablesHL_Identifier
+hi link nftablesCmdDeleteTable_Name nftablesHL_Table
 syn match nftablesCmdDeleteTable_Name contained /\S\{1,64}/ skipwhite
 
-hi link nftablesCmdDeleteTable_Family nftablesHL_Builtin
+hi link nftablesCmdDeleteTable_Family nftablesHL_Family
 syn keyword nftablesCmdDeleteTable_Family contained skipwhite
 \    arp
 \    bridge
@@ -555,7 +571,7 @@ syn keyword nftablesCmdDeleteTableKeyword contained table skipwhite
 " End of 'delete table ...'
 
 " Begin of 'export table ...'
-hi link nftablesCmdExport_Format nftablesHL_Builtin
+hi link nftablesCmdExport_Format nftablesHL_Type
 syn keyword nftablesCmdExport_Format contained skipwhite
 \    xml
 \    json
@@ -566,7 +582,7 @@ syn keyword nftablesCmdExportRulesetKeyword contained ruleset skipwhite
 " End of 'export table'
 
 " Begin of 'flush ruleset ...'
-hi link nftablesCmdFlushRulesetFamilies nftablesHL_Builtin
+hi link nftablesCmdFlushRulesetFamilies nftablesHL_Family
 syn keyword nftablesCmdFlushRulesetFamilies contained skipwhite
 \    arp
 \    netdev
@@ -581,10 +597,10 @@ syn keyword nftablesCmdFlushRulesetKeyword contained ruleset skipwhite
 " End of 'flush ruleset ...'
 
 " Begin of 'flush table ...'
-hi link nftablesCmdFlushTableName nftablesHL_Identifier
+hi link nftablesCmdFlushTableName nftablesHL_Table
 syn match nftablesCmdFlushTableName contained /\S\{1,64}/ skipwhite
 
-hi link nftablesCmdFlushTableFamily nftablesHL_Builtin
+hi link nftablesCmdFlushTableFamily nftablesHL_Family
 syn keyword nftablesCmdFlushTableFamily contained skipwhite
 \    arp
 \    netdev
@@ -592,7 +608,7 @@ syn keyword nftablesCmdFlushTableFamily contained skipwhite
 \    ip
 \    ip6
 \    inet
-\ nextgroup=nftablesCmdFlushTableName nftablesHL_Identifier
+\ nextgroup=nftablesCmdFlushTableName 
 
 hi link nftablesCmdFlushTableKeyword nftablesHL_Option
 syn keyword nftablesCmdFlushTableKeyword contained table skipwhite
@@ -603,7 +619,7 @@ syn keyword nftablesCmdFlushTableKeyword contained table skipwhite
 
 " Begin of 'flush chain ...'
 
-hi link nftablesCmdFlushChain_ChainName nftablesHL_Identifier
+hi link nftablesCmdFlushChain_ChainName nftablesHL_Chain
 syn match nftablesCmdFlushChain_ChainName contained /\S\{1,64}/ skipwhite
 
 hi link nftablesCmdFlushChain_Handle nftablesHL_Identifier
@@ -613,13 +629,13 @@ hi link nftablesCmdFlushChain_HandleKeyword nftablesHL_Option
 syn keyword nftablesCmdFlushChain_HandleKeyword contained handle skipwhite
 \ nextgroup=nftablesCmdFlushChain_Handle
 
-hi link nftablesCmdFlushChainTableName nftablesHL_Identifier
+hi link nftablesCmdFlushChainTableName nftablesHL_Table
 syn match nftablesCmdFlushChainTableName contained /\S\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdFlushChain_HandleKeyword,
 \    nftablesCmdFlushChain_ChainName
 
-hi link nftablesCmdFlushChainFamily nftablesHL_Builtin
+hi link nftablesCmdFlushChainFamily nftablesHL_Family
 syn keyword nftablesCmdFlushChainFamily contained skipwhite
 \    arp
 \    bridge
@@ -642,7 +658,7 @@ syn keyword nftablesCmdListNoArg contained skipwhite
 \    chains
 \    sets
 
-hi link nftablesCmdListRulesetFamily nftablesHL_Builtin
+hi link nftablesCmdListRulesetFamily nftablesHL_Family
 syn keyword nftablesCmdListRulesetFamily contained skipwhite
 \    arp
 \    bridge
@@ -656,17 +672,10 @@ hi link nftablesCmdListRuleset nftablesHL_Option
 syn keyword nftablesCmdListRuleset contained ruleset skipwhite
 \ nextgroup=nftablesCmdListRulesetFamily
 
-" \    arp
-" \    bridge
-" \    netdev
-" \    ip
-" \    ip6
-" \    inet
-"
-hi link nftablesCmdListTable_Name nftablesHL_Identifier
+hi link nftablesCmdListTable_Name nftablesHL_Table
 syn match nftablesCmdListTable_Name contained /\S\{1,64}/ skipwhite
 
-hi link nftablesCmdListTable_Family nftablesHL_Builtin
+hi link nftablesCmdListTable_Family nftablesHL_Family
 syn keyword nftablesCmdListTable_Family contained skipwhite
 \    arp
 \    netdev
@@ -685,13 +694,38 @@ syn keyword nftablesCmdListTableKeyword contained table skipwhite
 hi link nftablesCmdListSetName nftablesHL_String
 syn match nftablesCmdListSetName contained /\S\{1,64}/ skipwhite
 
-hi link nftablesCmdListSetTableName nftablesHL_Identifier
+hi link nftablesCmdListSetTableName nftablesHL_Table
 syn match nftablesCmdListSetTableName contained /\S\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdListSetName 
 
-hi link nftablesCmdListSetKeyword nftablesHL_Builtin
+hi link nftablesCmdListSetKeyword nftablesHL_Statement
 syn keyword nftablesCmdListSetKeyword contained set skipwhite
 \ nextgroup=nftablesCmdListSetTableName
+
+" Start of 'rename [family] <table_name> <chain_name> <new_chain_name>
+hi link nftablesCmdRenameChain_ChainName nftablesHL_Chain
+syn match nftablesCmdRenameChain_ChainName contained /\S\{1,64}/ skipwhite
+
+hi link nftablesCmdRenameChain_TableName nftablesHL_Table
+syn match nftablesCmdRenameChain_TableName contained /\S\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdRenameChain_ChainName
+
+hi link nftablesCmdRenameChain_Family nftablesHL_Family
+syn keyword nftablesCmdRenameChain_Family contained skipwhite
+\    arp
+\    bridge
+\    netdev
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdRenameChain_TableName
+
+hi link nftablesCmdRenameChainKeyword nftablesHL_Statement
+syn keyword nftablesCmdRenameChainKeyword contained chain skipwhite
+\ nextgroup=
+\    nftablesCmdRenameChain_Family,
+\    nftablesCmdRenameChain_TableName
+" End of 'rename [family] <table_name> <chain_name> <new_chain_name>
 
 """"""""""""""""""""""""""""""""""""""
 " Uncontained (free-floating) patterns
@@ -739,6 +773,11 @@ syn keyword nftablesCmdListKeyword list skipwhite
 " \    nftablesCmdListRuleset,
 " \    nftablesCmdListNoArg,
 
+hi link nftablesCmdRenameKeyword nftablesHL_Statement
+syn keyword nftablesCmdRenameKeyword rename skipwhite
+\ nextgroup=
+\    nftablesCmdRenameChainKeyword
+
 " Start of 'define <var_name> = <var_value>'
 hi link nftablesDefine_Value nftablesHL_String
 syn match nftablesDefine_Value contained /\S\{1,256}/ skipwhite
@@ -753,7 +792,7 @@ syn match nftablesDefine_Identifier contained /\i\{1,64}/ skipwhite
 " End of 'define <var_name> = <var_value>'
 
 " Begin of Command-less actions
-"
+
 " Start of '$<variable_name>'
 hi link nftablesVariableName Type
 syn match nftablesVariableName /\$\S\{1,64}/ skipwhite
@@ -763,7 +802,6 @@ syn match nftablesVariableName /\$\S\{1,64}/ skipwhite
 hi link nftablesDefineKeyword nftablesHL_Statement
 syn match nftablesDefineKeyword /^\s*define/ skipwhite skipempty
 \ nextgroup=nftablesDefine_Identifier
-
 " End of Command-less actions: define
 
 " Begin of Command-less actions: table

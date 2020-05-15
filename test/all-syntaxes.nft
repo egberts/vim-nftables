@@ -1,0 +1,355 @@
+#!/usr/sbin/nft -f
+# File: all-syntaxes.nft
+# Description: A test NFT file to exercise all Vim syntax highlightings.
+#
+# This is the part where you can add your own esoteric setting(s) if it breaks
+# the vim syntax highlighter for NFTABLES (yet `nft` takes it in just normally).
+#
+list ruleset arp
+list ruleset bridge
+list ruleset netdev
+list ruleset ip
+list ruleset ip6
+list ruleset inet
+list ruleset
+
+list tables
+
+list table TABLE_NETDEV
+list table netdev TABLE_NETDEV
+
+list chains
+list chain myIpTable myIpChain
+list chain arp myArp myArpchain
+list chain bridge myBridge myBridgechain
+list chain netdev myNetdev myNetdevchain
+list chain ip myIp myIpchain
+list chain ip6 myIp6 myIp6chain
+list chain inet myInet myInetchain
+
+list set TABLE_NETDEV SET_NETDEV
+list sets
+
+flush chain myIpTable myIpChain
+flush chain arp myArp myArpchain
+flush chain bridge myBridge myBridgechain
+flush chain netdev myNetdev myNetdevchain
+flush chain ip myIp myIpchain
+flush chain ip6 myIp6 myIp6chain
+flush chain inet myInet myInetchain
+
+flush table myArpTable
+flush table arp myArpTable
+flush table netdev TABLE_NETDEV
+flush table bridge myBridgeTable
+flush table inet myInetTable
+flush table ip myIpTable
+flush table ip6 myIp6Table
+
+flush ruleset
+flush ruleset arp
+flush ruleset bridge
+flush ruleset netdev
+flush ruleset inet
+flush ruleset ip
+flush ruleset ip6
+
+#  create Similar to the add command, but returns 
+#  an error if the chain already exists.
+create table myIpTable 
+create table myIpTable { flags dormant }
+create table arp myArpTable 
+create table arp myArpTable { flags dormant }
+create table bridge myBridge 
+create table bridge myBridge { flags dormant }
+create table netdev myNetdev 
+create table netdev myNetdev { flags dormant }
+create table inet myInetTable 
+create table inet myInetTable { flags dormant }
+create table ip myIpTable 
+create table ip myIpTable { flags dormant }
+create table ip6 myIp6Table 
+create table ip6 myIp6Table { flags dormant }
+
+add table myIpTable    # defaults to 'ip' family
+add table myIpTable { flags dormant }  # defaults to 'ip' family
+add table arp myArpTable 
+add table arp myArpTable { flags dormant }
+add table netdev TABLE_NETDEV
+add table netdev TABLE_NETDEV { flags dormant }
+add table ip myIpTable
+add table ip myIpTable { flags dormant }
+add table ip6 myIp6Table
+add table ip6 myIp6Table { flags dormant }
+add table inet myInetTable
+add table inet myInetTable { flags dormant; }
+
+# Two kinds of a base chain for syntax handling:
+#  1. Unidentified family chain
+#  2. Explictly-identified family chain
+create chain myIpTable myIpChain 
+create chain myIpTable myIpChain { type filter hook input priority 0; policy drop;}
+create chain myIpTable myIpChain { type filter hook input device "eth0" priority 0; policy drop;}
+create chain ip myIpTable myIpChain 
+create chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept}
+create chain ip myIpTable myIpChain { type filter hook input device "eth0" priority 0; policy accept}
+add chain mytable myin { type filter hook input priority 0; policy drop;}
+add chain ip mytable myin { type filter hook input priority 0; policy accept}
+
+export json
+export xml
+export ruleset json
+export ruleset xml
+
+
+add set TABLE_NETDEV SET_NETDEV
+add element TABLE_NETDEV SET_NETDEV
+add map TABLE_NETDEV
+
+add rule inet mytable myin counter
+
+delete table TABLE_NETDEV
+delete table netdev TABLE_NETDEV
+delete table netdev handle HANDLE
+delete table handle HANDLE
+
+delete chain myIpTable myIpChain
+delete chain arp myArp myArpchain
+delete chain bridge myBridge myBridgechain
+delete chain netdev myNetdev myNetdevchain
+delete chain ip myIp myIpchain
+delete chain ip6 myIp6 myIp6chain
+delete chain inet myInet myInetchain
+delete chain myInet handle "myHandle"
+delete chain inet myInet handle "myHandle"
+
+rename chain myIpChain newMyIpChain
+rename chain ip myIpChain newMyIpChain
+
+table arp ARP_TABLE {
+    chain ARP_INPUT_FILTER {
+       type filter hook input priority 0;
+       policy drop;
+       counter log drop
+    }
+    chain workstation_arp_filter_output {
+        type filter hook output priority 0;
+        policy drop;
+        counter log drop
+    }
+}
+
+table bridge workstation_bridge {
+    chain workstn_bridge_filter_input {
+        type filter hook input priority -200;
+        policy accept
+    }
+    chain workstn_bridge_filter_output {
+        type filter hook output priority -200;
+        policy accept
+    }
+
+    chain workstn_bridge_filter_forward {
+        type filter hook forward priority -200;
+        # default drop on all bridge forwarding
+        policy drop;
+
+        oif eth0 ip protocol icmp icmp type echo-request accept
+        iif eth0 ip protocol icmp icmp type echo-reply accept
+        counter log drop
+    }
+}
+
+table netdev NETDEV_TABLE {
+    # mind the NIC, it must exists
+    chain ingress_filter_netdev_lo { 
+        type filter hook ingress device lo priority -100; 
+        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    }
+    chain red_ingress_netdev_eth0 { 
+        # You'll get a cryptic error if 'device eth0' is missing after 'chain'
+        type filter hook ingress device eth0 priority -100; 
+        policy accept;
+
+        include "netdev-table/ingress-hook/*.eth0.rule.nft";
+        tcp dport 80 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set jhash ip saddr . tcp sport mod 2 map { 0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    }
+}
+
+table inet INET_TABLE {
+define interface_name2 = "br0"
+    chain workstation_inet_filter_input {
+        # Things that make this chain unique (input, filter)
+        type filter hook input priority 0;
+        policy drop;
+        iif lo accept
+        # Things that make this chain unique ('eth0', input, filter)
+        # meta iifname != $interface_name2 drop;  # workstation wants all intfs
+        # Let things back in if they've been established before new firewall
+        ct state established,related accept;
+        #  DNS 
+        tcp dport 53 counter accept 
+        udp dport 53 counter accept 
+        #  Multicast DNS 
+        tcp dport 5353 counter accept
+        # RFC 6092 - Simple Security in IPv6 Gateway CPE
+        # recommends that the DEFAULT
+        #   operating mode for residential IPv6 simple security be to treat
+        #   Generic Packet Tunneling [RFC2473] and similar protocols as opaque
+        #   transport layers, i.e., inbound tunnel initiations are denied and
+        #   outbound tunnel initiations are accepted.
+
+        # To facilitate the use of IPsec in support of IPv6
+        # mobility, the Internet Key Exchange (IKE) protocol [RFC5996] and the
+        # Host Identity Protocol (HIP) [RFC5201] should also be permitted in
+        # the DEFAULT operating mode.
+
+        #  Workstation
+        icmp type {
+            destination-unreachable, 
+            time-exceeded, 
+            parameter-problem
+        } counter accept
+
+        # Router/Gateway
+        icmp type {
+            destination-unreachable, 
+            redirect, 
+            time-exceeded, 
+            parameter-problem, 
+            router-advertisement, 
+            router-solicitation
+            } counter accept
+
+        # All ICMP
+        icmp type {
+            echo-reply, 
+            destination-unreachable, 
+            source-quench, redirect, 
+            echo-request, 
+            time-exceeded, 
+            parameter-problem, 
+            timestamp-request, 
+            timestamp-reply, 
+            info-request, 
+            info-reply, 
+            address-mask-request, 
+            address-mask-reply, 
+            router-advertisement, 
+            router-solicitation
+            } counter accept
+
+        tcp dport 25 counter accept    # smtp
+        tcp dport 465 counter accept   # submission
+        # SSH server
+        tcp dport ssh counter accept 
+        
+        tcp dport 514 counter accept    # syslog
+        tcp dport 6514 counter accept   # secured syslog
+
+        tcp dport 80 counter accept 
+        tcp dport 443 counter accept 
+
+        # IP-specific
+        # meta ip goto workstation_inet_filter_input_ip
+        # meta ip6 goto workstation_inet_filter_input_ip6
+        # meta vlan goto workstation_inet_filter_input_vlan
+        # meta arp goto workstation_inet_filter_input_arp
+
+        # Just in case that someone screws up our 'policy drop'
+
+        # multi-family reject, using the icmpx keyword
+        counter log reject with icmpx type admin-prohibited
+    };
+    # ARP filter input
+    chain workstation_arp_filter_input {
+        counter log reject
+    }
+    # ARP filter output
+    chain workstation_arp_filter_output {
+        #  Multicast DNS 
+        tcp dport 5353 counter accept
+        #  DNS 
+        tcp dport 53 counter accept 
+        udp dport 53 counter accept 
+
+        #  Workstation
+        icmp type {
+            destination-unreachable, 
+            time-exceeded, 
+            parameter-problem
+            } counter accept
+
+        # Router/Gateway
+        icmp type {
+            destination-unreachable, 
+            redirect, 
+            time-exceeded, 
+            parameter-problem, 
+            router-advertisement, 
+            router-solicitation
+            } counter accept
+
+        # All ICMP
+        icmp type {
+            echo-reply, 
+            destination-unreachable, 
+            source-quench, redirect, 
+            echo-request, 
+            time-exceeded, 
+            parameter-problem, 
+            timestamp-request, 
+            timestamp-reply, 
+            info-request, 
+            info-reply, 
+            address-mask-request, 
+            address-mask-reply, 
+            router-advertisement, 
+            router-solicitation
+            } counter accept
+
+        tcp dport 25 counter accept    # smtp
+        tcp dport 465 counter accept   # submission
+        # SSH server
+        tcp dport ssh counter accept 
+
+        tcp dport 514 counter accept    # syslog
+        tcp dport 6514 counter accept   # secured syslog
+
+        tcp dport 80 counter accept 
+        tcp dport 443 counter accept 
+
+        counter log reject
+    }
+    #IPv6 filtering
+    chain workstation_ip6_filter_input {
+        counter log reject
+    }
+    #IPv6 filtering
+    chain workstation_inet_filter_input_ip6 {
+        counter log reject
+    }
+    #IPv6 filtering
+    chain workstation_inet_filter_input_ip6 {
+        counter log reject
+    }
+}
+
+table ip workstn_ip_nat {
+    chain workstn_ip_nat_postrouting {
+        type nat hook postrouting priority 0;
+        #Likewise, in iptables NAT (source NAT):
+        # % iptables -t nat -A POSTROUTING -s 192.168.1.1 -j SNAT --to-source 1.1.1.1
+        # % iptables -t nat -A POSTROUTING -s 192.168.2.2 -j SNAT --to-source 2.2.2.2
+        # % iptables -t nat -A POSTROUTING -s 192.168.3.3 -j SNAT --to-source 3.3.3.3
+
+        # Translated to a nftables one-liner:
+
+        # snat ip saddr map { 
+        #     192.168.1.1 : 1.1.1.1, 
+        #     192.168.2.2 : 2.2.2.2, 
+        #     192.168.3.3 : 3.3.3.3 
+       #  }
+    }
+}
