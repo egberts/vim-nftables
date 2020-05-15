@@ -503,6 +503,7 @@ hi link nftablesCmdAddChainIp_Hook nftablesHL_Hook
 syn keyword nftablesCmdAddChainIp_Hook contained skipwhite
 \    prerouting
 \    input
+\    forward
 \    output
 \    postrouting
 \ nextgroup=
@@ -558,10 +559,10 @@ syn keyword nftablesCmdAddChainIp6_DeviceKeyword contained device skipwhite
 
 hi link nftablesCmdAddChainIp6_FilterHook nftablesHL_Hook
 syn keyword nftablesCmdAddChainIp6_FilterHook contained skipwhite
-\    all
-\    input
-\    output
 \    prerouting
+\    input
+\    forward
+\    output
 \    postrouting
 \ nextgroup=
 \    nftablesCmdAddChainIp6_DeviceKeyword,
@@ -640,9 +641,10 @@ syn keyword nftablesCmdAddChainInet_DeviceKeyword contained device skipwhite
 
 hi link nftablesCmdAddChainInet_Hook nftablesHL_Hook
 syn keyword nftablesCmdAddChainInet_Hook contained skipwhite
-\    input
-\    output
 \    prerouting
+\    input
+\    forward
+\    output
 \    postrouting
 \ nextgroup=
 \    nftablesCmdAddChainInet_DeviceKeyword,
