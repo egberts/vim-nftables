@@ -30,7 +30,7 @@ let s:save_cpo = &cpoptions
 set cpoptions-=C
 
 hi link nftablesHL_Comment     Comment
-hi link nftablesHL_Include     Preproc
+hi link nftablesHL_Include     Include
 hi link nftablesHL_ToDo        Todo
 hi link nftablesHL_Identifier  Identifier
 hi link nftablesHL_Variable    Variable  " doesn't work, stuck on dark cyan
@@ -51,23 +51,16 @@ hi link nftablesHL_Table       Identifier
 hi link nftablesHL_Chain       Identifier
 
 hi link nftables_ToDo nftablesHL_ToDo
-syn keyword nftables_ToDo xxx contained XXX FIXME TODO TODO: FIXME:
+syn keyword nftables_ToDo xxx contained XXX FIXME TODO TODO: FIXME: skipwhite
 
-hi link nftablesComment nftablesHL_Comment
-syn region nftablesComment start=/#/ end=/$/ contains=nftables_ToDo
+hi link nftables_Comment nftablesHL_Comment
+syn region nftables_Comment start=/#/ end=/$/ contains=nftables_ToDo skipwhite
 
-hi link nftables_Policy nftablesHL_Action
-syn keyword nftables_Policy contained skipwhite
-\    accept
-\    reject
-\    drop
-\ nextgroup=nftables_Semicolon
+hi link nftables_EOS nftablesHL_Error
+syn match nftables_EOS contained /[^ \t]*[^\n;# ]/ 
 
-hi link nftables_PolicyKeyword nftablesHL_Option
-syn keyword nftables_PolicyKeyword contained policy skipwhite
-\ nextgroup=nftables_Policy
-
-
+hi link nftables_UnexpectedSemicolon nftablesHL_Error
+syn match nftables_UnexpectedSemicolon contained /;\+/ skipwhite skipempty
 
 syn match nftablesSet contained /{.*}/ contains=nftablesSetEntry
 syn match nftablesSetEntry contained /[a-zA-Z0-9]\+/ contained
@@ -82,6 +75,21 @@ syn match nftablesMask "/[0-9.]\+" contained contains=nftablesDelimiter
 hi def link nftablesHex nftablesHL_Number
 hi def link nftablesDelimiter nftablesHL_Operator
 hi def link nftablesMask nftablesHL_Operator
+
+" We'll do error RED highlighting on all statement firstly, then later on
+" all the options, then all the clauses.
+" Uncomment following two lines for RED highlight of typos (still Beta here)
+" hi link nftables_Error nftablesHL_Error
+" syn match nftables_Error /[ a-zA-Z0-9\t]\{1,64}/
+
+hi link nftables_UnexpectedEOS namedHL_Error
+syn match nftables_UnexpectedEOS contained /[;\n]\+/ skipwhite
+
+syn match nftables_EOL contained /[\n\r]\{1,16}/ skipwhite
+
+hi link nftables_Semicolon nftablesHL_Normal
+syn match nftables_Semicolon contained /[;]\{1,15}/  skipwhite
+\ nextgroup=nftables_EOL
 
 " syn region String start=/"/ end=/"/
 " syn keyword Function flush
@@ -103,18 +111,29 @@ hi link nftables_E_Filespec_SC nftablesHL_Filespec
 syn match nftables_E_Filespec_SC contained /\'[ a-zA-Z\]\-\[0-9\._,:\;\/?<>|"`~!@#$%\^&*\\(\\)=\+ {}]\{1,1024}\'/hs=s+1,he=e-1 skipwhite skipempty skipnl 
 syn match nftables_E_Filespec_SC contained /"[ a-zA-Z\]\-\[0-9\._,:\;\/?<>|'`~!@#$%\^&*\\(\\)=\+ {}]\{1,1024}"/hs=s+1,he=e-1 skipwhite skipempty skipnl 
 
+" begin of 'include "filespec"'
+hi link nftablesInclude_Filespec nftablesHL_String
+syn match nftablesInclude_Filespec contained /\'[ a-zA-Z\]\-\[0-9\._,:\;\/?<>|\"`~!@#$%\^&*\\(\\)=\+ {}]\{1,1024}\'/hs=s+1,he=e-1 
+\ nextgroup=
+\    nftables_Semicolon
+\ nextgroup=nftables_EOS
+\ skipwhite 
+syn match nftablesInclude_Filespec contained /\"[ a-zA-Z\]\-\[0-9\._,:\;\/?<>|\'`~!@#$%\^&*\\(\\)=\+ {}]\{1,1024}\"/
+\ skipwhite 
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
 hi link nftablesInclude nftablesHL_Include
-syn match nftablesInclude /\s*include/ 
-\ nextgroup=nftables_E_Filespec_SC
-\ skipwhite skipnl skipempty
+syn match nftablesInclude /^\s*include/ skipwhite
+\ nextgroup=nftablesInclude_Filespec
+" end of 'include \"filespec\"'
 
 hi link nftablesAction nftablesHL_Action
 syn keyword nftablesAction contained skipwhite
 \    accept
 \    reject
 \    drop
-
-syn match nftables_Semicolon contained /;/ skipwhite
 
 "#################################################
 "
@@ -229,7 +248,7 @@ syn keyword nftablesIifnameKeyword contained skipwhite
 \    oifname
 \    oif
 
-syn region nftablesTArpChain_Section contained start=/{/ end=/}/ skipwhite
+syn region nftablesTArpChain_Section contained start=/{/ end=/}/ 
 \ contains=
 \    nftablesTArpC_TypeKeyword,
 \    nftablesPolicyKeyword,
@@ -240,7 +259,7 @@ syn region nftablesTArpChain_Section contained start=/{/ end=/}/ skipwhite
 \    nftablesOifnameKeyword,
 \    nftablesFibKeyword,
 \    nftablesMeterKeyword,
-\    nftablesComment,
+\    nftables_Comment,
 \    nftablesInclude
 
 
@@ -253,7 +272,7 @@ hi link nftablesTArpChainKeyword nftablesHL_Option
 syn keyword nftablesTArpChainKeyword contained chain skipwhite skipempty
 \ nextgroup=nftablesTArpChain_Name
 
-syn region nftablesTArp_Section contained start=/{/ end=/}/ skipwhite
+syn region nftablesTArp_Section contained start=/{/ end=/}/ 
 \ contains=
 \    nftablesTArpChainKeyword
 
@@ -276,15 +295,21 @@ hi link nftablesCmdCreateAddTable_Flags nftablesHL_Option
 syn keyword nftablesCmdCreateAddTable_Flags contained flags skipwhite
 \ nextgroup=nftablesCmdCreateAddTable_FlagValue
 
-syn region nftablesCmdCreateTable_Section contained start=/{/ end=/}/ skipwhite
+syn region nftablesCmdCreateTable_Section contained start=/{/ end=/}/ 
+\ skipwhite
 \ contains=nftablesCmdCreateAddTable_Flags
-\ nextgroup=nftablesCmd_EOL
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
 
 hi link nftablesCmdCreateTable_Name nftablesHL_Table
-syn match nftablesCmdCreateTable_Name contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdCreateTable_Name contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdCreateTable_Section,
-\    nftablesCmd_EOL
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
 
 hi link nftablesCmdCreateTable_Family nftablesHL_Family
 syn keyword nftablesCmdCreateTable_Family contained skipwhite
@@ -318,7 +343,7 @@ syn keyword nftablesCmdAddChainArp_PriorityKeyword contained priority skipwhite
 \ nextgroup=nftablesCmdAddChainArp_Priority
 
 hi link nftablesCmdAddChainArp_Device  nftablesHL_String
-syn match nftablesCmdAddChainArp_Device contained /\S\{1,256}/ skipwhite
+syn match nftablesCmdAddChainArp_Device contained /\"[A-Za-z0-9\-_]\{1,256}\"/ skipwhite
 \ nextgroup=nftablesCmdAddChainArp_PriorityKeyword
 
 hi link nftablesCmdAddChainArp_DeviceKeyword nftablesHL_Option
@@ -346,20 +371,33 @@ hi link nftablesCmdAddChainArp_TypeKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainArp_TypeKeyword contained type skipwhite
 \ nextgroup=nftablesCmdAddChainArp_Type
 
-syn region nftablesCmdAddChainArp_Section contained start=/{/ end=/}/
+hi link nftablesCmdAddChainArp_Policy nftablesHL_Action
+syn keyword nftablesCmdAddChainArp_Policy contained skipwhite
+\    accept
+\    reject
+\    drop
+\ nextgroup=nftables_Semicolon
+
+hi link nftablesCmdAddChainArp_PolicyKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainArp_PolicyKeyword contained policy skipwhite
+\ nextgroup=nftablesCmdAddChainArp_Policy
+
+syn region nftablesCmdAddChainArp_Section contained start=/{/ end=/}/ skipwhite
 \ contains=
 \    nftablesCmdAddChainArp_TypeKeyword,
-\    nftables_PolicyKeyword,
-\    nftablesCmd_EOL
+\    nftablesCmdAddChainArp_PolicyKeyword
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdAddChainArp_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainArp_ChainName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainArp_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdAddChainArp_Section,
-\    nftablesCmd_EOL
+\    nftables_EOS
 
 hi link nftablesCmdAddChainArp_TableName nftablesHL_Table
-syn match nftablesCmdAddChainArp_TableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainArp_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainArp_ChainName
 " End of 'add chain arp <table_name> <chain_name> { ... }
 
@@ -374,7 +412,7 @@ syn keyword nftablesCmdAddChainBridge_PriorityKeyword contained priority skipwhi
 \ nextgroup=nftablesCmdAddChainBridge_Priority
 
 hi link nftablesCmdAddChainBridge_Device  nftablesHL_String
-syn match nftablesCmdAddChainBridge_Device contained /\S\{1,256}/ skipwhite
+syn match nftablesCmdAddChainBridge_Device contained /\"[A-Za-z0-9\-_]\{1,256}\"/ skipwhite
 \ nextgroup=nftablesCmdAddChainBridge_PriorityKeyword
 
 hi link nftablesCmdAddChainBridge_DeviceKeyword nftablesHL_Option
@@ -404,20 +442,33 @@ hi link nftablesCmdAddChainBridge_TypeKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainBridge_TypeKeyword contained type skipwhite
 \ nextgroup=nftablesCmdAddChainBridge_Type
 
-syn region nftablesCmdAddChainBridge_Section contained start=/{/ end=/}/
+hi link nftablesCmdAddChainBridge_Policy nftablesHL_Action
+syn keyword nftablesCmdAddChainBridge_Policy contained skipwhite
+\    accept
+\    reject
+\    drop
+\ nextgroup=nftables_Semicolon
+
+hi link nftablesCmdAddChainBridge_PolicyKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainBridge_PolicyKeyword contained policy skipwhite
+\ nextgroup=nftablesCmdAddChainBridge_Policy
+
+syn region nftablesCmdAddChainBridge_Section contained start=/{/ end=/}/ skipwhite
 \ contains=
 \    nftablesCmdAddChainBridge_TypeKeyword,
-\    nftables_PolicyKeyword,
-\    nftablesCmd_EOL
+\    nftablesCmdAddChainBridge_PolicyKeyword
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdAddChainBridge_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainBridge_ChainName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainBridge_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdAddChainBridge_Section,
-\    nftablesCmd_EOL
+\    nftables_EOS
 
 hi link nftablesCmdAddChainBridge_TableName nftablesHL_Table
-syn match nftablesCmdAddChainBridge_TableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainBridge_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainBridge_ChainName
 " End of 'add chain bridge <table_name> <chain_name> { ... }
 
@@ -431,7 +482,7 @@ syn keyword nftablesCmdAddChainNetdev_PriorityKeyword contained priority skipwhi
 \ nextgroup=nftablesCmdAddChainNetdev_Priority
 
 hi link nftablesCmdAddChainNetdev_Device  nftablesHL_String
-syn match nftablesCmdAddChainNetdev_Device contained /\S\{1,256}/ skipwhite
+syn match nftablesCmdAddChainNetdev_Device contained /\"[A-Za-z0-9\-_]\{1,256}\"/ skipwhite
 \ nextgroup=nftablesCmdAddChainNetdev_PriorityKeyword
 
 hi link nftablesCmdAddChainNetdev_DeviceKeyword nftablesHL_Option
@@ -456,20 +507,33 @@ hi link nftablesCmdAddChainNetdev_TypeKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainNetdev_TypeKeyword contained type skipwhite
 \ nextgroup=nftablesCmdAddChainNetdev_Type
 
-syn region nftablesCmdAddChainNetdev_Section contained start=/{/ end=/}/
+hi link nftablesCmdAddChainNetdev_Policy nftablesHL_Action
+syn keyword nftablesCmdAddChainNetdev_Policy contained skipwhite
+\    accept
+\    reject
+\    drop
+\ nextgroup=nftables_Semicolon
+
+hi link nftablesCmdAddChainNetdev_PolicyKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainNetdev_PolicyKeyword contained policy skipwhite
+\ nextgroup=nftablesCmdAddChainNetdev_Policy
+
+syn region nftablesCmdAddChainNetdev_Section contained start=/{/ end=/}/ skipwhite
 \ contains=
 \    nftablesCmdAddChainNetdev_TypeKeyword,
-\    nftables_PolicyKeyword,
-\    nftablesCmd_EOL
+\    nftablesCmdAddChainNetdev_PolicyKeyword
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdAddChainNetdev_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainNetdev_ChainName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainNetdev_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdAddChainNetdev_Section,
-\    nftablesCmd_EOL
+\    nftables_EOS
 
 hi link nftablesCmdAddChainNetdev_TableName nftablesHL_Table
-syn match nftablesCmdAddChainNetdev_TableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainNetdev_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainNetdev_ChainName
 " End of 'add chain netdev <table_name> <chain_name> { ... }
 
@@ -483,7 +547,7 @@ syn keyword nftablesCmdAddChainIp_PriorityKeyword contained priority skipwhite
 \ nextgroup=nftablesCmdAddChainIp_Priority
 
 hi link nftablesCmdAddChainIp_Device  nftablesHL_String
-syn match nftablesCmdAddChainIp_Device contained /\S\{1,256}/ skipwhite
+syn match nftablesCmdAddChainIp_Device contained /\"[A-Za-z0-9\-_]\{1,256}\"/ skipwhite
 \ nextgroup=nftablesCmdAddChainIp_PriorityKeyword
 
 hi link nftablesCmdAddChainIp_DeviceKeyword nftablesHL_Option
@@ -540,20 +604,35 @@ hi link nftablesCmdAddChainIp_TypeKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainIp_TypeKeyword contained type skipwhite
 \ nextgroup=nftablesCmdAddChainIp_Type
 
-syn region nftablesCmdAddChainIp_Section contained start=/{/ end=/}/
+hi link nftablesCmdAddChainIp_Policy nftablesHL_Action
+syn keyword nftablesCmdAddChainIp_Policy contained skipwhite
+\    accept
+\    reject
+\    drop
+\ nextgroup=nftables_Semicolon
+
+hi link nftablesCmdAddChainIp_PolicyKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainIp_PolicyKeyword contained policy skipwhite
+\ nextgroup=nftablesCmdAddChainIp_Policy
+
+syn region nftablesCmdAddChainIp_Section contained start=/{/ end=/}/ skipwhite
 \ contains=
 \    nftablesCmdAddChainIp_TypeKeyword,
-\    nftables_PolicyKeyword,
-\    nftablesCmd_EOL
+\    nftablesCmdAddChainIp_PolicyKeyword
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdAddChainIp_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainIp_ChainName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainIp_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ 
+\ skipwhite
 \ nextgroup=
 \    nftablesCmdAddChainIp_Section,
-\    nftablesCmd_EOL
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdAddChainIp_TableName nftablesHL_Table
-syn match nftablesCmdAddChainIp_TableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainIp_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainIp_ChainName
 " End of 'add chain ip <table_name> <chain_name> { ... }
 
@@ -567,7 +646,7 @@ syn keyword nftablesCmdAddChainIp6_PriorityKeyword contained priority skipwhite
 \ nextgroup=nftablesCmdAddChainIp6_Priority
 
 hi link nftablesCmdAddChainIp6_Device  nftablesHL_String
-syn match nftablesCmdAddChainIp6_Device contained /\S\{1,256}/ skipwhite
+syn match nftablesCmdAddChainIp6_Device contained /\"[A-Za-z0-9\-_]\{1,256}\"/ skipwhite
 \ nextgroup=nftablesCmdAddChainIp6_PriorityKeyword
 
 hi link nftablesCmdAddChainIp6_DeviceKeyword nftablesHL_Option
@@ -624,20 +703,33 @@ hi link nftablesCmdAddChainIp6_TypeKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainIp6_TypeKeyword contained type skipwhite
 \ nextgroup=nftablesCmdAddChainIp6_Type
 
-syn region nftablesCmdAddChainIp6_Section contained start=/{/ end=/}/
+hi link nftablesCmdAddChainIp6_Policy nftablesHL_Action
+syn keyword nftablesCmdAddChainIp6_Policy contained skipwhite
+\    accept
+\    reject
+\    drop
+\ nextgroup=nftables_Semicolon
+
+hi link nftablesCmdAddChainIp6_PolicyKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainIp6_PolicyKeyword contained policy skipwhite
+\ nextgroup=nftablesCmdAddChainIp6_Policy
+
+syn region nftablesCmdAddChainIp6_Section contained start=/{/ end=/}/ skipwhite
 \ contains=
 \    nftablesCmdAddChainIp6_TypeKeyword,
-\    nftables_PolicyKeyword,
-\    nftablesCmd_EOL
+\    nftablesCmdAddChainIp6_PolicyKeyword
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdAddChainIp6_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainIp6_ChainName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainIp6_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdAddChainIp6_Section,
-\    nftablesCmd_EOL
+\    nftables_EOS
 
 hi link nftablesCmdAddChainIp6_TableName nftablesHL_Table
-syn match nftablesCmdAddChainIp6_TableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainIp6_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainIp6_ChainName
 " End of 'add chain ip6 <table_name> <chain_name> { ... }
 "
@@ -651,7 +743,7 @@ syn keyword nftablesCmdAddChainInet_PriorityKeyword contained priority skipwhite
 \ nextgroup=nftablesCmdAddChainInet_Priority
 
 hi link nftablesCmdAddChainInet_Device  nftablesHL_String
-syn match nftablesCmdAddChainInet_Device contained /\S\{1,256}/ skipwhite
+syn match nftablesCmdAddChainInet_Device contained /\"[A-Za-z0-9\-_]\{1,256}\"/ skipwhite
 \ nextgroup=nftablesCmdAddChainInet_PriorityKeyword
 
 hi link nftablesCmdAddChainInet_DeviceKeyword nftablesHL_Option
@@ -708,20 +800,31 @@ hi link nftablesCmdAddChainInet_TypeKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainInet_TypeKeyword contained type skipwhite
 \ nextgroup=nftablesCmdAddChainInet_Type
 
+hi link nftablesCmdAddChainInet_Policy nftablesHL_Action
+syn keyword nftablesCmdAddChainInet_Policy contained skipwhite
+\    accept
+\    reject
+\    drop
+\ nextgroup=nftables_Semicolon
+
+hi link nftablesCmdAddChainInet_PolicyKeyword nftablesHL_Option
+syn keyword nftablesCmdAddChainInet_PolicyKeyword contained policy skipwhite
+\ nextgroup=nftablesCmdAddChainInet_Policy
+
+
 syn region nftablesCmdAddChainInet_Section contained start=/{/ end=/}/
 \ contains=
 \    nftablesCmdAddChainInet_TypeKeyword,
-\    nftables_PolicyKeyword,
-\    nftablesCmd_EOL
+\    nftablesCmdAddChainInet_PolicyKeyword,
 
 hi link nftablesCmdAddChainInet_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainInet_ChainName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainInet_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdAddChainInet_Section,
-\    nftablesCmd_EOL
+\    nftables_EOS
 
 hi link nftablesCmdAddChainInet_TableName nftablesHL_Table
-syn match nftablesCmdAddChainInet_TableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddChainInet_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddChainInet_ChainName
 " End of 'add chain inet <table_name>...' 
 
@@ -762,10 +865,10 @@ syn keyword nftablesCmdAdd_ChainKeyword contained chain skipwhite
 " End of 'add chain ...'
 
 hi link nftablesCmdAddSetElementName nftablesHL_String
-syn match nftablesCmdAddSetElementName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddSetElementName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 
 hi link nftablesCmdAddSetElementTableName nftablesHL_Table
-syn match nftablesCmdAddSetElementTableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddSetElementTableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdAddSetElementName
 
 hi link nftablesCmdAddSetElement nftablesHL_Statement
@@ -775,7 +878,7 @@ syn keyword nftablesCmdAddSetElement contained skipwhite
 \ nextgroup=nftablesCmdAddSetElementTableName  nftablesHL_Identifier
 
 hi link nftablesCmdAddMapTableName nftablesHL_Table
-syn match nftablesCmdAddMapTableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdAddMapTableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 
 
 hi link nftablesCmdAddMap nftablesHL_Statement
@@ -784,8 +887,8 @@ syn keyword nftablesCmdAddMap contained map skipwhite
 " End of 'add map ...'
 "
 " Begin of 'delete table ...'
-hi link nftablesCmdDeleteTable_Handle nftablesHL_String
-syn match nftablesCmdDeleteTable_Handle contained /\S\{1,64}/ skipwhite
+hi link nftablesCmdDeleteTable_Handle nftablesHL_Number
+syn match nftablesCmdDeleteTable_Handle contained /[0-9]\{1,11}/ skipwhite
 
 hi link nftablesCmdDeleteTableHandleKeyword nftablesHL_Statement
 syn keyword nftablesCmdDeleteTableHandleKeyword contained skipwhite
@@ -793,7 +896,7 @@ syn keyword nftablesCmdDeleteTableHandleKeyword contained skipwhite
 \ nextgroup=nftablesCmdDeleteTable_Handle
 
 hi link nftablesCmdDeleteTable_Name nftablesHL_Table
-syn match nftablesCmdDeleteTable_Name contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdDeleteTable_Name contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 
 hi link nftablesCmdDeleteTable_Family nftablesHL_Family
 syn keyword nftablesCmdDeleteTable_Family contained skipwhite
@@ -835,19 +938,22 @@ syn keyword nftablesCmdFlushRulesetFamilies contained skipwhite
 \    ip
 \    ip6
 \    inet
-\ nextgroup=nftablesCmd_EOL
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdFlush_RulesetKeyword nftablesHL_Option
 syn keyword nftablesCmdFlush_RulesetKeyword contained ruleset skipwhite
 \ nextgroup=
 \    nftablesCmdFlushRulesetFamilies,
-\    nftablesCmd_EOL
+\    nftables_Semicolon,
+\    nftables_EOS
 " End of 'flush ruleset ...'
 
 " Begin of 'flush table ...'
 hi link nftablesCmdFlush_TableName nftablesHL_Table
-syn match nftablesCmdFlush_TableName contained /\S\{1,64}/ skipwhite
-\ nextgroup=nftablesCmd_EOL
+syn match nftablesCmdFlush_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=nftables_EOS
 
 hi link nftablesCmdFlushTable_Family nftablesHL_Family
 syn keyword nftablesCmdFlushTable_Family contained skipwhite
@@ -869,17 +975,25 @@ syn keyword nftablesCmdFlush_TableKeyword contained table skipwhite
 " Begin of 'flush chain ...'
 
 hi link nftablesCmdFlushChain_ChainName nftablesHL_Chain
-syn match nftablesCmdFlushChain_ChainName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdFlushChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
-hi link nftablesCmdFlushChain_Handle nftablesHL_Identifier
-syn match nftablesCmdFlushChain_Handle contained /\S\{1,64}/ skipwhite
+hi link nftablesCmdFlushChain_Handle nftablesHL_Number
+syn match nftablesCmdFlushChain_Handle contained /[0-9]\{1,11}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdFlushChain_HandleKeyword nftablesHL_Option
 syn keyword nftablesCmdFlushChain_HandleKeyword contained handle skipwhite
 \ nextgroup=nftablesCmdFlushChain_Handle
+\ nextgroup=
+\    nftables_UnexpectedEOS
 
 hi link nftablesCmdFlushChainTableName nftablesHL_Table
-syn match nftablesCmdFlushChainTableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdFlushChainTableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdFlushChain_HandleKeyword,
 \    nftablesCmdFlushChain_ChainName
@@ -901,28 +1015,37 @@ syn keyword nftablesCmdFlushChainKeyword contained chain skipwhite
 \    nftablesCmdFlushChainTableName
 " End of 'flush chain ...'
 
-hi link nftablesCmdListNoArg nftablesHL_Option
-syn keyword nftablesCmdListNoArg contained skipwhite
+hi link nftablesCmdList_NoArg nftablesHL_Option
+syn keyword nftablesCmdList_NoArg contained skipwhite
 \    tables
 \    chains
 \    sets
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
-hi link nftablesCmdListRulesetFamily nftablesHL_Family
-syn keyword nftablesCmdListRulesetFamily contained skipwhite
+hi link nftablesCmdListRuleset_Family nftablesHL_Family
+syn keyword nftablesCmdListRuleset_Family contained skipwhite
 \    netdev
 \    bridge
 \    arp
 \    ip
 \    ip6
 \    inet
+\ nextgroup=nftables_EOS
 
 " list ruleset [family]
-hi link nftablesCmdListRuleset nftablesHL_Option
-syn keyword nftablesCmdListRuleset contained ruleset skipwhite
-\ nextgroup=nftablesCmdListRulesetFamily
+hi link nftablesCmdList_Ruleset nftablesHL_Option
+syn keyword nftablesCmdList_Ruleset contained ruleset skipwhite
+\ nextgroup=
+\    nftablesCmdListRuleset_Family,
+\    nftables_EOS
 
 hi link nftablesCmdListTable_Name nftablesHL_Table
-syn match nftablesCmdListTable_Name contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdListTable_Name contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
 hi link nftablesCmdListTable_Family nftablesHL_Family
 syn keyword nftablesCmdListTable_Family contained skipwhite
@@ -932,7 +1055,9 @@ syn keyword nftablesCmdListTable_Family contained skipwhite
 \    ip
 \    ip6
 \    inet
-\ nextgroup=nftablesCmdListTable_Name 
+\ nextgroup=
+\    nftablesCmdListTable_Name,
+\    nftables_EOS
 
 hi link nftablesCmdListTableKeyword nftablesHL_Option
 syn keyword nftablesCmdListTableKeyword contained table skipwhite
@@ -941,22 +1066,50 @@ syn keyword nftablesCmdListTableKeyword contained table skipwhite
 \    nftablesCmdListTable_Family
     
 hi link nftablesCmdListSetName nftablesHL_String
-syn match nftablesCmdListSetName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdListSetName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 
 hi link nftablesCmdListSetTableName nftablesHL_Table
-syn match nftablesCmdListSetTableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdListSetTableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdListSetName 
 
 hi link nftablesCmdListSetKeyword nftablesHL_Statement
 syn keyword nftablesCmdListSetKeyword contained set skipwhite
 \ nextgroup=nftablesCmdListSetTableName
+" End of 'list set ...'
+
+" Begin 'monitor'
+hi link nftablesCmdMonitor_Format nftablesHL_Builtin
+syn keyword nftablesCmdMonitor_Format contained skipwhite
+\    nft
+\    xml
+\    json
+\ nextgroup=nftables_EOS
+
+hi link nftablesCmdMonitor_Group nftablesHL_Statement
+syn keyword nftablesCmdMonitor_Group contained skipwhite
+\    events
+\    tables
+\    chains
+\    ruleset
+\    table
+\    chain
+\ nextgroup=nftablesCmdMonitor_Format
+
+hi link nftablesCmdMonitor_Action nftablesHL_Statement
+syn keyword nftablesCmdMonitor_Action contained skipwhite
+\    new
+\    destroy
+\ nextgroup=
+\    nftablesCmdMonitor_Group,
+\    nftables_EOS
+" End 'monitor'
 
 " Start of 'rename [family] <table_name> <chain_name> <new_chain_name>
 hi link nftablesCmdRenameChain_ChainName nftablesHL_Chain
-syn match nftablesCmdRenameChain_ChainName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdRenameChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 
 hi link nftablesCmdRenameChain_TableName nftablesHL_Table
-syn match nftablesCmdRenameChain_TableName contained /\S\{1,64}/ skipwhite
+syn match nftablesCmdRenameChain_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesCmdRenameChain_ChainName
 
 hi link nftablesCmdRenameChain_Family nftablesHL_Family
@@ -977,9 +1130,9 @@ syn keyword nftablesCmdRenameChainKeyword contained chain skipwhite
 " End of 'rename [family] <table_name> <chain_name> <new_chain_name>
 
 """"""""""""""""""""""""""""""""""""""
+" Base commands
 " Uncontained (free-floating) patterns
 """"""""""""""""""""""""""""""""""""""
-
 hi link nftablesCmdAddKeyword nftablesHL_Statement
 syn keyword nftablesCmdAddKeyword add skipwhite skipempty 
 \ nextgroup=
@@ -1000,6 +1153,11 @@ syn keyword nftablesCmdDeleteTable skipwhite delete skipempty
 \    nftablesCmdDeleteTableKeyword,
 \    nftablesCmdFlushChainKeyword
 
+hi link nftablesCmdDescribeTable nftablesHL_Statement
+syn keyword nftablesCmdDescribeTable skipwhite describe skipempty 
+\ nextgroup=
+\    nftablesCmdDescribe_Keyword,
+
 hi link nftablesCmdExportKeyword nftablesHL_Statement
 syn keyword nftablesCmdExportKeyword export skipwhite 
 \ nextgroup=
@@ -1013,31 +1171,64 @@ syn keyword nftablesCmdFlushKeyword flush skipwhite
 \    nftablesCmdFlush_TableKeyword,
 \    nftablesCmdFlushChainKeyword
 
+hi link nftablesCmdGetKeyword nftablesHL_Statement
+syn keyword nftablesCmdGetKeyword get skipwhite
+\ nextgroup=
+\    nftablesCmdGet_Keyword
+
+hi link nftablesCmdImportKeyword nftablesHL_Statement
+syn keyword nftablesCmdImportKeyword import skipwhite
+\ nextgroup=
+\    nftablesCmdImport_Keyword
+
+hi link nftablesCmdInsertKeyword nftablesHL_Statement
+syn keyword nftablesCmdInsertKeyword insert skipwhite
+\ nextgroup=
+\    nftablesCmdInsert_Keyword
+
 hi link nftablesCmdListKeyword nftablesHL_Statement
 syn keyword nftablesCmdListKeyword list skipwhite
 \ nextgroup=
+\    nftablesCmdList_NoArg,
 \    nftablesCmdFlush_RulesetKeyword,
 \    nftablesCmdListTableKeyword,
-\    nftablesCmdFlushChainKeyword
-" \    nftablesCmdListSetKeyword,
-" \    nftablesCmdListRuleset,
-" \    nftablesCmdListNoArg,
+\    nftablesCmdFlushChainKeyword,
+\    nftables_UnexpectedEOS,
+
+hi link nftablesCmdMonitorKeyword nftablesHL_Statement
+syn keyword nftablesCmdMonitorKeyword monitor skipwhite
+\ nextgroup=
+\    nftablesCmdMonitor_Group,
+\    nftablesCmdMonitor_Action,
+\    nftables_EOS
 
 hi link nftablesCmdRenameKeyword nftablesHL_Statement
 syn keyword nftablesCmdRenameKeyword rename skipwhite
 \ nextgroup=
 \    nftablesCmdRenameChainKeyword
 
+hi link nftablesCmdReplaceKeyword nftablesHL_Statement
+syn keyword nftablesCmdReplaceKeyword replace skipwhite
+\ nextgroup=
+\    nftablesCmdReplace_Keyword
+
+hi link nftablesCmdResetKeyword nftablesHL_Statement
+syn keyword nftablesCmdResetKeyword reset skipwhite
+\ nextgroup=
+\    nftablesCmdReset_Keyword
+
+" End of base commands
+
 " Start of 'define <var_name> = <var_value>'
 hi link nftablesDefine_Value nftablesHL_String
-syn match nftablesDefine_Value contained /\S\{1,256}/ skipwhite
+syn match nftablesDefine_Value contained /[A-Za-z0-9\-_]\{1,256}/ skipwhite
 
 hi link nftablesOp_Equal nftablesHL_Operator
 syn match nftablesOp_Equal contained /=/ skipwhite
 \ nextgroup=nftablesDefine_Value
 
 hi link nftablesDefine_Identifier nftablesHL_Identifier
-syn match nftablesDefine_Identifier contained /\i\{1,64}/ skipwhite
+syn match nftablesDefine_Identifier contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=nftablesOp_Equal
 " End of 'define <var_name> = <var_value>'
 
@@ -1045,7 +1236,7 @@ syn match nftablesDefine_Identifier contained /\i\{1,64}/ skipwhite
 
 " Start of '$<variable_name>'
 hi link nftablesVariableName Type
-syn match nftablesVariableName /\$\S\{1,64}/ skipwhite
+syn match nftablesVariableName /\$[A-Za-z0-9\-_]\{1,64}/ skipwhite
 " End of '$<variable_name>'
 
 " Begin of Command-less actions: define
