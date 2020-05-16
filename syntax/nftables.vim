@@ -49,6 +49,10 @@ hi link nftablesHL_Hook        Type
 hi link nftablesHL_Action      Special
 hi link nftablesHL_Table       Identifier
 hi link nftablesHL_Chain       Identifier
+hi link nftablesHL_Map         Identifier
+hi link nftablesHL_Set         Identifier
+hi link nftablesHL_Element     Identifier
+hi link nftablesHL_Handle      Identifier
 
 hi link nftables_ToDo nftablesHL_ToDo
 syn keyword nftables_ToDo xxx contained XXX FIXME TODO TODO: FIXME: skipwhite
@@ -1023,7 +1027,7 @@ syn region nftablesCmdAddSet_Section contained start=/{/ end=/}/ skipwhite
 \    nftables_Comment,
 \    nftables_EOS
 
-hi link nftablesCmdAddSet_SetName nftablesHL_Identifier
+hi link nftablesCmdAddSet_SetName nftablesHL_Set
 syn match nftablesCmdAddSet_SetName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftablesCmdAddSet_Section,
@@ -1063,27 +1067,38 @@ syn match nftablesAddElement_Separator contained /,/ skipwhite
 \ nextgroup=
 \    nftablesAddElement_ElementNth
 
-hi link nftablesAddElement_Element nftablesHL_String
-syn match nftablesAddElement_Element contained skipwhite
+hi link nftablesAddElement_SetElements nftablesHL_String
+syn match nftablesAddElement_SetElements contained skipwhite
 \    /[a-zA-Z0-9\-_]\{1,64}/
 \ nextgroup=nftablesAddElement_Separator
+
+syn region nftablesAddElement_MapSection contained start=/{/ end=/}/ skipwhite
+\ contains=nftablesAddElement_SetElements
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment
+
+hi link nftablesAddElement_MapElements nftablesHL_Option
+syn keyword nftablesAddElement_MapElements contained elements skipwhite
+\ nextgroup=nftablesAddElement_MapSection
 
 syn region nftablesCmdAddElement_Section contained start=/{/ end=/}/
 \ skipwhite
 \ contains=
-\    nftablesAddElement_Element
+\    nftablesAddElement_MapElements,
+\    nftablesAddElement_SetElements
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_Comment,
 \    nftables_EOS
 
-hi link nftablesCmdAddElement_SetName nftablesHL_Identifier
+hi link nftablesCmdAddElement_SetName nftablesHL_Set
 syn match nftablesCmdAddElement_SetName contained /[a-zA-Z0-9\-_]\{1,64}/
 \ skipwhite
 \ nextgroup=
 \    nftablesCmdAddElement_Section
 
-hi link nftablesCmdAddElement_TableName nftablesHL_Identifier
+hi link nftablesCmdAddElement_TableName nftablesHL_Table
 syn match nftablesCmdAddElement_TableName contained /[a-zA-Z0-9\-_]\{1,64}/
 \ skipwhite
 \ nextgroup=
@@ -1105,16 +1120,134 @@ syn keyword nftablesCmdAdd_ElementKeyword contained element skipwhite
 \ nextgroup=
 \    nftablesCmdAddElement_Family,
 \    nftablesCmdAddElement_TableName
-" End of 'add element [<family>] <table_id> <set_id>'
+" End 'add element [<family>] <table_id> <set_id>'
 
-hi link nftablesCmdAddMapTableName nftablesHL_Table
-syn match nftablesCmdAddMapTableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+" Begin 'add map ...'
+hi link nftablesAddMap_Type nftablesHL_Type
+syn keyword nftablesAddMap_Type contained skipwhite
+\    ipv4_addr
+\    ipv6_addr
+\    ether_addr
+\    inet_proto
+\    inet_service
+\    mark
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
+hi link nftablesAddMap_TypeKeyword nftablesHL_Statement
+syn keyword nftablesAddMap_TypeKeyword contained type skipwhite
+\ nextgroup=nftablesAddMap_Type
 
-hi link nftablesCmdAddMap nftablesHL_Statement
-syn keyword nftablesCmdAddMap contained map skipwhite
-\ nextgroup=nftablesCmdAddMapTableName
-" End of 'add map ...'
+hi link nftablesAddMap_Flags nftablesHL_Type
+syn keyword nftablesAddMap_Flags contained skipwhite
+\    constant
+\    interval
+\    timeout
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesAddMap_FlagsKeyword nftablesHL_Statement
+syn keyword nftablesAddMap_FlagsKeyword contained flags skipwhite
+\ nextgroup=
+\    nftablesAddMap_Flags
+
+hi link nftablesAddMap_TimeoutKeyword nftablesHL_Statement
+syn keyword nftablesAddMap_TimeoutKeyword contained timeout skipwhite
+\ nextgroup=nftablesAddMap_Timeout
+
+hi link nftablesAddMapElements_ElementNth nftablesHL_String
+syn match nftablesAddMapElements_ElementNth contained skipwhite
+\    /[a-zA-Z0-9\-_]\{1,64}/
+\ nextgroup=
+\    nftablesAddMapElements_Separator
+
+hi link nftablesAddMapElements_Separator nftablesHL_Operator
+syn match nftablesAddMapElements_Separator contained /,/ skipwhite
+\ nextgroup=
+\    nftablesAddMapElements_ElementNth,
+\    nftables_Error
+
+hi link nftablesAddMapElements_Element nftablesHL_String
+syn match nftablesAddMapElements_Element contained skipwhite
+\    /[a-zA-Z0-9\-_]\{1,64}/
+\ nextgroup=nftablesAddMapElements_Separator
+
+syn region nftablesAddMap_ElementsSection contained start=/=/ end=/;/ skipwhite
+\ contains=nftablesAddMapElements_Element
+\ nextgroup=
+\    nftables_Semicolon
+
+hi link nftablesAddMap_ElementsKeyword nftablesHL_Statement
+syn keyword nftablesAddMap_ElementsKeyword contained elements skipwhite
+\ nextgroup=
+\    nftablesAddMap_ElementsSection
+
+hi link nftablesAddMap_Size nftablesHL_Type
+syn match nftablesAddMap_Size contained /\d\{1,11}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesAddMap_SizeKeyword nftablesHL_Statement
+syn keyword nftablesAddMap_SizeKeyword contained size skipwhite
+\ nextgroup=
+\    nftablesAddMap_Size
+
+hi link nftablesAddMap_Policy nftablesHL_Type
+syn keyword nftablesAddMap_Policy contained skipwhite
+\    performance
+\    default
+\    memory
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesAddMap_PolicyKeyword nftablesHL_Statement
+syn keyword nftablesAddMap_PolicyKeyword contained policy skipwhite
+\ nextgroup=
+\    nftablesAddMap_Policy
+
+syn region nftablesCmdAddMap_Section contained start=/{/ end=/}/ skipwhite
+\ contains=
+\    nftablesAddMap_TypeKeyword,
+\    nftablesAddMap_FlagsKeyword,
+\    nftablesAddMap_ElementsKeyword,
+\    nftablesAddMap_SizeKeyword,
+\    nftablesAddMap_PolicyKeyword,
+\    nftables_Comment
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
+
+hi link nftablesCmdAddMap_MapName nftablesHL_Map
+syn match nftablesCmdAddMap_MapName contained /[A-Za-z0-9\-_]\{1,64}/ 
+\ skipwhite
+\ nextgroup=nftablesCmdAddMap_Section
+
+hi link nftablesCmdAddMap_TableName nftablesHL_Table
+syn match nftablesCmdAddMap_TableName contained /[A-Za-z0-9\-_]\{1,64}/ 
+\ skipwhite
+\ nextgroup=nftablesCmdAddMap_MapName
+
+hi link nftablesCmdAddMap_Family nftablesHL_Family
+syn keyword nftablesCmdAddMap_Family contained skipwhite
+\    netdev
+\    bridge
+\    arp
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdAddMap_TableName
+
+hi link nftablesCmdAdd_MapKeyword nftablesHL_Statement
+syn keyword nftablesCmdAdd_MapKeyword contained map skipwhite
+\ nextgroup=
+\    nftablesCmdAddMap_Family,
+\    nftablesCmdAddMap_TableName,
+" End 'add map ...'
 "
 " Begin of 'delete chain ...'
 hi link nftablesCmdDeleteChain_ChainName nftablesHL_Chain
@@ -1123,7 +1256,7 @@ syn match nftablesCmdDeleteChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ ski
 \    nftables_Semicolon,
 \    nftables_EOS
 
-hi link nftablesCmdDeleteChain_Handle nftablesHL_Number
+hi link nftablesCmdDeleteChain_Handle nftablesHL_Handle
 syn match nftablesCmdDeleteChain_Handle contained /[0-9]\{1,11}/ skipwhite
 \ nextgroup=
 \    nftables_Semicolon,
@@ -1165,7 +1298,7 @@ syn match nftablesCmdDeleteSet_SetName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhi
 \    nftables_Semicolon,
 \    nftables_EOS
 
-hi link nftablesCmdDeleteSet_Handle nftablesHL_Number
+hi link nftablesCmdDeleteSet_Handle nftablesHL_Handle
 syn match nftablesCmdDeleteSet_Handle contained /[0-9]\{1,11}/ skipwhite
 \ nextgroup=
 \    nftables_Semicolon,
@@ -1201,13 +1334,13 @@ syn keyword nftablesCmdDelete_SetKeyword contained set skipwhite
 " End of 'delete set ...'
 
 " Begin of 'delete table ...'
-hi link nftablesCmdDeleteTable_Handle nftablesHL_Number
+hi link nftablesCmdDeleteTable_Handle nftablesHL_Handle
 syn match nftablesCmdDeleteTable_Handle contained /[0-9]\{1,11}/ skipwhite
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS,
 
-hi link nftablesCmdDeleteTable_HandleKeyword nftablesHL_Statement
+hi link nftablesCmdDeleteTable_HandleKeyword nftablesHL_Option
 syn keyword nftablesCmdDeleteTable_HandleKeyword contained handle skipwhite
 \ nextgroup=nftablesCmdDeleteTable_Handle
 
@@ -1304,7 +1437,7 @@ syn match nftablesCmdFlushChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skip
 \    nftables_Semicolon,
 \    nftables_EOS
 
-hi link nftablesCmdFlushChain_Handle nftablesHL_Number
+hi link nftablesCmdFlushChain_Handle nftablesHL_Handle
 syn match nftablesCmdFlushChain_Handle contained /[0-9]\{1,11}/ skipwhite
 \ nextgroup=
 \    nftables_Semicolon,
@@ -1348,6 +1481,35 @@ syn keyword nftablesCmdList_NoArg contained skipwhite
 \    nftables_Semicolon,
 \    nftables_EOS
 
+" Begin of 'list map [<family>] <table_name> <map>' 
+hi link nftablesCmdList_MapName nftablesHL_Map
+syn match nftablesCmdList_MapName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesCmdListMap_TableName nftablesHL_Table
+syn match nftablesCmdListMap_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=nftablesCmdList_MapName 
+
+hi link nftablesCmdListMap_Family nftablesHL_Family
+syn keyword  nftablesCmdListMap_Family contained skipwhite
+\    netdev
+\    bridge
+\    arp
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdListMap_TableName
+
+hi link nftablesCmdList_MapKeyword nftablesHL_Statement
+syn keyword nftablesCmdList_MapKeyword contained map skipwhite
+\ nextgroup=
+\    nftablesCmdListMap_Family,
+\    nftablesCmdListMap_TableName
+" End of 'list map [<family>] <table_name> <map>' 
+
+" Begin of 'list ruleset [family]'
 hi link nftablesCmdListRuleset_Family nftablesHL_Family
 syn keyword nftablesCmdListRuleset_Family contained skipwhite
 \    netdev
@@ -1358,7 +1520,6 @@ syn keyword nftablesCmdListRuleset_Family contained skipwhite
 \    inet
 \ nextgroup=nftables_EOS
 
-" Begin of 'list ruleset [family]'
 hi link nftablesCmdList_Ruleset nftablesHL_Option
 syn keyword nftablesCmdList_Ruleset contained ruleset skipwhite
 \ nextgroup=
@@ -1366,34 +1527,8 @@ syn keyword nftablesCmdList_Ruleset contained ruleset skipwhite
 \    nftables_EOS
 " End of 'list ruleset [<family>]'
 
-" Begin of 'list table [<family>] <table_name>' 
-hi link nftablesCmdListTable_Name nftablesHL_Table
-syn match nftablesCmdListTable_Name contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
-\ nextgroup=
-\    nftables_Semicolon,
-\    nftables_EOS
-
-hi link nftablesCmdListTable_Family nftablesHL_Family
-syn keyword nftablesCmdListTable_Family contained skipwhite
-\    netdev
-\    bridge
-\    arp
-\    ip
-\    ip6
-\    inet
-\ nextgroup=
-\    nftablesCmdListTable_Name,
-\    nftables_EOS
-
-hi link nftablesCmdListTableKeyword nftablesHL_Option
-syn keyword nftablesCmdListTableKeyword contained table skipwhite
-\ nextgroup=
-\    nftablesCmdListTable_Name,
-\    nftablesCmdListTable_Family
-" End of 'list table [<family>] <table_name>' 
-
 " Begin of 'list set [<family>] <table_name> <set_name>' 
-hi link nftablesCmdList_SetName nftablesHL_String
+hi link nftablesCmdList_SetName nftablesHL_Set
 syn match nftablesCmdList_SetName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
 \    nftables_Semicolon,
@@ -1419,6 +1554,32 @@ syn keyword nftablesCmdList_SetKeyword contained set skipwhite
 \    nftablesCmdListSet_Family,
 \    nftablesCmdListSet_TableName
 " End of 'list set [<family>] <table_name> <set_name>' 
+"
+" Begin of 'list table [<family>] <table_name>' 
+hi link nftablesCmdListTable_Name nftablesHL_Table
+syn match nftablesCmdListTable_Name contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesCmdListTable_Family nftablesHL_Family
+syn keyword nftablesCmdListTable_Family contained skipwhite
+\    netdev
+\    bridge
+\    arp
+\    ip
+\    ip6
+\    inet
+\ nextgroup=
+\    nftablesCmdListTable_Name,
+\    nftables_EOS
+
+hi link nftablesCmdListTableKeyword nftablesHL_Option
+syn keyword nftablesCmdListTableKeyword contained table skipwhite
+\ nextgroup=
+\    nftablesCmdListTable_Name,
+\    nftablesCmdListTable_Family
+" End of 'list table [<family>] <table_name>' 
 " End of 'list set ...'
 
 " Begin 'monitor'
@@ -1495,7 +1656,7 @@ syn keyword nftablesCmdAddKeyword add skipwhite skipempty
 \    nftablesCmdAdd_ChainKeyword,
 \    nftablesCmdAdd_SetKeyword,
 \    nftablesCmdAdd_ElementKeyword,
-\    nftablesCmdAddMap
+\    nftablesCmdAdd_MapKeyword
 
 hi link nftablesCmd_Create nftablesHL_Statement
 syn keyword nftablesCmd_Create skipwhite create skipempty 
@@ -1510,6 +1671,7 @@ syn keyword nftablesCmd_Delete skipwhite delete skipempty
 \    nftablesCmdDelete_ChainKeyword,
 \    nftablesCmdDelete_SetKeyword,
 \    nftablesCmdAdd_ElementKeyword,
+\    nftablesCmdAdd_MapKeyword
 
 hi link nftablesCmd_Describe nftablesHL_Statement
 syn keyword nftablesCmd_Describe describe skipwhite 
@@ -1528,7 +1690,8 @@ syn keyword nftablesCmdFlushKeyword flush skipwhite
 \    nftablesCmdFlush_RulesetKeyword,
 \    nftablesCmdFlush_TableKeyword,
 \    nftablesCmdFlush_ChainKeyword,
-\    nftablesCmdList_SetKeyword
+\    nftablesCmdList_SetKeyword,
+\    nftablesCmdList_MapKeyword,
 
 hi link nftablesCmdGetKeyword nftablesHL_Statement
 syn keyword nftablesCmdGetKeyword get skipwhite
@@ -1553,6 +1716,7 @@ syn keyword nftablesCmdListKeyword list skipwhite
 \    nftablesCmdListTableKeyword,
 \    nftablesCmdFlush_ChainKeyword,
 \    nftablesCmdList_SetKeyword,
+\    nftablesCmdList_MapKeyword,
 \    nftables_UnexpectedEOS,
 
 hi link nftablesCmdMonitorKeyword nftablesHL_Statement

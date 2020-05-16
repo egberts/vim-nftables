@@ -28,57 +28,44 @@ include "Filespec" bad stuff oppsie
 include "Filespec"  oopsie
 include "Filespec"  oopsie  ;
 
-list oopsie
-list oopsie ;
-list ruleset   
-list ruleset  ;  
-list ruleset netdev
-list ruleset netdev oopsie;
-list ruleset bridge
-list ruleset arp
-list ruleset ip
-list ruleset ip6
-list ruleset inet
+monitor tables
+monitor chains
+monitor sets
+monitor rules
+monitor elements
+monitor trace
 
-list tables
-list tables  ;   asdf
+monitor tables json;
+monitor chains json
+monitor sets json
+monitor rules json
+monitor elements json
+monitor trace json
 
-list table TABLE_NETDEV   ; asdf
-list table netdev TABLE_NETDEV
-list table bridge TABLE_NETDEV
-list table arp TABLE_NETDEV
-list table ip TABLE_NETDEV
-list table ip6 TABLE_NETDEV
-list table inet TABLE_NETDEV
+monitor new 
+monitor new tables 
+monitor new chains
+monitor new sets
+monitor new rules
+monitor new elements 
+monitor new trace 
 
-list chains
-
-list chain myIpTable myIpChain ; 
-list chain netdev myNetdev myNetdevchain
-list chain bridge myBridge myBridgechain
-list chain arp myArp myArpchain
-list chain ip myIp myIpchain
-list chain ip6 myIp6 myIp6chain
-list chain inet myInet myInetchain
-
-list set TABLE_NETDEV SET_NETDEV
-list set myIpTable handle 123 # intentional syntax error
-list set ip myIpTable myIpSet
-list set netdev myNetdevTable myNetdevSet
-list set bridge myBridgeTable myBridgeSet
-list set arp myArpTable myArpSet
-list set ip myIpTable myIpSet
-list set ip6 myIp6Table myIp6Set
-list set inet myInetTable myInetSet
-list sets
+flush map myIpTable myIpMap 
+flush map netdev myNetdevTable myNetdevMap 
+flush map bridge myBridgeTable myBridgeMap 
+flush map arp myArpTable myArpMap 
+flush map ip myIpTable myIpMap 
+flush map ip6 myIp6Table myIp6Map 
+flush map inet myInetTable myInetMap 
 
 flush set myIpTable mySet
-flush set ip myIpTable mySet
 flush set netdev myNetdevTable mySet
 flush set bridge myBridgeTable mySet
+flush set arp myArpTable mySet
 flush set ip myIpTable mySet
 flush set ip6 myIp6Table mySet
 flush set inet myInetTable mySet ; 
+flush set inet myInetTable handle 123  # Intentional Syntax ERROR
 
 flush chain myIpTable myIpChain
 flush chain myIpTable myIpChain ; flush chain netdev myNetDev X; oopsie
@@ -263,12 +250,88 @@ add set inet myInetTable myInetSet { type mark; flags interval; timeout 15m; gc-
 add element myIpTable myIpSet { element, element }
 add element netdev myNetdevTable myNetdevSet { element, element }
 add element bridge myBridgeTable myBridgeSet { element, element }
+add element arp myArpTable myArpSet { element, element }
 add element ip myIpTable myIpSet { element, element }
 add element ip6 myIp6Table myIp6Set { element, element }
 add element inet myInetTable myInetSet { element, element }
 
+add map myIpTable myIpMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
+add map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
+add map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
+add map arp myArpTable myArpMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
+add map ip myIpTable myIpMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
+add map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
+add map inet myInetTable myInetMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
 
-add map TABLE_NETDEV
+add element myIpTable myIpMap { elements = { element, element }; }
+add element netdev myNetdevTable myNetdevMap { elements = { element, element } ; }
+add element bridge myBridgeTable myBridgeMap { elements = { element, element } ; }
+add element arp myArpTable myArpMap { elements = { element, element } ; }
+add element ip myIpTable myIpMap { elements = { element, element } ; }
+add element ip6 myIp6Table myIp6Map { elements = { element, element } ; }
+add element inet myInetTable myInetMap { elements = { element, element } ; }
+
+rename chain myIpTable myIpChain newMyIpChain
+rename chain netdev myNetdevTable myNetdevChain newMyNetdevChain    ;    
+rename chain bridge myBridgeTable myBridgeChain newMyBridgeChain;
+rename chain arp myArpTable myArpChain newMyArpChain  ;
+rename chain ip myIpTable myIpChain newMyIpChain    ;    # comment
+rename chain ip6 myIp6Table myIp6Chain newMyIp6Chain  # comment
+rename chain inet myInetTable myInetChain newMyInetChain
+
+list oopsie
+list oopsie ;
+list ruleset   
+list ruleset  ;  
+list ruleset netdev
+list ruleset netdev oopsie;
+list ruleset bridge
+list ruleset arp
+list ruleset ip
+list ruleset ip6
+list ruleset inet
+
+list tables
+list tables  ;   asdf
+
+list table TABLE_NETDEV   ; asdf
+list table netdev TABLE_NETDEV
+list table bridge TABLE_NETDEV
+list table arp TABLE_NETDEV
+list table ip TABLE_NETDEV
+list table ip6 TABLE_NETDEV
+list table inet TABLE_NETDEV
+
+list chains
+
+list chain myIpTable myIpChain ; 
+list chain netdev myNetdev myNetdevchain
+list chain bridge myBridge myBridgechain
+list chain arp myArp myArpchain
+list chain ip myIp myIpchain
+list chain ip6 myIp6 myIp6chain
+list chain inet myInet myInetchain
+
+list sets
+
+list set TABLE_NETDEV SET_NETDEV
+list set myIpTable handle 123 # intentional syntax error
+list set ip myIpTable myIpSet
+list set netdev myNetdevTable myNetdevSet
+list set bridge myBridgeTable myBridgeSet
+list set arp myArpTable myArpSet
+list set ip myIpTable myIpSet
+list set ip6 myIp6Table myIp6Set
+list set inet myInetTable myInetSet
+list set inet myInetTable handle 123  # Intentional Syntax ERROR
+
+list map myIpTable myIpMap 
+list map netdev myNetdevTable myNetdevMap 
+list map bridge myBridgeTable myBridgeMap 
+list map arp myArpTable myArpMap 
+list map ip myIpTable myIpMap 
+list map ip6 myIp6Table myIp6Map 
+list map inet myInetTable myInetMap 
 
 
 export json
@@ -281,27 +344,46 @@ describe tcp flag; # oopsie
 delete element myIpTable myIpSet { element, element }
 delete element netdev myNetdevTable myNetdevSet { element, element }
 delete element bridge myBridgeTable myBridgeSet { element, element }
+delete element arp myArpTable myArpSet { element, element }
 delete element ip myIpTable myIpSet { element, element }
 delete element ip6 myIp6Table myIp6Set { element, element }
 delete element inet myInetTable myInetSet { element, element }
 
-delete set myIpTable myIpChain
-delete set netdev myNetdev myNetdevchain
-delete set bridge myBridge myBridgeset
-delete set arp myArp myArpset
-delete set ip myIp myIpset
-delete set ip6 myIp6 myIp6set
-delete set inet myInet myInetset
-delete set myInet handle 123123
-delete set inet myInet handle 42 # comment
+delete element myIpTable myIpMap { elements = { element, element }; }
+delete element netdev myNetdevTable myNetdevMap { elements = { element, element } ; }
+delete element bridge myBridgeTable myBridgeMap { elements = { element, element } ; }
+delete element arp myArpTable myArpMap { elements = { element, element } ; }
+delete element ip myIpTable myIpMap { elements = { element, element } ; }
+delete element ip6 myIp6Table myIp6Map { elements = { element, element } ; }
+delete element inet myInetTable myInetMap { elements = { element, element } ; }
+
+
+delete map myIpTable myIpMap 
+delete map netdev myNetdevTable myNetdevMap 
+delete map bridge myBridgeTable myBridgeMap 
+delete map arp myArpTable myArpMap 
+delete map ip myIpTable myIpMap 
+delete map ip6 myIp6Table myIp6Map 
+delete map inet myInetTable myInetMap 
+
+delete set myIpTable myIpSet
+delete set netdev myNetdevTable mySet
+delete set bridge myBridgeTable myBridgeSet
+delete set arp myArpTable myArpSet
+delete set ip myIpTable myIpSet
+delete set ip6 myIp6Table myIp6Set
+delete set inet myInetTable myInetSet
+delete set myIpTable handle 123
+delete set ip myIpTable handle 123
+delete set inet myInetTable handle 42 # comment
 
 delete chain myIpTable myIpChain
-delete chain netdev myNetdev myNetdevchain
-delete chain bridge myBridge myBridgechain
-delete chain arp myArp myArpchain
-delete chain ip myIp myIpchain
-delete chain ip6 myIp6 myIp6chain
-delete chain inet myInet myInetchain
+delete chain netdev myNetdev myNetdevChain
+delete chain bridge myBridge myBridgeChain
+delete chain arp myArp myArpChain
+delete chain ip myIp myIpChain
+delete chain ip6 myIp6 myIp6Chain
+delete chain inet myInet myInetChain
 delete chain myInet handle 123123
 delete chain inet myInet handle 42 # comment
 
@@ -315,25 +397,7 @@ delete table inet myInetTable
 delete table netdev handle 123
 delete table handle 4321 # comment
 
-monitor tables
-monitor chains
-monitor sets
-monitor rules
-monitor elements
-monitor trace
-monitor tables json;
-monitor chains json
-monitor sets json
-monitor rules json
-monitor elements json
-monitor trace json
-monitor new 
-monitor new tables 
-monitor new chains
-monitor new sets
-monitor new rules
-monitor new elements 
-monitor new trace 
+
 monitor destroy 
 monitor destroy tables 
 monitor destroy chains
@@ -341,48 +405,6 @@ monitor destroy sets
 monitor destroy rules
 monitor destroy elements
 monitor destroy trace 
-
-delete set myIpTable handle 123
-delete set ip myIpTable handle 123
-
-delete set myIpTable mySet
-delete set myIpTable handle 123
-delete set netdev myNetdevTable mySet
-delete set bridge myBridgeTable mySet
-delete set arp myArpTable mySet
-delete set ip myIpTable mySet
-delete set ip6 myIp6Table mySet
-delete set inet myInetTable mySet
-delete set inet myInetTable handle 123
-
-add element myIpTable mySet { element, element, element }
-add ip element myIpTable mySet { element, element, element }
-delete element myIpTable mySet { element, element, element }
-delete ip element myIpTable mySet { element, element, element }
-
-list set netdev myNetdevTable mySet
-list set bridge myBridgeTable mySet
-list set arp myArpTable mySet
-list set ip myIpTable mySet
-list set ip6 myIp6Table mySet
-list set inet myInetTable mySet
-list set inet myInetTable handle 123  # Intentional Syntax ERROR
-
-flush set netdev myNetdevTable mySet
-flush set bridge myBridgeTable mySet
-flush set arp myArpTable mySet
-flush set ip myIpTable mySet
-flush set ip6 myIp6Table mySet
-flush set inet myInetTable mySet
-flush set inet myInetTable handle 123  # Intentional Syntax ERROR
-
-rename chain myIpTable myIpChain newMyIpChain
-rename chain netdev myNetdevTable myNetdevChain newMyNetdevChain    ;    
-rename chain bridge myBridgeTable myBridgeChain newMyBridgeChain;
-rename chain arp myArpTable myArpChain newMyArpChain  ;
-rename chain ip myIpTable myIpChain newMyIpChain    ;    # comment
-rename chain ip6 myIp6Table myIp6Chain newMyIp6Chain  # comment
-rename chain inet myInetTable myInetChain newMyInetChain
 
 table arp ARP_TABLE {
     chain ARP_INPUT_FILTER {
