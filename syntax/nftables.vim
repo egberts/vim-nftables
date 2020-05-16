@@ -1052,9 +1052,59 @@ syn keyword nftablesCmdAdd_SetKeyword contained set skipwhite
 " End of 'add set [<family>] <table_id> <set_id>'
 
 " Begin of 'add element [<family>] <table_id> <set_id>'
+hi link nftablesAddElement_ElementNth nftablesHL_String
+syn match nftablesAddElement_ElementNth contained skipwhite
+\    /[a-zA-Z0-9\-_]\{1,64}/
+\ nextgroup=
+\    nftablesAddElement_Separator
+
+hi link nftablesAddElement_Separator nftablesHL_Operator
+syn match nftablesAddElement_Separator contained /,/ skipwhite
+\ nextgroup=
+\    nftablesAddElement_ElementNth
+
+hi link nftablesAddElement_Element nftablesHL_String
+syn match nftablesAddElement_Element contained skipwhite
+\    /[a-zA-Z0-9\-_]\{1,64}/
+\ nextgroup=nftablesAddElement_Separator
+
+syn region nftablesCmdAddElement_Section contained start=/{/ end=/}/
+\ skipwhite
+\ contains=
+\    nftablesAddElement_Element
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
+
+hi link nftablesCmdAddElement_SetName nftablesHL_Identifier
+syn match nftablesCmdAddElement_SetName contained /[a-zA-Z0-9\-_]\{1,64}/
+\ skipwhite
+\ nextgroup=
+\    nftablesCmdAddElement_Section
+
+hi link nftablesCmdAddElement_TableName nftablesHL_Identifier
+syn match nftablesCmdAddElement_TableName contained /[a-zA-Z0-9\-_]\{1,64}/
+\ skipwhite
+\ nextgroup=
+\    nftablesCmdAddElement_SetName,
+\    nftables_UnexpectedEOS
+
+hi link nftablesCmdAddElement_Family nftablesHL_Type
+syn keyword nftablesCmdAddElement_Family contained skipwhite
+\    netdev
+\    bridge
+\    arp
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdAddElement_TableName
+
 hi link nftablesCmdAdd_ElementKeyword nftablesHL_Statement
 syn keyword nftablesCmdAdd_ElementKeyword contained element skipwhite
-\ nextgroup=nftablesCmdAdd_Element nftablesHL_Identifier
+\ nextgroup=
+\    nftablesCmdAddElement_Family,
+\    nftablesCmdAddElement_TableName
 " End of 'add element [<family>] <table_id> <set_id>'
 
 hi link nftablesCmdAddMapTableName nftablesHL_Table
@@ -1183,6 +1233,15 @@ syn keyword nftablesCmdDelete_TableKeyword contained table skipwhite
 \    nftablesCmdDeleteTable_Family,
 \    nftablesCmdDeleteTable_HandleKeyword
 " End of 'delete table ...'
+
+" Begin of 'describe ...'
+hi link nftablesCmdDescribe_String nftablesHL_String
+syn match nftablesCmdDescribe_String contained /[^;\n]*/ 
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
+" End of 'describe ...'
 
 " Begin of 'export table ...'
 hi link nftablesCmdExport_Format nftablesHL_Type
@@ -1449,12 +1508,13 @@ syn keyword nftablesCmd_Delete skipwhite delete skipempty
 \ nextgroup=
 \    nftablesCmdDelete_TableKeyword,
 \    nftablesCmdDelete_ChainKeyword,
-\    nftablesCmdDelete_SetKeyword
+\    nftablesCmdDelete_SetKeyword,
+\    nftablesCmdAdd_ElementKeyword,
 
 hi link nftablesCmd_Describe nftablesHL_Statement
-syn keyword nftablesCmd_Describe skipwhite describe skipempty 
+syn keyword nftablesCmd_Describe describe skipwhite 
 \ nextgroup=
-\    nftablesCmdDescribe_Keyword,
+\    nftablesCmdDescribe_String,
 
 hi link nftablesCmdExportKeyword nftablesHL_Statement
 syn keyword nftablesCmdExportKeyword export skipwhite 

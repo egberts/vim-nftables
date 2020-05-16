@@ -260,7 +260,12 @@ add set ip myIpTable myIpSet { type mark; flags interval; timeout 15m; gc-interv
 add set ip6 myIp6Table myIp6Set { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
 add set inet myInetTable myInetSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
 
-add element TABLE_NETDEV SET_NETDEV
+add element myIpTable myIpSet { element, element }
+add element netdev myNetdevTable myNetdevSet { element, element }
+add element bridge myBridgeTable myBridgeSet { element, element }
+add element ip myIpTable myIpSet { element, element }
+add element ip6 myIp6Table myIp6Set { element, element }
+add element inet myInetTable myInetSet { element, element }
 
 
 add map TABLE_NETDEV
@@ -270,6 +275,15 @@ export json
 export xml
 export ruleset json
 export ruleset xml
+
+describe tcp flag; # oopsie
+
+delete element myIpTable myIpSet { element, element }
+delete element netdev myNetdevTable myNetdevSet { element, element }
+delete element bridge myBridgeTable myBridgeSet { element, element }
+delete element ip myIpTable myIpSet { element, element }
+delete element ip6 myIp6Table myIp6Set { element, element }
+delete element inet myInetTable myInetSet { element, element }
 
 delete set myIpTable myIpChain
 delete set netdev myNetdev myNetdevchain
