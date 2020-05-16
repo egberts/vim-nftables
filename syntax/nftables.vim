@@ -1066,6 +1066,90 @@ syn keyword nftablesCmdAddMap contained map skipwhite
 \ nextgroup=nftablesCmdAddMapTableName
 " End of 'add map ...'
 "
+" Begin of 'delete chain ...'
+hi link nftablesCmdDeleteChain_ChainName nftablesHL_Chain
+syn match nftablesCmdDeleteChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesCmdDeleteChain_Handle nftablesHL_Number
+syn match nftablesCmdDeleteChain_Handle contained /[0-9]\{1,11}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesCmdDeleteChain_HandleKeyword nftablesHL_Option
+syn keyword nftablesCmdDeleteChain_HandleKeyword contained handle skipwhite
+\ nextgroup=nftablesCmdDeleteChain_Handle
+\ nextgroup=
+\    nftables_UnexpectedEOS
+
+hi link nftablesCmdDeleteChainTableName nftablesHL_Table
+syn match nftablesCmdDeleteChainTableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftablesCmdDeleteChain_HandleKeyword,
+\    nftablesCmdFlushChain_ChainName
+
+hi link nftablesCmdDeleteChainFamily nftablesHL_Family
+syn keyword nftablesCmdDeleteChainFamily contained skipwhite
+\    netdev
+\    bridge
+\    arp
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdDeleteChainTableName
+
+hi link nftablesCmdDelete_ChainKeyword nftablesHL_Option
+syn keyword nftablesCmdDelete_ChainKeyword contained chain skipwhite
+\ nextgroup=
+\    nftablesCmdDeleteChainFamily,
+\    nftablesCmdDeleteChainTableName
+" End of 'delete chain ...'
+
+" Begin of 'delete set ...'
+hi link nftablesCmdDeleteSet_SetName nftablesHL_Set
+syn match nftablesCmdDeleteSet_SetName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesCmdDeleteSet_Handle nftablesHL_Number
+syn match nftablesCmdDeleteSet_Handle contained /[0-9]\{1,11}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesCmdDeleteSet_HandleKeyword nftablesHL_Option
+syn keyword nftablesCmdDeleteSet_HandleKeyword contained handle skipwhite
+\ nextgroup=
+\    nftablesCmdDeleteSet_Handle
+\    nftables_UnexpectedEOS
+
+hi link nftablesCmdDeleteSet_TableName nftablesHL_Table
+syn match nftablesCmdDeleteSet_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+\ nextgroup=
+\    nftablesCmdDeleteSet_HandleKeyword,
+\    nftablesCmdDeleteSet_SetName
+
+hi link nftablesCmdDeleteSet_Family nftablesHL_Family
+syn keyword nftablesCmdDeleteSet_Family contained skipwhite
+\    netdev
+\    bridge
+\    arp
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdDeleteSet_TableName
+
+hi link nftablesCmdDelete_SetKeyword nftablesHL_Option
+syn keyword nftablesCmdDelete_SetKeyword contained set skipwhite
+\ nextgroup=
+\    nftablesCmdDeleteSet_Family,
+\    nftablesCmdDeleteSet_TableName
+" End of 'delete set ...'
+
 " Begin of 'delete table ...'
 hi link nftablesCmdDeleteTable_Handle nftablesHL_Number
 syn match nftablesCmdDeleteTable_Handle contained /[0-9]\{1,11}/ skipwhite
@@ -1092,8 +1176,8 @@ syn keyword nftablesCmdDeleteTable_Family contained skipwhite
 \    nftablesCmdDeleteTable_HandleKeyword,
 \    nftablesCmdDeleteTable_Name
 
-hi link nftablesCmdDeleteTableKeyword nftablesHL_Option
-syn keyword nftablesCmdDeleteTableKeyword contained table skipwhite
+hi link nftablesCmdDelete_TableKeyword nftablesHL_Option
+syn keyword nftablesCmdDelete_TableKeyword contained table skipwhite
 \ nextgroup=
 \    nftablesCmdDeleteTable_Name,
 \    nftablesCmdDeleteTable_Family,
@@ -1155,7 +1239,6 @@ syn keyword nftablesCmdFlush_TableKeyword contained table skipwhite
 " End of 'flush table ...'
 
 " Begin of 'flush chain ...'
-
 hi link nftablesCmdFlushChain_ChainName nftablesHL_Chain
 syn match nftablesCmdFlushChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 \ nextgroup=
@@ -1170,8 +1253,8 @@ syn match nftablesCmdFlushChain_Handle contained /[0-9]\{1,11}/ skipwhite
 
 hi link nftablesCmdFlushChain_HandleKeyword nftablesHL_Option
 syn keyword nftablesCmdFlushChain_HandleKeyword contained handle skipwhite
-\ nextgroup=nftablesCmdFlushChain_Handle
 \ nextgroup=
+\    nftablesCmdFlushChain_Handle
 \    nftables_UnexpectedEOS
 
 hi link nftablesCmdFlushChainTableName nftablesHL_Table
@@ -1355,20 +1438,21 @@ syn keyword nftablesCmdAddKeyword add skipwhite skipempty
 \    nftablesCmdAdd_ElementKeyword,
 \    nftablesCmdAddMap
 
-hi link nftablesCmdCreate nftablesHL_Statement
-syn keyword nftablesCmdCreate skipwhite create skipempty 
+hi link nftablesCmd_Create nftablesHL_Statement
+syn keyword nftablesCmd_Create skipwhite create skipempty 
 \ nextgroup=
 \    nftablesCmdCreate_TableKeyword,
 \    nftablesCmdAdd_ChainKeyword,
 
-hi link nftablesCmdDeleteTable nftablesHL_Statement
-syn keyword nftablesCmdDeleteTable skipwhite delete skipempty 
+hi link nftablesCmd_Delete nftablesHL_Statement
+syn keyword nftablesCmd_Delete skipwhite delete skipempty 
 \ nextgroup=
-\    nftablesCmdDeleteTableKeyword,
-\    nftablesCmdFlush_ChainKeyword
+\    nftablesCmdDelete_TableKeyword,
+\    nftablesCmdDelete_ChainKeyword,
+\    nftablesCmdDelete_SetKeyword
 
-hi link nftablesCmdDescribeTable nftablesHL_Statement
-syn keyword nftablesCmdDescribeTable skipwhite describe skipempty 
+hi link nftablesCmd_Describe nftablesHL_Statement
+syn keyword nftablesCmd_Describe skipwhite describe skipempty 
 \ nextgroup=
 \    nftablesCmdDescribe_Keyword,
 

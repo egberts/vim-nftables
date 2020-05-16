@@ -63,13 +63,13 @@ list chain inet myInet myInetchain
 
 list set TABLE_NETDEV SET_NETDEV
 list set myIpTable handle 123 # intentional syntax error
-list set ip myIpTable
-list set netdev myNetdevTable
-list set bridge myBridgeTable
-list set arp myArpTable
-list set ip myIpTable
-list set ip6 myIp6Table
-list set inet myInetTable
+list set ip myIpTable myIpSet
+list set netdev myNetdevTable myNetdevSet
+list set bridge myBridgeTable myBridgeSet
+list set arp myArpTable myArpSet
+list set ip myIpTable myIpSet
+list set ip6 myIp6Table myIp6Set
+list set inet myInetTable myInetSet
 list sets
 
 flush set myIpTable mySet
@@ -78,16 +78,16 @@ flush set netdev myNetdevTable mySet
 flush set bridge myBridgeTable mySet
 flush set ip myIpTable mySet
 flush set ip6 myIp6Table mySet
-flush set inet myInetTable mySet ;
+flush set inet myInetTable mySet ; 
 
 flush chain myIpTable myIpChain
 flush chain myIpTable myIpChain ; flush chain netdev myNetDev X; oopsie
-flush chain netdev myNetdev myNetdevchain
-flush chain bridge myBridge myBridgechain
-flush chain arp myArp myArpchain
-flush chain ip myIp myIpchain
-flush chain ip6 myIp6 myIp6chain
-flush chain inet myInet myInetchain
+flush chain netdev myNetdev myNetdevChain
+flush chain bridge myBridge myBridgeChain
+flush chain arp myArp myArpChain
+flush chain ip myIp myIpChain
+flush chain ip6 myIp6 myIp6Chain
+flush chain inet myInet myInetChain
 
 flush table myArpTable
 flush table netdev TABLE_NETDEV
@@ -271,15 +271,15 @@ export xml
 export ruleset json
 export ruleset xml
 
-delete table myIpTable
-delete table netdev myNetdevTable
-delete table bridge myBridgeTable
-delete table arp myArpTable
-delete table ip myIpTable
-delete table ip6 myIp6Table
-delete table inet myInetTable
-delete table netdev handle 123
-delete table handle 4321 # comment
+delete set myIpTable myIpChain
+delete set netdev myNetdev myNetdevchain
+delete set bridge myBridge myBridgeset
+delete set arp myArp myArpset
+delete set ip myIp myIpset
+delete set ip6 myIp6 myIp6set
+delete set inet myInet myInetset
+delete set myInet handle 123123
+delete set inet myInet handle 42 # comment
 
 delete chain myIpTable myIpChain
 delete chain netdev myNetdev myNetdevchain
@@ -290,6 +290,16 @@ delete chain ip6 myIp6 myIp6chain
 delete chain inet myInet myInetchain
 delete chain myInet handle 123123
 delete chain inet myInet handle 42 # comment
+
+delete table myIpTable
+delete table netdev myNetdevTable
+delete table bridge myBridgeTable
+delete table arp myArpTable
+delete table ip myIpTable
+delete table ip6 myIp6Table
+delete table inet myInetTable
+delete table netdev handle 123
+delete table handle 4321 # comment
 
 monitor tables
 monitor chains
