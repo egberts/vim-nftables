@@ -53,6 +53,7 @@ hi link nftablesHL_Map         Identifier
 hi link nftablesHL_Set         Identifier
 hi link nftablesHL_Element     Identifier
 hi link nftablesHL_Handle      Identifier
+hi link nftablesHL_Flowtable   Identifier
 
 hi link nftables_ToDo nftablesHL_ToDo
 syn keyword nftables_ToDo xxx contained XXX FIXME TODO TODO: FIXME: skipwhite
@@ -1249,7 +1250,98 @@ syn keyword nftablesCmdAdd_MapKeyword contained map skipwhite
 \    nftablesCmdAddMap_Family,
 \    nftablesCmdAddMap_TableName,
 " End 'add map ...'
+
+" Begin 'add flowtable ...'
 "
+hi link nftablesAddFTDev_DeviceNth nftablesHL_String
+syn match nftablesAddFTDev_DeviceNth contained skipwhite
+\    /[a-zA-Z0-9\-_]\{1,64}/
+\ nextgroup=
+\    nftablesAddFTDev_Separator
+
+" TODO Why does a space first device and first comma separate causes error here?
+hi link nftablesAddFTDev_Separator nftablesHL_Operator
+syn match nftablesAddFTDev_Separator contained /,/ skipwhite
+\ nextgroup=
+\    nftablesAddFTDev_DeviceNth,
+\    nftables_Error
+
+hi link nftablesAddFTDev_Device nftablesHL_String
+syn match nftablesAddFTDev_Device contained skipwhite
+\    /[a-zA-Z0-9\-_]\{1,64}/
+\ nextgroup=nftablesAddFTDev_Separator
+
+syn region nftablesCmdAddFTDev_Section contained start=/{/ end=/}/ skipwhite
+\ contains=nftablesAddFTDev_Device
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
+
+hi link nftablesCmdAddFTDev_Equal nftablesHL_Operator
+syn match nftablesCmdAddFTDev_Equal contained /=/ skipwhite
+\ nextgroup=nftablesCmdAddFtDev_Section
+
+hi link nftablesCmdAddFT_DevicesKeyword nftablesHL_Option
+syn keyword nftablesCmdAddFT_DevicesKeyword contained devices skipwhite
+\ nextgroup=nftablesCmdAddFtDev_Equal
+
+hi link nftablesCmdAddFTHook_Priority nftablesHL_Number
+syn match nftablesCmdAddFTHook_Priority contained /[\-]\?[0-9]\{1,5}/
+\ skipwhite
+\ nextgroup=
+\    nftables_Semicolon
+
+hi link nftablesCmdAddFTHook_PriorityKeyword nftablesHL_Option
+syn keyword nftablesCmdAddFTHook_PriorityKeyword contained priority skipwhite
+\ nextgroup=
+\    nftablesCmdAddFTHook_Priority
+
+hi link nftablesCmdAddFTHook_HookType nftablesHL_Type
+syn keyword nftablesCmdAddFTHook_HookType contained skipwhite
+\    input
+\    filter
+\    nat
+\ nextgroup=
+\    nftablesCmdAddFTHook_PriorityKeyword
+
+hi link nftablesCmdAddFT_HookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddFT_HookKeyword contained hook skipwhite
+\ nextgroup=
+\    nftablesCmdAddFTHook_HookType
+
+syn region nftablesCmdAddFT_Section contained start=/{/ end=/}/ skipwhite
+\ contains=
+\    nftablesCmdAddFT_HookKeyword,
+\    nftablesCmdAddFT_DevicesKeyword
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
+hi link nftablesCmdAddFT_FlowtableName nftablesHL_Flowtable
+syn match nftablesCmdAddFT_FlowtableName contained /[A-Za-z0-9\-_]\{1,64}/ 
+\ skipwhite
+\ nextgroup=nftablesCmdAddFT_Section
+
+hi link nftablesCmdAddFT_TableName nftablesHL_Table
+syn match nftablesCmdAddFT_TableName contained /[A-Za-z0-9\-_]\{1,64}/ 
+\ skipwhite
+\ nextgroup=nftablesCmdAddFT_FlowtableName
+
+hi link nftablesCmdAddFT_Family nftablesHL_Family
+syn keyword nftablesCmdAddFT_Family contained skipwhite
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdAddFT_TableName
+
+hi link nftablesCmdAdd_FlowtableKeyword nftablesHL_Option
+syn keyword nftablesCmdAdd_FlowtableKeyword contained flowtable skipwhite
+\ nextgroup=
+\    nftablesCmdAddFT_Family,
+\    nftablesCmdAddFT_TableName
+" End 'add flowtable ...'
+
 " Begin of 'delete chain ...'
 hi link nftablesCmdDeleteChain_ChainName nftablesHL_Chain
 syn match nftablesCmdDeleteChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
@@ -1291,6 +1383,34 @@ syn keyword nftablesCmdDelete_ChainKeyword contained chain skipwhite
 \    nftablesCmdDeleteChainFamily,
 \    nftablesCmdDeleteChainTableName
 " End of 'delete chain ...'
+
+" Begin 'delete flowtable ...'
+hi link nftablesCmdDeleteFT_FlowtableName nftablesHL_Flowtable
+syn match nftablesCmdDeleteFT_FlowtableName contained /[A-Za-z0-9\-_]\{1,64}/ 
+\ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
+
+hi link nftablesCmdDeleteFT_TableName nftablesHL_Table
+syn match nftablesCmdDeleteFT_TableName contained /[A-Za-z0-9\-_]\{1,64}/ 
+\ skipwhite
+\ nextgroup=nftablesCmdDeleteFT_FlowtableName
+
+hi link nftablesCmdDeleteFT_Family nftablesHL_Family
+syn keyword nftablesCmdDeleteFT_Family contained skipwhite
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdDeleteFT_TableName
+
+hi link nftablesCmdDelete_FlowtableKeyword nftablesHL_Option
+syn keyword nftablesCmdDelete_FlowtableKeyword contained flowtable skipwhite
+\ nextgroup=
+\    nftablesCmdDeleteFT_Family,
+\    nftablesCmdDeleteFT_TableName
+" End 'delete flowtable ...'
 
 " Begin of 'delete set ...'
 hi link nftablesCmdDeleteSet_SetName nftablesHL_Set
@@ -1657,13 +1777,15 @@ syn keyword nftablesCmdAddKeyword add skipwhite skipempty
 \    nftablesCmdAdd_ChainKeyword,
 \    nftablesCmdAdd_SetKeyword,
 \    nftablesCmdAdd_ElementKeyword,
-\    nftablesCmdAdd_MapKeyword
+\    nftablesCmdAdd_MapKeyword,
+\    nftablesCmdAdd_FlowtableKeyword
 
 hi link nftablesCmd_Create nftablesHL_Statement
 syn keyword nftablesCmd_Create skipwhite create skipempty 
 \ nextgroup=
 \    nftablesCmdCreate_TableKeyword,
 \    nftablesCmdAdd_ChainKeyword,
+\    nftablesCmdAdd_FlowtableKeyword
 
 hi link nftablesCmd_Delete nftablesHL_Statement
 syn keyword nftablesCmd_Delete skipwhite delete skipempty 
@@ -1672,7 +1794,8 @@ syn keyword nftablesCmd_Delete skipwhite delete skipempty
 \    nftablesCmdDelete_ChainKeyword,
 \    nftablesCmdDelete_SetKeyword,
 \    nftablesCmdAdd_ElementKeyword,
-\    nftablesCmdAdd_MapKeyword
+\    nftablesCmdAdd_MapKeyword,
+\    nftablesCmdDelete_FlowtableKeyword
 
 hi link nftablesCmd_Describe nftablesHL_Statement
 syn keyword nftablesCmd_Describe describe skipwhite 
@@ -1718,6 +1841,7 @@ syn keyword nftablesCmdListKeyword list skipwhite
 \    nftablesCmdFlush_ChainKeyword,
 \    nftablesCmdList_SetKeyword,
 \    nftablesCmdList_MapKeyword,
+\    nftablesCmdDelete_FlowtableKeyword,
 \    nftables_UnexpectedEOS,
 
 hi link nftablesCmdMonitorKeyword nftablesHL_Statement

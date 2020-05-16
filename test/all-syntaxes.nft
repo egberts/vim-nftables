@@ -271,6 +271,16 @@ add element ip myIpTable myIpMap { elements = { element, element } ; }
 add element ip6 myIp6Table myIp6Map { elements = { element, element } ; }
 add element inet myInetTable myInetMap { elements = { element, element } ; }
 
+create flowtable myIpTable myIpFT { hook input priority 0; devices = { device,device,device} ; }
+create flowtable ip myIpTable myIpFT { hook input priority 0; devices = { device, device } ; }
+create flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { device, device } ; }
+create flowtable inet myInetTable myInetFT { hook input priority 0; devices = { device, device } ; }
+
+add flowtable myIpTable myIpFT { hook input priority 0; devices = { device, device } ; }
+add flowtable ip myIpTable myIpFT { hook input priority 0; devices = { device, device } ; }
+add flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { device, device } ; }
+add flowtable inet myInetTable myInetFT { hook input priority 0; devices = { device, device } ; }
+
 rename chain myIpTable myIpChain newMyIpChain
 rename chain netdev myNetdevTable myNetdevChain newMyNetdevChain    ;    
 rename chain bridge myBridgeTable myBridgeChain newMyBridgeChain;
@@ -333,6 +343,11 @@ list map ip myIpTable myIpMap
 list map ip6 myIp6Table myIp6Map 
 list map inet myInetTable myInetMap 
 
+list flowtable myIpTable myIpFT
+list flowtable netdev myIpTable myIpFT  # intentional syntax error
+list flowtable ip myIpTable myIpFT
+list flowtable ip6 myIp6Table myIp6FT
+list flowtable inet myInetTable myInetFT
 
 export json
 export xml
@@ -340,6 +355,11 @@ export ruleset json
 export ruleset xml
 
 describe tcp flag; # oopsie
+
+delete flowtable myIpTable myIpFT
+delete flowtable ip myIpTable myIpFT
+delete flowtable ip6 myIp6Table myIp6FT
+delete flowtable inet myInetTable myInetFT
 
 delete element myIpTable myIpSet { element, element }
 delete element netdev myNetdevTable myNetdevSet { element, element }
