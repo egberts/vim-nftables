@@ -1131,6 +1131,8 @@ syn keyword nftablesAddMap_Type contained skipwhite
 \    inet_proto
 \    inet_service
 \    mark
+\    counter
+\    quota
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
@@ -1143,7 +1145,6 @@ hi link nftablesAddMap_Flags nftablesHL_Type
 syn keyword nftablesAddMap_Flags contained skipwhite
 \    constant
 \    interval
-\    timeout
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
