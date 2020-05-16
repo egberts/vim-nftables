@@ -62,7 +62,23 @@ list chain ip6 myIp6 myIp6chain
 list chain inet myInet myInetchain
 
 list set TABLE_NETDEV SET_NETDEV
+list set myIpTable handle 123 # intentional syntax error
+list set ip myIpTable
+list set netdev myNetdevTable
+list set bridge myBridgeTable
+list set arp myArpTable
+list set ip myIpTable
+list set ip6 myIp6Table
+list set inet myInetTable
 list sets
+
+flush set myIpTable mySet
+flush set ip myIpTable mySet
+flush set netdev myNetdevTable mySet
+flush set bridge myBridgeTable mySet
+flush set ip myIpTable mySet
+flush set ip6 myIp6Table mySet
+flush set inet myInetTable mySet ;
 
 flush chain myIpTable myIpChain
 flush chain myIpTable myIpChain ; flush chain netdev myNetDev X; oopsie
@@ -224,17 +240,36 @@ add chain inet myInetTable myInetChain { type nat hook postrouting priority 0; p
 add chain inet myInetTable myInetChain { type route hook output priority 0; policy accept}
 add chain inet myInetTable myInetChain { type filter hook input device "eth0" priority 0; policy drop;}
 
+add rule inet mytable myin counter
+
+add set myIpTable mySet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+add set ip myIpTable mySet {   # comment
+    type inet_proto;   # comment
+    flags constant;   # comment
+    timeout 30s;   # comment
+    gc-interval 2h;   # comment
+    elements = element,element;   # comment
+    size 1200;   # comment
+    policy memory;   # comment
+    auto-merge;   # comment
+    };  # comment
+add set netdev myNetdevTable myNetdevSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+add set bridge myBridgeTable myBridgeSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+add set arp myArpTable myArpSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+add set ip myIpTable myIpSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+add set ip6 myIp6Table myIp6Set { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+add set inet myInetTable myInetSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+
+add element TABLE_NETDEV SET_NETDEV
+
+
+add map TABLE_NETDEV
+
+
 export json
 export xml
 export ruleset json
 export ruleset xml
-
-
-add set TABLE_NETDEV SET_NETDEV
-add element TABLE_NETDEV SET_NETDEV
-add map TABLE_NETDEV
-
-add rule inet mytable myin counter
 
 delete table myIpTable
 delete table netdev myNetdevTable
@@ -283,8 +318,6 @@ monitor destroy rules
 monitor destroy elements
 monitor destroy trace 
 
-add set myIpTable mySet { type ???; flags ???; timeout ???; gc-interval ???; elements = element,element; size 1200; policy accept; auto-merge yes; }
-add set ip myIpTable mySet { type ???; flags ???; timeout ???; gc-interval ???; elements = element,element; size 1200; policy accept; auto-merge yes; }
 delete set myIpTable handle 123
 delete set ip myIpTable handle 123
 
