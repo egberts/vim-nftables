@@ -95,6 +95,7 @@ flush ruleset inet
 #  create Similar to the add command, but returns 
 #  an error if the chain already exists.
 create table myIpTable 
+create table my\./_IpTable 
 create table myIpTable { flags dormant }
 create table netdev myNetdev 
 create table netdev myNetdev { flags dormant }
@@ -186,6 +187,7 @@ create chain inet myInetTable myInetChain { type filter hook input device "eth0"
 add chain myIpTable myIpChain 
 add chain myIpTable myIpChain { type filter hook input priority 0; policy drop;}
 add chain myIpTable myIpChain { type filter hook input device "eth0" priority 0; policy drop;}
+add chain arp my_/\./_ArpTable my\./_ArpChain 
 add chain arp myArpTable myArpChain 
 add chain arp myArpTable myArpChain { type filter hook input priority 0; policy drop;}
 add chain arp myArpTable myArpChain { type filter hook output priority 0; policy drop;}
@@ -276,10 +278,18 @@ create flowtable ip myIpTable myIpFT { hook input priority 0; devices = { device
 create flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { device, device } ; }
 create flowtable inet myInetTable myInetFT { hook input priority 0; devices = { device, device } ; }
 
-add flowtable myIpTable myIpFT { hook input priority 0; devices = { device, device } ; }
-add flowtable ip myIpTable myIpFT { hook input priority 0; devices = { device, device } ; }
-add flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { device, device } ; }
-add flowtable inet myInetTable myInetFT { hook input priority 0; devices = { device, device } ; }
+add flowtable myIpTable myIpFT { hook input priority 0; devices = { device,device } ; }
+add flowtable ip myIpTable myIpFT { hook input priority 0; devices = { device,device } ; }
+add flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { device,device } ; }
+add flowtable inet myInetTable myInetFT { hook input priority 0; devices = { device,device } ; }
+
+add type myIpTable myIpType
+add type netdev myNetdevTable myNetdevType
+add type bridge myBridgeTable myBridgeType
+add type arp myArpTable myArpType
+add type ip myIpTable myIpType
+add type ip6 myIp6Table myIp6Type
+add type inet myInetTable myInetType
 
 rename chain myIpTable myIpChain newMyIpChain
 rename chain netdev myNetdevTable myNetdevChain newMyNetdevChain    ;    
@@ -349,12 +359,46 @@ list flowtable ip myIpTable myIpFT
 list flowtable ip6 myIp6Table myIp6FT
 list flowtable inet myInetTable myInetFT
 
+list type myIpTable myIpType
+list type netdev myNetdevTable myNetdevType
+list type bridge myBridgeTable myBridgeType
+list type arp myArpTable myArpType
+list type ip myIpTable myIpType
+list type ip6 myIp6Table myIp6Type
+list type inet myInetTable myInetType
+
+ct helper myHelper { type myFtp protocol tcp ; l3proto ip }
+
+counter <packets> <bytes>
+
+quota 15mbytes
+quota over 30kbytes
+quota until 5bytes
+
+
 export json
 export xml
 export ruleset json
 export ruleset xml
 
 describe tcp flag; # oopsie
+
+reset type myIpTable myIpType
+reset type netdev myNetdevTable myNetdevType
+reset type bridge myBridgeTable myBridgeType
+reset type arp myArpTable myArpType
+reset type ip myIpTable myIpType
+reset type ip6 myIp6Table myIp6Type
+reset type inet myInetTable myInetType
+
+delete type myIpTable myIpType
+delete type netdev myNetdevTable myNetdevType
+delete type bridge myBridgeTable myBridgeType
+delete type arp myArpTable myArpType
+delete type ip myIpTable myIpType
+delete type ip6 myIp6Table myIp6Type
+delete type inet myInetTable myInetType
+delete type inet myInetTable handle 3
 
 delete flowtable myIpTable myIpFT
 delete flowtable ip myIpTable myIpFT
@@ -426,7 +470,7 @@ monitor destroy rules
 monitor destroy elements
 monitor destroy trace 
 
-table arp ARP_TABLE {
+table arp A0b\./_RP_TABLE {
     chain ARP_INPUT_FILTER {
        type filter hook input priority 0;
        policy drop;

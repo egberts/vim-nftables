@@ -20,8 +20,8 @@ endif
 syn case match
 
 " iskeyword severly impacts '\<' and '\>' atoms
-setlocal iskeyword=.,-,48-58,A-Z,a-z,_
-setlocal isident=.,-,48-58,A-Z,a-z,_
+setlocal iskeyword=.,48-58,A-Z,a-z,\_,\\,\/
+setlocal isident=.,48-58,A-Z,a-z,\_,\\,\/
 
 " syn sync match nftablesSync grouphere NONE "^(table|chain|set)"
 syn sync fromstart
@@ -85,7 +85,8 @@ hi def link nftablesMask nftablesHL_Operator
 " all the options, then all the clauses.
 " Uncomment following two lines for RED highlight of typos (still Beta here)
 hi link nftables_Error nftablesHL_Error
-syn match nftables_Error /[ a-zA-Z0-9\t]\{1,64}/
+" syn match nftables_Error /[ \ta-zA-Z0-9\_\\\/\.]\{1,64}/
+syn match nftables_Error /[ \ta-zA-Z0-9\\\.\/\_]\{1,64}/
 
 hi link nftables_UnexpectedEOS namedHL_Error
 syn match nftables_UnexpectedEOS contained /[;\n]\+/ skipwhite
@@ -283,7 +284,8 @@ syn region nftablesTArpChain_Section contained start=/{/ end=/}/
 
 
 hi link nftablesTArpChain_Name nftablesHL_Chain
-syn match nftablesTArpChain_Name contained /[A-Za-z0-9\_]\{1,64}/ skipwhite
+syn match nftablesTArpChain_Name contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\/\\\_.]\{0,63}/ 
 \ nextgroup=
 \    nftablesTArpChain_Section
 
@@ -301,7 +303,8 @@ syn region nftablesTArp_Section contained start=/{/ end=/}/
 \    nftables_EOS
 
 hi link nftablesTArp_Name nftablesHL_Identifier
-syn match nftablesTArp_Name contained /[A-Za-z0-9\_]\{1,64}/ skipwhite
+syn match nftablesTArp_Name contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesTArp_Section
 
@@ -330,7 +333,8 @@ syn region nftablesCmdCreateTable_Section contained start=/{/ end=/}/
 \    nftables_EOS
 
 hi link nftablesCmdCreateTable_Name nftablesHL_Table
-syn match nftablesCmdCreateTable_Name contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdCreateTable_Name contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdCreateTable_Section,
 \    nftables_Semicolon,
@@ -418,13 +422,15 @@ syn region nftablesCmdAddChainArp_Section contained start=/{/ end=/}/ skipwhite
 \    nftables_EOS
 
 hi link nftablesCmdAddChainArp_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainArp_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainArp_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddChainArp_Section,
 \    nftables_EOS
 
 hi link nftablesCmdAddChainArp_TableName nftablesHL_Table
-syn match nftablesCmdAddChainArp_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainArp_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddChainArp_ChainName
 " End of 'add chain arp <table_name> <chain_name> { ... }
 
@@ -490,19 +496,22 @@ syn region nftablesCmdAddChainBridge_Section contained start=/{/ end=/}/ skipwhi
 \    nftables_EOS
 
 hi link nftablesCmdAddChainBridge_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainBridge_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainBridge_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddChainBridge_Section,
 \    nftables_EOS
 
 hi link nftablesCmdAddChainBridge_TableName nftablesHL_Table
-syn match nftablesCmdAddChainBridge_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainBridge_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddChainBridge_ChainName
 " End of 'add chain bridge <table_name> <chain_name> { ... }
 
 " Begin of 'add chain netdev <table_name> <chain_name> { ... }
 hi link nftablesCmdAddChainNetdev_Priority nftablesHL_Number
-syn match nftablesCmdAddChainNetdev_Priority contained /[\-]\?\d\{1,5}/ skipwhite
+syn match nftablesCmdAddChainNetdev_Priority contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesOpt_Semicolon
 
 hi link nftablesCmdAddChainNetdev_PriorityKeyword nftablesHL_Option
@@ -556,13 +565,15 @@ syn region nftablesCmdAddChainNetdev_Section contained start=/{/ end=/}/ skipwhi
 \    nftables_EOS
 
 hi link nftablesCmdAddChainNetdev_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainNetdev_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainNetdev_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddChainNetdev_Section,
 \    nftables_EOS
 
 hi link nftablesCmdAddChainNetdev_TableName nftablesHL_Table
-syn match nftablesCmdAddChainNetdev_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainNetdev_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddChainNetdev_ChainName
 " End of 'add chain netdev <table_name> <chain_name> { ... }
 
@@ -654,15 +665,16 @@ syn region nftablesCmdAddChainIp_Section contained start=/{/ end=/}/ skipwhite
 \    nftables_EOS
 
 hi link nftablesCmdAddChainIp_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainIp_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ 
-\ skipwhite
+syn match nftablesCmdAddChainIp_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddChainIp_Section,
 \    nftables_Semicolon,
 \    nftables_EOS
 
 hi link nftablesCmdAddChainIp_TableName nftablesHL_Table
-syn match nftablesCmdAddChainIp_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainIp_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddChainIp_ChainName
 " End of 'add chain ip <table_name> <chain_name> { ... }
 
@@ -754,13 +766,15 @@ syn region nftablesCmdAddChainIp6_Section contained start=/{/ end=/}/ skipwhite
 \    nftables_EOS
 
 hi link nftablesCmdAddChainIp6_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainIp6_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainIp6_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddChainIp6_Section,
 \    nftables_EOS
 
 hi link nftablesCmdAddChainIp6_TableName nftablesHL_Table
-syn match nftablesCmdAddChainIp6_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainIp6_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddChainIp6_ChainName
 " End of 'add chain ip6 <table_name> <chain_name> { ... }
 "
@@ -853,13 +867,15 @@ syn region nftablesCmdAddChainInet_Section contained start=/{/ end=/}/
 \    nftables_EOS
 
 hi link nftablesCmdAddChainInet_ChainName nftablesHL_Chain
-syn match nftablesCmdAddChainInet_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainInet_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddChainInet_Section,
 \    nftables_EOS
 
 hi link nftablesCmdAddChainInet_TableName nftablesHL_Table
-syn match nftablesCmdAddChainInet_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddChainInet_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddChainInet_ChainName
 " End of 'add chain inet <table_name>...' 
 
@@ -1029,14 +1045,16 @@ syn region nftablesCmdAddSet_Section contained start=/{/ end=/}/ skipwhite
 \    nftables_EOS
 
 hi link nftablesCmdAddSet_SetName nftablesHL_Set
-syn match nftablesCmdAddSet_SetName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddSet_SetName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddSet_Section,
 \    nftables_Semicolon,
 \    nftables_EOS
 
 hi link nftablesCmdAddSet_TableName nftablesHL_Table
-syn match nftablesCmdAddSet_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdAddSet_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddSet_SetName
 
 hi link nftablesCmdAddSet_Family nftablesHL_Family
@@ -1094,14 +1112,14 @@ syn region nftablesCmdAddElement_Section contained start=/{/ end=/}/
 \    nftables_EOS
 
 hi link nftablesCmdAddElement_SetName nftablesHL_Set
-syn match nftablesCmdAddElement_SetName contained /[a-zA-Z0-9\-_]\{1,64}/
-\ skipwhite
+syn match nftablesCmdAddElement_SetName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddElement_Section
 
 hi link nftablesCmdAddElement_TableName nftablesHL_Table
-syn match nftablesCmdAddElement_TableName contained /[a-zA-Z0-9\-_]\{1,64}/
-\ skipwhite
+syn match nftablesCmdAddElement_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdAddElement_SetName,
 \    nftables_UnexpectedEOS
@@ -1122,6 +1140,96 @@ syn keyword nftablesCmdAdd_ElementKeyword contained element skipwhite
 \    nftablesCmdAddElement_Family,
 \    nftablesCmdAddElement_TableName
 " End 'add element [<family>] <table_id> <set_id>'
+
+" Begin 'add flowtable ...'
+hi link nftablesAddFTDev_DeviceNth nftablesHL_String
+syn match nftablesAddFTDev_DeviceNth contained skipwhite
+\    /[a-zA-Z0-9\-_]\{1,64}/
+\ nextgroup=
+\    nftablesAddFTDev_Separator
+
+" TODO Why does a space first device and first comma separate causes error here?
+hi link nftablesAddFTDev_Separator nftablesHL_Operator
+syn match nftablesAddFTDev_Separator contained /,/ skipwhite
+\ nextgroup=
+\    nftablesAddFTDev_DeviceNth,
+\    nftables_Error
+
+hi link nftablesAddFTDev_Device nftablesHL_String
+syn match nftablesAddFTDev_Device contained skipwhite
+\    /[a-zA-Z0-9\-_]\{1,64}/
+\ nextgroup=nftablesAddFTDev_Separator
+
+syn region nftablesCmdAddFTDev_Section contained start=/{/ end=/}/ skipwhite
+\ contains=nftablesAddFTDev_Device
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
+
+hi link nftablesCmdAddFTDev_Equal nftablesHL_Operator
+syn match nftablesCmdAddFTDev_Equal contained /=/ skipwhite
+\ nextgroup=nftablesCmdAddFtDev_Section
+
+hi link nftablesCmdAddFT_DevicesKeyword nftablesHL_Option
+syn keyword nftablesCmdAddFT_DevicesKeyword contained devices skipwhite
+\ nextgroup=nftablesCmdAddFtDev_Equal
+
+hi link nftablesCmdAddFTHook_Priority nftablesHL_Number
+syn match nftablesCmdAddFTHook_Priority contained /[\-]\?[0-9]\{1,5}/
+\ skipwhite
+\ nextgroup=
+\    nftables_Semicolon
+
+hi link nftablesCmdAddFTHook_PriorityKeyword nftablesHL_Option
+syn keyword nftablesCmdAddFTHook_PriorityKeyword contained priority skipwhite
+\ nextgroup=
+\    nftablesCmdAddFTHook_Priority
+
+hi link nftablesCmdAddFTHook_HookType nftablesHL_Type
+syn keyword nftablesCmdAddFTHook_HookType contained skipwhite
+\    input
+\    filter
+\    nat
+\ nextgroup=
+\    nftablesCmdAddFTHook_PriorityKeyword
+
+hi link nftablesCmdAddFT_HookKeyword nftablesHL_Option
+syn keyword nftablesCmdAddFT_HookKeyword contained hook skipwhite
+\ nextgroup=
+\    nftablesCmdAddFTHook_HookType
+
+syn region nftablesCmdAddFT_Section contained start=/{/ end=/}/ skipwhite
+\ contains=
+\    nftablesCmdAddFT_HookKeyword,
+\    nftablesCmdAddFT_DevicesKeyword
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
+hi link nftablesCmdAddFT_FlowtableName nftablesHL_Flowtable
+syn match nftablesCmdAddFT_FlowtableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
+\ nextgroup=nftablesCmdAddFT_Section
+
+hi link nftablesCmdAddFT_TableName nftablesHL_Table
+syn match nftablesCmdAddFT_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
+\ nextgroup=nftablesCmdAddFT_FlowtableName
+
+hi link nftablesCmdAddFT_Family nftablesHL_Family
+syn keyword nftablesCmdAddFT_Family contained skipwhite
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdAddFT_TableName
+
+hi link nftablesCmdAdd_FlowtableKeyword nftablesHL_Option
+syn keyword nftablesCmdAdd_FlowtableKeyword contained flowtable skipwhite
+\ nextgroup=
+\    nftablesCmdAddFT_Family,
+\    nftablesCmdAddFT_TableName
+" End 'add flowtable ...'
 
 " Begin 'add map ...'
 hi link nftablesAddMap_Type nftablesHL_Type
@@ -1225,13 +1333,13 @@ syn region nftablesCmdAddMap_Section contained start=/{/ end=/}/ skipwhite
 \    nftables_EOS
 
 hi link nftablesCmdAddMap_MapName nftablesHL_Map
-syn match nftablesCmdAddMap_MapName contained /[A-Za-z0-9\-_]\{1,64}/ 
-\ skipwhite
+syn match nftablesCmdAddMap_MapName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddMap_Section
 
 hi link nftablesCmdAddMap_TableName nftablesHL_Table
-syn match nftablesCmdAddMap_TableName contained /[A-Za-z0-9\-_]\{1,64}/ 
-\ skipwhite
+syn match nftablesCmdAddMap_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdAddMap_MapName
 
 hi link nftablesCmdAddMap_Family nftablesHL_Family
@@ -1248,103 +1356,41 @@ hi link nftablesCmdAdd_MapKeyword nftablesHL_Statement
 syn keyword nftablesCmdAdd_MapKeyword contained map skipwhite
 \ nextgroup=
 \    nftablesCmdAddMap_Family,
-\    nftablesCmdAddMap_TableName,
+\    nftablesCmdAddMap_TableName
 " End 'add map ...'
-
-" Begin 'add flowtable ...'
 "
-hi link nftablesAddFTDev_DeviceNth nftablesHL_String
-syn match nftablesAddFTDev_DeviceNth contained skipwhite
-\    /[a-zA-Z0-9\-_]\{1,64}/
-\ nextgroup=
-\    nftablesAddFTDev_Separator
+" Begin 'add type ...'
+hi link nftablesCmdAddType_TypeName nftablesHL_Type
+syn match nftablesCmdAddType_TypeName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
+\ nextgroup=nftablesCmdAddType_Section
 
-" TODO Why does a space first device and first comma separate causes error here?
-hi link nftablesAddFTDev_Separator nftablesHL_Operator
-syn match nftablesAddFTDev_Separator contained /,/ skipwhite
-\ nextgroup=
-\    nftablesAddFTDev_DeviceNth,
-\    nftables_Error
+hi link nftablesCmdAddType_TableName nftablesHL_Table
+syn match nftablesCmdAddType_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
+\ nextgroup=nftablesCmdAddType_TypeName
 
-hi link nftablesAddFTDev_Device nftablesHL_String
-syn match nftablesAddFTDev_Device contained skipwhite
-\    /[a-zA-Z0-9\-_]\{1,64}/
-\ nextgroup=nftablesAddFTDev_Separator
-
-syn region nftablesCmdAddFTDev_Section contained start=/{/ end=/}/ skipwhite
-\ contains=nftablesAddFTDev_Device
-\ nextgroup=
-\    nftables_Semicolon,
-\    nftables_Comment,
-\    nftables_EOS
-
-hi link nftablesCmdAddFTDev_Equal nftablesHL_Operator
-syn match nftablesCmdAddFTDev_Equal contained /=/ skipwhite
-\ nextgroup=nftablesCmdAddFtDev_Section
-
-hi link nftablesCmdAddFT_DevicesKeyword nftablesHL_Option
-syn keyword nftablesCmdAddFT_DevicesKeyword contained devices skipwhite
-\ nextgroup=nftablesCmdAddFtDev_Equal
-
-hi link nftablesCmdAddFTHook_Priority nftablesHL_Number
-syn match nftablesCmdAddFTHook_Priority contained /[\-]\?[0-9]\{1,5}/
-\ skipwhite
-\ nextgroup=
-\    nftables_Semicolon
-
-hi link nftablesCmdAddFTHook_PriorityKeyword nftablesHL_Option
-syn keyword nftablesCmdAddFTHook_PriorityKeyword contained priority skipwhite
-\ nextgroup=
-\    nftablesCmdAddFTHook_Priority
-
-hi link nftablesCmdAddFTHook_HookType nftablesHL_Type
-syn keyword nftablesCmdAddFTHook_HookType contained skipwhite
-\    input
-\    filter
-\    nat
-\ nextgroup=
-\    nftablesCmdAddFTHook_PriorityKeyword
-
-hi link nftablesCmdAddFT_HookKeyword nftablesHL_Option
-syn keyword nftablesCmdAddFT_HookKeyword contained hook skipwhite
-\ nextgroup=
-\    nftablesCmdAddFTHook_HookType
-
-syn region nftablesCmdAddFT_Section contained start=/{/ end=/}/ skipwhite
-\ contains=
-\    nftablesCmdAddFT_HookKeyword,
-\    nftablesCmdAddFT_DevicesKeyword
-\ nextgroup=
-\    nftables_Semicolon,
-\    nftables_Comment,
-\    nftables_EOS
-hi link nftablesCmdAddFT_FlowtableName nftablesHL_Flowtable
-syn match nftablesCmdAddFT_FlowtableName contained /[A-Za-z0-9\-_]\{1,64}/ 
-\ skipwhite
-\ nextgroup=nftablesCmdAddFT_Section
-
-hi link nftablesCmdAddFT_TableName nftablesHL_Table
-syn match nftablesCmdAddFT_TableName contained /[A-Za-z0-9\-_]\{1,64}/ 
-\ skipwhite
-\ nextgroup=nftablesCmdAddFT_FlowtableName
-
-hi link nftablesCmdAddFT_Family nftablesHL_Family
-syn keyword nftablesCmdAddFT_Family contained skipwhite
+hi link nftablesCmdAddType_Family nftablesHL_Family
+syn keyword nftablesCmdAddType_Family contained skipwhite
+\    netdev
+\    bridge
+\    arp
 \    ip
 \    ip6
 \    inet
-\ nextgroup=nftablesCmdAddFT_TableName
+\ nextgroup=nftablesCmdAddType_TableName
 
-hi link nftablesCmdAdd_FlowtableKeyword nftablesHL_Option
-syn keyword nftablesCmdAdd_FlowtableKeyword contained flowtable skipwhite
+hi link nftablesCmdAdd_TypeKeyword nftablesHL_Option
+syn keyword nftablesCmdAdd_TypeKeyword contained type skipwhite
 \ nextgroup=
-\    nftablesCmdAddFT_Family,
-\    nftablesCmdAddFT_TableName
-" End 'add flowtable ...'
+\    nftablesCmdAddType_Family,
+\    nftablesCmdAddType_TableName
+" End 'add type ...'
 
 " Begin of 'delete chain ...'
 hi link nftablesCmdDeleteChain_ChainName nftablesHL_Chain
-syn match nftablesCmdDeleteChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdDeleteChain_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
@@ -1362,7 +1408,8 @@ syn keyword nftablesCmdDeleteChain_HandleKeyword contained handle skipwhite
 \    nftables_UnexpectedEOS
 
 hi link nftablesCmdDeleteChainTableName nftablesHL_Table
-syn match nftablesCmdDeleteChainTableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdDeleteChainTableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdDeleteChain_HandleKeyword,
 \    nftablesCmdFlushChain_ChainName
@@ -1386,16 +1433,16 @@ syn keyword nftablesCmdDelete_ChainKeyword contained chain skipwhite
 
 " Begin 'delete flowtable ...'
 hi link nftablesCmdDeleteFT_FlowtableName nftablesHL_Flowtable
-syn match nftablesCmdDeleteFT_FlowtableName contained /[A-Za-z0-9\-_]\{1,64}/ 
-\ skipwhite
+syn match nftablesCmdDeleteFT_FlowtableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_Comment,
 \    nftables_EOS
 
 hi link nftablesCmdDeleteFT_TableName nftablesHL_Table
-syn match nftablesCmdDeleteFT_TableName contained /[A-Za-z0-9\-_]\{1,64}/ 
-\ skipwhite
+syn match nftablesCmdDeleteFT_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdDeleteFT_FlowtableName
 
 hi link nftablesCmdDeleteFT_Family nftablesHL_Family
@@ -1414,7 +1461,8 @@ syn keyword nftablesCmdDelete_FlowtableKeyword contained flowtable skipwhite
 
 " Begin of 'delete set ...'
 hi link nftablesCmdDeleteSet_SetName nftablesHL_Set
-syn match nftablesCmdDeleteSet_SetName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdDeleteSet_SetName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
@@ -1432,7 +1480,8 @@ syn keyword nftablesCmdDeleteSet_HandleKeyword contained handle skipwhite
 \    nftables_UnexpectedEOS
 
 hi link nftablesCmdDeleteSet_TableName nftablesHL_Table
-syn match nftablesCmdDeleteSet_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdDeleteSet_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdDeleteSet_HandleKeyword,
 \    nftablesCmdDeleteSet_SetName
@@ -1466,7 +1515,11 @@ syn keyword nftablesCmdDeleteTable_HandleKeyword contained handle skipwhite
 \ nextgroup=nftablesCmdDeleteTable_Handle
 
 hi link nftablesCmdDeleteTable_Name nftablesHL_Table
-syn match nftablesCmdDeleteTable_Name contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdDeleteTable_Name contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS,
 
 hi link nftablesCmdDeleteTable_Family nftablesHL_Family
 syn keyword nftablesCmdDeleteTable_Family contained skipwhite
@@ -1487,6 +1540,50 @@ syn keyword nftablesCmdDelete_TableKeyword contained table skipwhite
 \    nftablesCmdDeleteTable_Family,
 \    nftablesCmdDeleteTable_HandleKeyword
 " End of 'delete table ...'
+"
+" Begin of 'delete type ...'
+hi link nftablesCmdDeleteType_TypeName nftablesHL_Chain
+syn match nftablesCmdDeleteType_TypeName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesCmdDeleteType_Handle nftablesHL_Handle
+syn match nftablesCmdDeleteType_Handle contained /[0-9]\{1,11}/ skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftablesCmdDeleteType_HandleKeyword nftablesHL_Option
+syn keyword nftablesCmdDeleteType_HandleKeyword contained handle skipwhite
+\ nextgroup=nftablesCmdDeleteType_Handle
+\ nextgroup=
+\    nftables_UnexpectedEOS
+
+hi link nftablesCmdDeleteType_TableName nftablesHL_Table
+syn match nftablesCmdDeleteType_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
+\ nextgroup=
+\    nftablesCmdDeleteType_HandleKeyword,
+\    nftablesCmdDeleteType_TypeName
+
+hi link nftablesCmdDeleteType_Family nftablesHL_Family
+syn keyword nftablesCmdDeleteType_Family contained skipwhite
+\    netdev
+\    bridge
+\    arp
+\    ip
+\    ip6
+\    inet
+\ nextgroup=nftablesCmdDeleteType_TableName
+
+hi link nftablesCmdDelete_TypeKeyword nftablesHL_Option
+syn keyword nftablesCmdDelete_TypeKeyword contained type skipwhite
+\ nextgroup=
+\    nftablesCmdDeleteType_Family,
+\    nftablesCmdDeleteType_TableName
+" End of 'delete type ...'
 
 " Begin of 'describe ...'
 hi link nftablesCmdDescribe_String nftablesHL_String
@@ -1531,8 +1628,12 @@ syn keyword nftablesCmdFlush_RulesetKeyword contained ruleset skipwhite
 
 " Begin of 'flush table ...'
 hi link nftablesCmdFlush_TableName nftablesHL_Table
-syn match nftablesCmdFlush_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
-\ nextgroup=nftables_EOS
+syn match nftablesCmdFlush_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_Comment,
+\    nftables_EOS
 
 hi link nftablesCmdFlushTable_Family nftablesHL_Family
 syn keyword nftablesCmdFlushTable_Family contained skipwhite
@@ -1553,7 +1654,8 @@ syn keyword nftablesCmdFlush_TableKeyword contained table skipwhite
 
 " Begin of 'flush chain ...'
 hi link nftablesCmdFlushChain_ChainName nftablesHL_Chain
-syn match nftablesCmdFlushChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdFlushChain_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
@@ -1571,7 +1673,8 @@ syn keyword nftablesCmdFlushChain_HandleKeyword contained handle skipwhite
 \    nftables_UnexpectedEOS
 
 hi link nftablesCmdFlushChainTableName nftablesHL_Table
-syn match nftablesCmdFlushChainTableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdFlushChainTableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftablesCmdFlushChain_HandleKeyword,
 \    nftablesCmdFlushChain_ChainName
@@ -1604,13 +1707,15 @@ syn keyword nftablesCmdList_NoArg contained skipwhite
 
 " Begin of 'list map [<family>] <table_name> <map>' 
 hi link nftablesCmdList_MapName nftablesHL_Map
-syn match nftablesCmdList_MapName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdList_MapName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
 
 hi link nftablesCmdListMap_TableName nftablesHL_Table
-syn match nftablesCmdListMap_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdListMap_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdList_MapName 
 
 hi link nftablesCmdListMap_Family nftablesHL_Family
@@ -1650,13 +1755,15 @@ syn keyword nftablesCmdList_Ruleset contained ruleset skipwhite
 
 " Begin of 'list set [<family>] <table_name> <set_name>' 
 hi link nftablesCmdList_SetName nftablesHL_Set
-syn match nftablesCmdList_SetName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdList_SetName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
 
 hi link nftablesCmdListSet_TableName nftablesHL_Table
-syn match nftablesCmdListSet_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdListSet_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdList_SetName 
 
 hi link nftablesCmdListSet_Family nftablesHL_Family
@@ -1678,7 +1785,8 @@ syn keyword nftablesCmdList_SetKeyword contained set skipwhite
 "
 " Begin of 'list table [<family>] <table_name>' 
 hi link nftablesCmdListTable_Name nftablesHL_Table
-syn match nftablesCmdListTable_Name contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdListTable_Name contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
@@ -1736,17 +1844,20 @@ syn match nftablesCmdMonitor_Action contained /\(new\|destroy\)/ skipwhite
 
 " Start of 'rename [family] <table_name> <chain_name> <new_chain_name>
 hi link nftablesCmdRenameChain_NewChain nftablesHL_Chain
-syn match nftablesCmdRenameChain_NewChain contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdRenameChain_NewChain contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=
 \    nftables_Semicolon,
 \    nftables_EOS
 
 hi link nftablesCmdRenameChain_ChainName nftablesHL_Chain
-syn match nftablesCmdRenameChain_ChainName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdRenameChain_ChainName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdRenameChain_NewChain
 
 hi link nftablesCmdRenameChain_TableName nftablesHL_Table
-syn match nftablesCmdRenameChain_TableName contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesCmdRenameChain_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesCmdRenameChain_ChainName
 
 hi link nftablesCmdRenameChain_Family nftablesHL_Family
@@ -1778,7 +1889,8 @@ syn keyword nftablesCmdAddKeyword add skipwhite skipempty
 \    nftablesCmdAdd_SetKeyword,
 \    nftablesCmdAdd_ElementKeyword,
 \    nftablesCmdAdd_MapKeyword,
-\    nftablesCmdAdd_FlowtableKeyword
+\    nftablesCmdAdd_FlowtableKeyword,
+\    nftablesCmdAdd_TypeKeyword
 
 hi link nftablesCmd_Create nftablesHL_Statement
 syn keyword nftablesCmd_Create skipwhite create skipempty 
@@ -1795,7 +1907,8 @@ syn keyword nftablesCmd_Delete skipwhite delete skipempty
 \    nftablesCmdDelete_SetKeyword,
 \    nftablesCmdAdd_ElementKeyword,
 \    nftablesCmdAdd_MapKeyword,
-\    nftablesCmdDelete_FlowtableKeyword
+\    nftablesCmdDelete_FlowtableKeyword,
+\    nftablesCmdDelete_TypeKeyword
 
 hi link nftablesCmd_Describe nftablesHL_Statement
 syn keyword nftablesCmd_Describe describe skipwhite 
@@ -1842,7 +1955,8 @@ syn keyword nftablesCmdListKeyword list skipwhite
 \    nftablesCmdList_SetKeyword,
 \    nftablesCmdList_MapKeyword,
 \    nftablesCmdDelete_FlowtableKeyword,
-\    nftables_UnexpectedEOS,
+\    nftablesCmdAdd_TypeKeyword,
+\    nftables_UnexpectedEOS
 
 hi link nftablesCmdMonitorKeyword nftablesHL_Statement
 syn keyword nftablesCmdMonitorKeyword monitor skipwhite
@@ -1864,20 +1978,20 @@ syn keyword nftablesCmdReplaceKeyword replace skipwhite
 hi link nftablesCmdResetKeyword nftablesHL_Statement
 syn keyword nftablesCmdResetKeyword reset skipwhite
 \ nextgroup=
-\    nftablesCmdReset_Keyword
-
+\    nftablesCmdAdd_TypeKeyword
 " End of base commands
 
 " Start of 'define <var_name> = <var_value>'
 hi link nftablesDefine_Value nftablesHL_String
-syn match nftablesDefine_Value contained /[A-Za-z0-9\-_]\{1,256}/ skipwhite
+syn match nftablesDefine_Value contained /[A-Za-z0-9\\\_\.\/]\{1,256}/ skipwhite
 
 hi link nftablesOp_Equal nftablesHL_Operator
 syn match nftablesOp_Equal contained /=/ skipwhite
 \ nextgroup=nftablesDefine_Value
 
 hi link nftablesDefine_Identifier nftablesHL_Identifier
-syn match nftablesDefine_Identifier contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesDefine_Identifier contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 \ nextgroup=nftablesOp_Equal
 " End of 'define <var_name> = <var_value>'
 
@@ -1885,7 +1999,8 @@ syn match nftablesDefine_Identifier contained /[A-Za-z0-9\-_]\{1,64}/ skipwhite
 
 " Start of '$<variable_name>'
 hi link nftablesVariableName Type
-syn match nftablesVariableName /\$[A-Za-z0-9\-_]\{1,64}/ skipwhite
+syn match nftablesVariableName skipwhite
+\    /\$[A-Za-z][A-Za-z0-9\_\.\\\/]\{0,64}/ 
 " End of '$<variable_name>'
 
 " Begin of Command-less actions: define
