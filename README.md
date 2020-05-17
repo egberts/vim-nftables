@@ -15,6 +15,6 @@ Files having `.nft` filetype also will active the `syntax nftables` as well.
 
 ## Installation
 
-See [INSTALL](https://github.com/egberts/vim-nftables/INSTALL.md) for
-installation procedure and quick test.
+See [INSTALL](https://github.com/egberts/vim-nftables/blob/master/INSTALL.md)
+for installation procedure and quick test.
 
