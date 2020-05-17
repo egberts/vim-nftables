@@ -6,9 +6,6 @@
 # the vim syntax highlighter for NFTABLES (yet `nft` takes it in just normally).
 # TODO: More todo, FIXME, FIXME: TODO: xxx XXX ARGH!
 #
-include Filespec
-include 'Filespec'
-include 'Fil"espec'
 include ";;;;;;;;;;";
 include "Fil'espec"
 include "Filespec"
@@ -24,9 +21,6 @@ include "Filespec";   # inline comment
 include "Filespec";      # inline comment
 include "Filespec???<>|\~`!@#$%^&*()\=+{}] /;:,._0123abcXYZ"  ;   # inline comment
 include "Filespec"  ;      # inline comment
-include "Filespec" bad stuff oppsie
-include "Filespec"  oopsie
-include "Filespec"  oopsie  ;
 
 monitor tables
 monitor chains
@@ -50,25 +44,7 @@ monitor new rules
 monitor new elements 
 monitor new trace 
 
-flush map myIpTable myIpMap 
-flush map netdev myNetdevTable myNetdevMap 
-flush map bridge myBridgeTable myBridgeMap 
-flush map arp myArpTable myArpMap 
-flush map ip myIpTable myIpMap 
-flush map ip6 myIp6Table myIp6Map 
-flush map inet myInetTable myInetMap 
-
-flush set myIpTable mySet
-flush set netdev myNetdevTable mySet
-flush set bridge myBridgeTable mySet
-flush set arp myArpTable mySet
-flush set ip myIpTable mySet
-flush set ip6 myIp6Table mySet
-flush set inet myInetTable mySet ; 
-flush set inet myInetTable handle 123  # Intentional Syntax ERROR
-
 flush chain myIpTable myIpChain
-flush chain myIpTable myIpChain ; flush chain netdev myNetDev X; oopsie
 flush chain netdev myNetdev myNetdevChain
 flush chain bridge myBridge myBridgeChain
 flush chain arp myArp myArpChain
@@ -95,7 +71,11 @@ flush ruleset inet
 #  create Similar to the add command, but returns 
 #  an error if the chain already exists.
 create table myIpTable 
-create table my\./_IpTable 
+create table my\IpTable
+create table my.IpTable
+create table my/IpTable
+create table my_IpTable
+create table my\./_IpTable
 create table myIpTable { flags dormant }
 create table netdev myNetdev 
 create table netdev myNetdev { flags dormant }
@@ -299,8 +279,6 @@ rename chain ip myIpTable myIpChain newMyIpChain    ;    # comment
 rename chain ip6 myIp6Table myIp6Chain newMyIp6Chain  # comment
 rename chain inet myInetTable myInetChain newMyInetChain
 
-list oopsie
-list oopsie ;
 list ruleset   
 list ruleset  ;  
 list ruleset netdev
@@ -353,8 +331,10 @@ list map ip myIpTable myIpMap
 list map ip6 myIp6Table myIp6Map 
 list map inet myInetTable myInetMap 
 
-list flowtable myIpTable myIpFT
-list flowtable netdev myIpTable myIpFT  # intentional syntax error
+list \
+    flowtable \
+        myIpTable \
+            myIpFT
 list flowtable ip myIpTable myIpFT
 list flowtable ip6 myIp6Table myIp6FT
 list flowtable inet myInetTable myInetFT
@@ -366,6 +346,22 @@ list type arp myArpTable myArpType
 list type ip myIpTable myIpType
 list type ip6 myIp6Table myIp6Type
 list type inet myInetTable myInetType
+
+flush map myIpTable myIpMap 
+flush map netdev myNetdevTable myNetdevMap 
+flush map bridge myBridgeTable myBridgeMap 
+flush map arp myArpTable myArpMap 
+flush map ip myIpTable myIpMap 
+flush map ip6 myIp6Table myIp6Map 
+flush map inet myInetTable myInetMap 
+
+flush set myIpTable mySet
+flush set netdev myNetdevTable mySet
+flush set bridge myBridgeTable mySet
+flush set arp myArpTable mySet
+flush set ip myIpTable mySet
+flush set ip6 myIp6Table mySet
+flush set inet myInetTable mySet ; 
 
 ct helper myHelper { type myFtp protocol tcp ; l3proto ip }
 
@@ -702,3 +698,16 @@ table ip workstn_ip_nat {
        #  }
     }
 }
+
+# SYNTAX ERRORS GOES PAST HERE
+include Filespec  # intentional syntax error
+include 'Filespec'  # intentional syntax error
+include 'Fil"espec'  # intentional syntax error
+include "Filespec" bad stuff oppsie  # intentional syntax error
+include "Filespec"  oopsie  # intentional syntax error
+include "Filespec"  oopsie  ;  # intentional syntax error
+flush chain myIpTable myIpChain ; flush chain netdev myNetDev X; oopsie
+list oopsie
+list oopsie ;
+list flowtable netdev myIpTable myIpFT  # intentional syntax error
+flush set inet myInetTable handle 123  # Intentional Syntax ERROR
