@@ -9,7 +9,7 @@ This VIM syntax proactively highlights typo errors in RED for:
 * nftables configuration file and 
 * nftables script file
 
-![Example](https://github.com/egberts/blob/vim-nftables/test/nftables.gif "Example")
+![Example](test/nftables.gif "Example")
 
 
 Files having `nft` in 1st-line shebang will activate the `syntax nftables`.
