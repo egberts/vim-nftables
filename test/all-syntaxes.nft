@@ -112,103 +112,103 @@ add table inet myInetTable { flags dormant; };
 #  2. Explictly-identified family chain
 create chain myIpTable myIpChain
 create chain myIpTable myIpChain { type filter hook prerouting priority 0; policy drop; } ;
-create chain myIpTable myIpChain { type filter hook input priority 0; policy drop;}
+create chain myIpTable myIpChain { type filter hook input priority 0; policy drop;};
 create chain myIpTable myIpChain { type filter hook forward priority 0; policy drop;}
 create chain myIpTable myIpChain { type filter hook output priority 0; policy drop;}
 create chain myIpTable myIpChain { type filter hook postrouting priority 0; policy drop;}
 create chain myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
 create chain arp myArpTable myArpChain 
-create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept}
-create chain arp myArpTable myArpChain { type filter hook output priority 0; policy accept}
-create chain arp myArpTable myArpChain { type filter hook input device "eth0" priority 0; policy accept}
+create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept; }
+create chain arp myArpTable myArpChain { type filter hook output priority 0; policy accept; }
+create chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy accept; }
 create chain bridge myBridgeTable myBridgeChain 
-create chain bridge myBridgeTable myBridgeChain { type filter hook input priority 0; policy accept}
-create chain bridge myBridgeTable myBridgeChain { type filter hook output priority 0; policy accept}
-create chain bridge myBridgeTable myBridgeChain { type filter hook input device "eth0" priority 0; policy accept}
+create chain bridge myBridgeTable myBridgeChain { type filter hook input priority 0; policy accept; }
+create chain bridge myBridgeTable myBridgeChain { type filter hook output priority 0; policy accept; }
+create chain bridge myBridgeTable myBridgeChain { type filter hook input device eth0 priority 0; policy accept; }
 create chain netdev myNetdevTable myNetdevChain 
-create chain netdev myNetdevTable myNetdevChain { type filter hook ingress device "vlan0" priority 0; policy accept}
+create chain netdev myNetdevTable myNetdevChain { type filter hook ingress device vlan0 priority 0; policy accept; }
 create chain ip myIpTable myIpChain 
-create chain ip myIpTable myIpChain { type filter hook prerouting priority 0; policy accept}
-create chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept}
-create chain ip myIpTable myIpChain { type filter hook forward priority 0; policy accept}
-create chain ip myIpTable myIpChain { type filter hook output priority 0; policy accept}
-create chain ip myIpTable myIpChain { type filter hook postrouting priority 0; policy accept}
-create chain ip myIpTable myIpChain { type nat hook prerouting priority 0; policy accept}
-create chain ip myIpTable myIpChain { type nat hook input priority 0; policy accept}
-create chain ip myIpTable myIpChain { type nat hook output priority 0; policy accept}
-create chain ip myIpTable myIpChain { type nat hook postrouting priority 0; policy accept}
-create chain ip myIpTable myIpChain { type route hook output priority 0; policy accept}
+create chain ip myIpTable myIpChain { type filter hook prerouting priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook forward priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook output priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook postrouting priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type nat hook prerouting priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type nat hook input priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type nat hook output priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type nat hook postrouting priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type route hook output priority 0; policy accept; }
 
-create chain ip myIpTable myIpChain { type filter hook input device "eth0" priority 0; policy accept}
+create chain ip myIpTable myIpChain { type filter hook input device eth0 priority 0; policy accept; }
 
 create chain ip6 myIp6Table myIp6Chain 
-create chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type filter hook output priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type filter hook postrouting priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type nat hook prerouting priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type nat hook input priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept}
-create chain ip6 myIp6Table myIp6Chain { type filter hook input device "eth0" priority 0; policy accept}
+create chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook output priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook postrouting priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type nat hook prerouting priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type nat hook input priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook input device eth0 priority 0; policy accept; }
 create chain inet myInetTable myInetChain 
-create chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept}
-create chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept}
-create chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept}
-create chain inet myInetTable myInetChain { type filter hook output priority 0; policy accept}
-create chain inet myInetTable myInetChain { type filter hook postrouting priority 0; policy accept}
-create chain inet myInetTable myInetChain { type nat hook prerouting priority 0; policy accept}
-create chain inet myInetTable myInetChain { type nat hook input priority 0; policy accept}
-create chain inet myInetTable myInetChain { type nat hook output priority 0; policy accept}
-create chain inet myInetTable myInetChain { type nat hook postrouting priority 0; policy accept}
-create chain inet myInetTable myInetChain { type route hook output priority 0; policy accept}
-create chain inet myInetTable myInetChain { type filter hook input device "eth0" priority 0; policy accept}
+create chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook output priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook postrouting priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type nat hook prerouting priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type nat hook input priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type nat hook output priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type nat hook postrouting priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type route hook output priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy accept; }
 
 add chain myIpTable myIpChain 
 add chain myIpTable myIpChain { type filter hook input priority 0; policy drop;}
-add chain myIpTable myIpChain { type filter hook input device "eth0" priority 0; policy drop;}
+add chain myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
 add chain arp myArpTable myArpChain 
 add chain arp myArpTable myArpChain { type filter hook input priority 0; policy drop;}
 add chain arp myArpTable myArpChain { type filter hook output priority 0; policy drop;}
-add chain arp myArpTable myArpChain { type filter hook input device "eth0" priority 0; policy reject;}
-add chain arp myArpTable myArpChain { type filter hook output device "eth0" priority 0; policy accept;}
+add chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy reject;}
+add chain arp myArpTable myArpChain { type filter hook output device eth0 priority 0; policy accept;}
 add chain bridge myBridgeTable myBridgeChain 
 add chain bridge myBridgeTable myBridgeChain { type filter hook input priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook output priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook prerouting priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook postrouting priority 0; policy drop;}
-add chain bridge myBridgeTable myBridgeChain { type filter hook input device "eth0" priority 0; policy drop;}
+add chain bridge myBridgeTable myBridgeChain { type filter hook input device eth0 priority 0; policy drop;}
 add chain netdev myNetdevTable myNetdevTable 
-add chain netdev myNetdevTable myNetdevChain { type filter hook ingress device "eth0" priority 0; policy drop;}
+add chain netdev myNetdevTable myNetdevChain { type filter hook ingress device eth0 priority 0; policy drop;}
 add chain ip myIpTable myIpChain 
-add chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept}
-add chain ip myIpTable myIpChain { type filter hook input device "eth0" priority 0; policy drop;}
+add chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept; }
+add chain ip myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
 add chain ip6 myIp6Table myIp6Chain 
-add chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type filter hook output priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type filter hook postrouting priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type nat hook prerouting priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type nat hook input priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept}
-add chain ip6 myIp6Table myIp6Chain { type filter hook input device "eth0" priority 0; policy drop;}
+add chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type filter hook output priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type filter hook postrouting priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type nat hook prerouting priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type nat hook input priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept; }
+add chain ip6 myIp6Table myIp6Chain { type filter hook input device eth0 priority 0; policy drop;}
 add chain inet myInetTable myInetChain 
-add chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept}
-add chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept}
-add chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept}
-add chain inet myInetTable myInetChain { type filter hook output priority 0; policy accept}
-add chain inet myInetTable myInetChain { type filter hook postrouting priority 0; policy accept}
-add chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept}
-add chain inet myInetTable myInetChain { type nat hook input priority 0; policy accept}
-add chain inet myInetTable myInetChain { type nat hook output priority 0; policy accept}
-add chain inet myInetTable myInetChain { type nat hook postrouting priority 0; policy accept}
-add chain inet myInetTable myInetChain { type route hook output priority 0; policy accept}
-add chain inet myInetTable myInetChain { type filter hook input device "eth0" priority 0; policy drop;}
+add chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type filter hook output priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type filter hook postrouting priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type nat hook input priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type nat hook output priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type nat hook postrouting priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type route hook output priority 0; policy accept; }
+add chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy drop;}
 
 add rule inet mytable myin counter
 
@@ -483,11 +483,11 @@ table arp A0b_._/RP_TABLE {
 table bridge workstation_bridge {
     chain workstn_bridge_filter_input {
         type filter hook input priority -200;
-        policy accept
+        policy accept;
     }
     chain workstn_bridge_filter_output {
         type filter hook output priority -200;
-        policy accept
+        policy accept;
     }
 
     chain workstn_bridge_filter_forward {
