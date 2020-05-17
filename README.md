@@ -2,16 +2,19 @@
 
 VIM Syntax for NFTABLES.
 
-It's better highlighted using standard Vim color syntax.
+# ALPHA, it is in ALPHA stage #
 
+This VIM syntax proactively highlights typo errors in RED for:
+
+* nftables configuration file and 
+* nftables script file
+
+Files having `nft` in 1st-line shebang will activate the `syntax nftables`.
+Files having `.nft` filetype also will active the `syntax nftables` as well.
 
 
 ## Installation
 
-Recommend [NeoBundle](https://github.com/Shougo/neobundle.vim) for installation.
+See [INSTALL](https://github.com/egberts/vim-nftables/INSTALL.md) for
+installation procedure and quick test.
 
-Add the following to your vimrc:
-
-```vim
-NeoBundle 'egberts/vim-nftables'
-```
