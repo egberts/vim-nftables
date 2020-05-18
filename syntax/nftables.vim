@@ -7,7 +7,7 @@
 " Location:     https://github.com/egberts/vim-nftables
 " License:      MIT license
 " Remarks:
-" Bug Report:   https://github.com/egberts/vim-nftables
+" Bug Report:   https://github.com/egberts/vim-nftables/issues
 
 " quit when a syntax file was already loaded
 if !exists('main_syntax')
@@ -969,9 +969,14 @@ syn keyword nftablesAddSet_GcIntervalKeyword contained gc-interval skipwhite
 \    nftablesAddSet_GcInterval,
 \    nftables_EOS
 
-hi link nftablesAddSetElements_ElementNth nftablesHL_String
-syn match nftablesAddSetElements_ElementNth contained skipwhite
-\    /[a-zA-Z0-9_.\-%]\{1,64}/
+hi link nftablesAddSetElements_ElementNth nftablesHL_Type
+syn keyword nftablesAddSetElements_ElementNth contained skipwhite
+\    ipv4_addr
+\    ipv6_addr
+\    ether_addr
+\    inet_proto
+\    inet_service
+\    mark
 \ nextgroup=
 \    nftablesAddSetElements_Separator
 
@@ -981,9 +986,14 @@ syn match nftablesAddSetElements_Separator contained /,/ skipwhite
 \    nftablesAddSetElements_ElementNth,
 \    nftables_Error
 
-hi link nftablesAddSetElements_Element nftablesHL_String
-syn match nftablesAddSetElements_Element contained skipwhite
-\    /[a-zA-Z0-9_.\-%]\{1,64}/
+hi link nftablesAddSetElements_Element nftablesHL_Type
+syn keyword nftablesAddSetElements_Element contained skipwhite
+\    ipv4_addr
+\    ipv6_addr
+\    ether_addr
+\    inet_proto
+\    inet_service
+\    mark
 \ nextgroup=nftablesAddSetElements_Separator
 
 syn region nftablesAddSet_ElementsSection contained start=/=/ end=/;/ skipwhite
@@ -1010,7 +1020,6 @@ syn keyword nftablesAddSet_SizeKeyword contained size skipwhite
 hi link nftablesAddSet_Policy nftablesHL_Type
 syn keyword nftablesAddSet_Policy contained skipwhite
 \    performance
-\    default
 \    memory
 \ nextgroup=
 \    nftables_Semicolon,
@@ -1074,9 +1083,16 @@ syn keyword nftablesCmdAdd_SetKeyword contained set skipwhite
 " End of 'add set [<family>] <table_id> <set_id>'
 
 " Begin of 'add element [<family>] <table_id> <set_id>'
-hi link nftablesAddElement_ElementNth nftablesHL_String
-syn match nftablesAddElement_ElementNth contained skipwhite
-\    /[a-zA-Z0-9_.\-%]\{1,64}/
+hi link nftablesAddElement_ElementNth nftablesHL_Type
+syn keyword nftablesAddElement_ElementNth contained skipwhite
+\    ipv4_addr
+\    ipv6_addr
+\    ether_addr
+\    inet_proto
+\    inet_service
+\    mark
+\    counter
+\    quota
 \ nextgroup=
 \    nftablesAddElement_Separator
 
@@ -1085,9 +1101,16 @@ syn match nftablesAddElement_Separator contained /,/ skipwhite
 \ nextgroup=
 \    nftablesAddElement_ElementNth
 
-hi link nftablesAddElement_SetElements nftablesHL_String
-syn match nftablesAddElement_SetElements contained skipwhite
-\    /[a-zA-Z0-9_./]\{1,64}/
+hi link nftablesAddElement_SetElements nftablesHL_Type
+syn keyword nftablesAddElement_SetElements contained skipwhite
+\    ipv4_addr
+\    ipv6_addr
+\    ether_addr
+\    inet_proto
+\    inet_service
+\    mark
+\    counter
+\    quota
 \ nextgroup=nftablesAddElement_Separator
 
 syn region nftablesAddElement_MapSection contained start=/{/ end=/}/ skipwhite
@@ -1096,9 +1119,13 @@ syn region nftablesAddElement_MapSection contained start=/{/ end=/}/ skipwhite
 \    nftables_Semicolon,
 \    nftables_Comment
 
+hi link nftablesAddElementMap_Equal nftablesHL_Operator
+syn match nftablesAddElementMap_Equal contained /=/ skipwhite
+\ nextgroup=nftablesAddElement_MapSection
+
 hi link nftablesAddElement_MapElements nftablesHL_Option
 syn keyword nftablesAddElement_MapElements contained elements skipwhite
-\ nextgroup=nftablesAddElement_MapSection
+\ nextgroup=nftablesAddElementMap_Equal
 
 syn region nftablesCmdAddElement_Section contained start=/{/ end=/}/
 \ skipwhite
@@ -1266,7 +1293,7 @@ hi link nftablesAddMap_TimeoutKeyword nftablesHL_Statement
 syn keyword nftablesAddMap_TimeoutKeyword contained timeout skipwhite
 \ nextgroup=nftablesAddMap_Timeout
 
-hi link nftablesAddMapElements_ElementNth nftablesHL_String
+hi link nftablesAddMapElements_ElementNth nftablesHL_Type
 syn match nftablesAddMapElements_ElementNth contained skipwhite
 \    /[a-zA-Z0-9\-_]\{1,64}/
 \ nextgroup=
@@ -1278,7 +1305,7 @@ syn match nftablesAddMapElements_Separator contained /,/ skipwhite
 \    nftablesAddMapElements_ElementNth,
 \    nftables_Error
 
-hi link nftablesAddMapElements_Element nftablesHL_String
+hi link nftablesAddMapElements_Element nftablesHL_Type
 syn match nftablesAddMapElements_Element contained skipwhite
 \    /[a-zA-Z0-9\-_]\{1,64}/
 \ nextgroup=nftablesAddMapElements_Separator
@@ -1307,7 +1334,6 @@ syn keyword nftablesAddMap_SizeKeyword contained size skipwhite
 hi link nftablesAddMap_Policy nftablesHL_Type
 syn keyword nftablesAddMap_Policy contained skipwhite
 \    performance
-\    default
 \    memory
 \ nextgroup=
 \    nftables_Semicolon,
@@ -1827,6 +1853,7 @@ syn keyword nftablesCmdMonitor_Object contained skipwhite
 \    sets
 \    rules
 \    elements
+\    ruleset
 \    trace
 \ nextgroup=
 \    nftablesCmdMonitor_Format,
