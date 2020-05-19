@@ -21,8 +21,13 @@
 # include "Filespec";      # inline comment
 # include "Filespec???<>|\~`!@#$%^&*()\=+{}] /;:,._0123abcXYZ"  ;   # inline comment
 # include "Filespec"  ;      # inline comment
+#
+define my_public_wan = eth2
+define int_if1 = eth0
+define int_if2 = $my_public_wan
+define int_ifs = { virbr0, $int_if2, virbr1 }
 
-monitor tables
+monitor tables;
 monitor chains
 monitor sets
 monitor rules
@@ -89,22 +94,29 @@ create table ip6 myIp6Table { flags dormant; }
 create table inet myInetTable 
 create table inet myInetTable { flags dormant; }
 
+# add table <table_spec>
 add table myIpTable    # defaults to 'ip' family
 add table my_IpTable    # defaults to 'ip' family
 add table my.IpTable    # defaults to 'ip' family
 add table my/IpTable    # defaults to 'ip' family
-add table myIpTable { flags dormant;  }    # defaults to 'ip' family
-# add table netdev myNetdevTable
-# add table netdev myNetdevTable { flags dormant; }
+add table netdev myNetdevTable
 add table bridge myBridgeTable
-add table bridge myBridgeTable { flags dormant; }
 add table arp myArpTable 
-add table arp myArpTable { flags dormant; }
 add table ip myIpTable
-add table ip myIpTable { flags dormant; }
 add table ip6 myIp6Table
-add table ip6 myIp6Table { flags dormant; }
 add table inet myInetTable
+
+# add table <table_spec> <table_block>
+# add table <table_spec> <common_block>
+#      <common_block> = <include>|<define>|<redefine>|<undefine>
+# add table <table_spec> <table_options>
+# add table <table_spec> chain <chain_id> { <chain_block> };
+add table myIpTable { flags dormant;}
+add table netdev myNetdevTable { flags dormant; }
+add table bridge myBridgeTable { flags dormant; }
+add table arp myArpTable { flags dormant; }
+add table ip myIpTable { flags dormant; }
+add table ip6 myIp6Table { flags dormant; }
 add table inet myInetTable { flags dormant; };
 
 # Two kinds of a base chain for syntax handling:
@@ -166,26 +178,36 @@ create chain inet myInetTable myInetChain { type nat hook postrouting priority 0
 create chain inet myInetTable myInetChain { type route hook output priority 0; policy accept; }
 create chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy accept; }
 
+create chain netdev myIpTable myIpChain { type filter hook ingress devices = { eth0, eth1, eth2; } priority 0; policy drop;}
+create chain bridge myBridgeTable myBridgeChain { type filter hook prerouting devices = { eth0, eth1, eth2; } priority 0; policy drop;}
+create chain arp myArpTable myArpChain { type filter hook input devices = { eth0, eth1, eth2; } priority 0; policy drop;}
+create chain ip myIpTable myIpChain { type nat hook postrouting devices = { eth0, eth1, eth2; } priority 0; policy drop;}
+create chain ip6 myIp6Table myIp6Chain { type filter hook input devices = { eth0, eth1, eth2; } priority 0; policy drop;}
+create chain inet myInetTable myInetChain { type route hook output devices = { eth0, eth1, eth2; } priority 0; policy drop;}
+
+# add chain <chain_spec>
 add chain myIpTable myIpChain 
+add chain netdev myNetdevTable myNetdevTable 
+add chain bridge myBridgeTable myBridgeChain 
+add chain arp myArpTable myArpChain 
+add chain ip myIpTable myIpChain 
+add chain ip6 myIp6Table myIp6Chain 
+add chain inet myInetTable myInetChain 
+# add chain <chain_spec> <chain_block>
 add chain myIpTable myIpChain { type filter hook input priority 0; policy drop;}
 add chain myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
-add chain arp myArpTable myArpChain 
 add chain arp myArpTable myArpChain { type filter hook input priority 0; policy drop;}
 add chain arp myArpTable myArpChain { type filter hook output priority 0; policy drop;}
-add chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy reject;}
+add chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy accept;}
 add chain arp myArpTable myArpChain { type filter hook output device eth0 priority 0; policy accept;}
-add chain bridge myBridgeTable myBridgeChain 
 add chain bridge myBridgeTable myBridgeChain { type filter hook input priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook output priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook prerouting priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook postrouting priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook input device eth0 priority 0; policy drop;}
-add chain netdev myNetdevTable myNetdevTable 
 add chain netdev myNetdevTable myNetdevChain { type filter hook ingress device eth0 priority 0; policy drop;}
-add chain ip myIpTable myIpChain 
 add chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept; }
 add chain ip myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
-add chain ip6 myIp6Table myIp6Chain 
 add chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept; }
 add chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept; }
 add chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept; }
@@ -197,7 +219,6 @@ add chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy ac
 add chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept; }
 add chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept; }
 add chain ip6 myIp6Table myIp6Chain { type filter hook input device eth0 priority 0; policy drop;}
-add chain inet myInetTable myInetChain 
 add chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept; }
 add chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept; }
 add chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept; }
@@ -210,25 +231,71 @@ add chain inet myInetTable myInetChain { type nat hook postrouting priority 0; p
 add chain inet myInetTable myInetChain { type route hook output priority 0; policy accept; }
 add chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy drop;}
 
-add rule inet mytable myin counter
+# add rule <rule_position> <rule>
+#
+# add rule <table_id> <chain_id> <rule>
+# add rule <family_spec> <table_id> <chain_id> <rule>
+# add rule <chain_spec> position <position_id> <rule>
+# add rule <chain_spec> handle <handle_id> <rule>
+# add rule <chain_spec> index <index_id> <rule>
+add rule netdev myNetdevTable myNetdevRule fwd to eth1
+add rule bridge myBridgeTable myBridgeRule jump BridgeSpan
+add rule arp myArpTable myArpRule jump ArpProxy
+add rule ip myIpTable myIpRule accept
+add rule ip myIpTable myIpRule accept
+add rule ip myIpTable myIpRule tcp dport 23 accept
+add rule ip myIpTable myIpRule tcp dport { 22, 80, 443 } accept
+add rule inet mytable myin jump nuts
+add rule inet mytable myin counter jump nuts;
+add rule inet mytable myin jump toMe accept;
+add rule inet mytable myin counter accept
+add rule inet mytable myin counter accept comment "foo bar"
 
-add set myIpTable mySet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+# real-world 'add rule'
+add rule filter output quota name tcp dport map @ports
+
+# add <table_id> <chain_id> <rule>
+# add <family_spec> <table_id> <chain_id> <rule>
+# add <chain_spec> position <position_id> <rule>
+# add <chain_spec> handle <handle_id> <rule>
+# add <chain_spec> index <index_id> <rule>
+add netdev myNetdevTable myNetdevRule fwd to eth1
+add bridge myBridgeTable myBridgeRule jump BridgeSpan
+add arp myArpTable myArpRule jump ArpProxy
+add ip myIpTable myIpRule accept
+add ip myIpTable myIpRule accept
+add ip myIpTable myIpRule tcp dport 23 accept
+add ip myIpTable myIpRule tcp dport { 22, 80, 443 } accept
+add inet mytable myin jump nuts
+add inet mytable myin counter jump nuts;
+add inet mytable myin jump toMe accept;
+add inet mytable myin counter accept
+add inet mytable myin counter accept comment "foo bar"
+
+add set myIpTable mySet { type mark; flags interval; timeout 15m; gc-interval 2d; size 1200; policy memory; auto-merge; }
 add set ip myIpTable mySet {   # comment
     type inet_proto;   # comment
-    flags constant;   # comment
+    flags interval;   # comment
     timeout 30s;   # comment
     gc-interval 2h;   # comment
-    elements = element,element;   # comment
+    elements = {ip};   # comment
     size 1200;   # comment
     policy memory;   # comment
     auto-merge;   # comment
     };  # comment
-add set netdev myNetdevTable myNetdevSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
-add set bridge myBridgeTable myBridgeSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
-add set arp myArpTable myArpSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
-add set ip myIpTable myIpSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
-add set ip6 myIp6Table myIp6Set { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
-add set inet myInetTable myInetSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = element,element; size 1200; policy default; auto-merge; }
+add set netdev myNetdevTable myNetdevSet { type ether_addr; flags interval; timeout 15m; gc-interval 2d; elements = {mark}; size 1200; policy performance; auto-merge; }
+add set bridge myBridgeTable myBridgeSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = {ether_addr}; size 1200; policy memory; auto-merge; }
+add set arp myArpTable myArpSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = {ipv4_addr}; size 1200; policy performance; auto-merge; }
+add set ip myIpTable myIpSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = {ipv4_addr}; size 1200; policy memory; auto-merge; }
+add set ip6 myIp6Table myIp6Set { type inet_service; flags interval; timeout 15m; gc-interval 2d; elements = {ipv6_addr}; size 1200; policy memory; auto-merge; }
+add set inet myInetTable myInetSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = {ipv4_addr,ipv6_addr}; size 1200; policy performance; auto-merge; }
+
+# 'add set' concatenator
+add set my_filter_table my_ssh_meter { type ipv4_addr . inet_proto; flags dynamic ;}
+add set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout . dynamic ;}
+
+create set my_filter_table my_ssh_meter { type ipv4_addr . inet_proto; flags dynamic ;}
+create set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout . dynamic ;}
 
 add element myIpTable myIpSet { element, element }
 add element netdev myNetdevTable myNetdevSet { element, element }
@@ -238,22 +305,38 @@ add element ip myIpTable myIpSet { element, element }
 add element ip6 myIp6Table myIp6Set { element, element }
 add element inet myInetTable myInetSet { element, element }
 
-add map myIpTable myIpMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
-add map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
-add map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
-add map arp myArpTable myArpMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
-add map ip myIpTable myIpMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
-add map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
-add map inet myInetTable myInetMap { type mark; flags interval; elements = { element,element }; size 1200; policy default; }
+add map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+add map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+add map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+add map arp myArpTable myArpMap { type mark; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+add map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+add map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
+add map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
 
-add element myIpTable myIpMap { elements = { element, element }; }
-add element netdev myNetdevTable myNetdevMap { elements = { element, element } ; }
-add element bridge myBridgeTable myBridgeMap { elements = { element, element } ; }
-add element arp myArpTable myArpMap { elements = { element, element } ; }
-add element ip myIpTable myIpMap { elements = { element, element } ; }
-add element ip6 myIp6Table myIp6Map { elements = { element, element } ; }
-add element inet myInetTable myInetMap { elements = { element, element } ; }
+# 'add map' real-world
+add map filter whitelist { type ipv4_addr . inet_service : ipv6_addr; }
+add map filter ports { type inet_service : ipv4_addr ; }
 
+add element myIpTable myIpMap { elements = { ipv4_addr }; }
+add element netdev myNetdevTable myNetdevMap { elements = { ether_addr } ; }
+add element bridge myBridgeTable myBridgeMap { elements = { ether_addr } ; }
+add element arp myArpTable myArpMap { elements = { ipv4_addr } ; }
+add element ip myIpTable myIpMap { elements = { ipv4_addr } ; }
+add element ip6 myIp6Table myIp6Map { elements = { ipv6_addr } ; }
+add element inet myInetTable myInetMap { elements = { ipv4_addr } ; }
+
+# Real-world 'add element's
+add element filter ports { 80 : "http-quota" }
+add element filter ports { 22 : "ssh-quota" }
+add element ip myIpTable myTestMap { 10.11.1.15 : jump test_1_15 }
+
+create map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+create map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+create map arp myArpTable myArpMap { type mark; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
+create map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
 create flowtable myIpTable myIpFT { hook input priority 0; devices = { device,device,device} ; }
 create flowtable ip myIpTable myIpFT { hook input priority 0; devices = { device, device } ; }
 create flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { device, device } ; }
@@ -272,6 +355,49 @@ add type ip myIpTable myIpType
 add type ip6 myIp6Table myIp6Type
 add type inet myInetTable myInetType
 
+add limit myIpTable myIpLimit { rate 1/second }
+add limit netdev myNetdevTable myNetdevLimit { rate 1/second }
+add limit bridge myBridgeTable myBridgeLimit { rate 1/second }
+add limit ip myIpTable myIpLimit { rate 1/second }
+add limit ip6 myIp6Table myIp6Limit { rate 1/second }
+add limit inet myInetTable myInetLimit { rate 1/second }
+
+ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
+add ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
+delete  ct helper ip myIpTable cth
+
+add ct expectation myTimeout { .... }
+add ct timeout myTimeout { .... }
+add ct timeout myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout netdev myNetdevTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout bridge myBridgeTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout arp myArpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout ip myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout ip6 myIp6Table ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout inet myInetTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+delete ct timeout myIpTable ctt
+delete ct timeout netdev myNetdevTable ctt
+delete ct timeout bridge myBridgeTable ctt
+delete ct timeout arp myArpTable ctt
+delete ct timeout ip myIpTable ctt
+delete ct timeout ip6 myIp6Table ctt
+delete ct timeout inet myInetTable ctt
+
+add quota filter http-quota over 25 mbytes
+add quota filter ssh-quota { 10 kbytes }
+add quota netdev myIpfilter http-quota over 25 mbytes
+add quota bridge myIpfilter http-quota over 25 mbytes
+add quota arp myIpfilter http-quota over 25 mbytes
+add quota ip myIpfilter http-quota over 25 mbytes
+add quota ip6 myIpfilter http-quota until 525 kbytes
+add quota inet myIpfilter http-quota over 25 mbytes
+
+# TODO Need to study syntax for secmark/synproxy
+add secmark 
+add synproxy
+
+replace rule <ruleid_spec> <rule>
+
 rename chain myIpTable myIpChain newMyIpChain
 rename chain netdev myNetdevTable myNetdevChain newMyNetdevChain    ;    
 rename chain bridge myBridgeTable myBridgeChain newMyBridgeChain;
@@ -279,6 +405,36 @@ rename chain arp myArpTable myArpChain newMyArpChain  ;
 rename chain ip myIpTable myIpChain newMyIpChain    ;    # comment
 rename chain ip6 myIp6Table myIp6Chain newMyIp6Chain  # comment
 rename chain inet myInetTable myInetChain newMyInetChain
+
+list limits
+list limits netdev
+list limits bridge
+list limits arp
+list limits ip
+list limits ip6
+list limits inet
+list limits table myIpTable
+list limits table netdev myNetdevTable
+list limits table bridge myBridgeTable
+list limits table arp myArpTable
+list limits table ip myIpTable
+list limits table ip6 myIp6Table
+list limits table inet myInetTable
+
+list counters
+list counters netdev
+list counters bridge
+list counters arp
+list counters ip
+list counters ip6
+list counters inet
+list counters table myIpTable
+list counters table netdev myNetdevTable
+list counters table bridge myBridgeTable
+list counters table arp myArpTable
+list counters table ip myIpTable
+list counters table ip6 myIp6Table
+list counters table inet myInetTable
 
 list ruleset   
 list ruleset  ;  
@@ -359,14 +515,7 @@ flush set ip myIpTable mySet
 flush set ip6 myIp6Table mySet
 flush set inet myInetTable mySet ; 
 
-ct helper myHelper { type myFtp protocol tcp ; l3proto ip }
-
-counter <packets> <bytes>
-
-quota 15mbytes
-quota over 30kbytes
-quota until 5bytes
-
+ct helper myHelper { type "myFtp" protocol tcp ; l3proto ip }
 
 export json
 export xml
@@ -375,6 +524,71 @@ export ruleset xml
 
 describe tcp flag; # oopsie
 
+# reset counters <ruleset_spec>
+reset counters
+reset counters netdev
+reset counters bridge
+reset counters arp
+reset counters ip
+reset counters ip6
+reset counters inet
+# reset counters table <table_spec>
+reset counters table myIpTable
+reset counters table netdev myNetdevTable
+reset counters table bridge myBridgeTable
+reset counters table arp myArpTable
+reset counters table ip myIpTable
+reset counters table ip6 myIp6Table
+reset counters table inet myInetTable
+
+# reset counter <obj_spec>
+reset counter netdev
+reset counter bridge
+reset counter arp
+reset counter ip
+reset counter ip6
+reset counter inet
+reset counter netdev myNetdevTable
+reset counter bridge myBridgeTable
+reset counter arp myArpTable
+reset counter ip myIpTable
+reset counter ip6 myIp6Table
+reset counter inet myInetTable
+# reset counter <objid_spec>
+reset counter myIpTable handle 5
+reset counter netdev myNetdevTable handle 5
+reset counter bridge myBridgeTable handle 5
+reset counter arp myArpTable handle 5
+reset counter ip myIpTable handle 5
+reset counter ip6 myIp6Table handle 5
+reset counter inet myInetTable handle 5
+
+# reset quotas <ruleset_spec>
+reset quotas 
+reset quotas netdev 
+reset quotas bridge 
+reset quotas arp 
+reset quotas ip 
+reset quotas ip6 
+reset quotas inet 
+# reset quotas table <table_spec>
+reset quotas table myIpFilter
+reset quotas table netdev myIpFilter
+reset quotas table bridge myIpFilter
+reset quotas table arp myIpFilter
+reset quotas table ip myIpFilter
+reset quotas table ip6 myIpFilter
+reset quotas table inet myIpFilter
+
+reset quota myIpTable myIpFilter
+reset quota myIpFilter https-quota
+reset quota netdev myNetDevFilter https-quota
+reset quota bridge myBridgeFilter https-quota
+reset quota arp myArpFilter https-quota
+reset quota ip myIpFilter https-quota
+reset quota ip6 myIp6Filter https-quota
+reset quota inet myInetFilter https-quota
+
 reset type myIpTable myIpType
 reset type netdev myNetdevTable myNetdevType
 reset type bridge myBridgeTable myBridgeType
@@ -382,6 +596,14 @@ reset type arp myArpTable myArpType
 reset type ip myIpTable myIpType
 reset type ip6 myIp6Table myIp6Type
 reset type inet myInetTable myInetType
+
+delete counter myIpTable myIpCounter
+delete counter netdev myNetdevTable myNetdevCounter
+delete counter bridge myBridgeTable myBridgeCounter
+delete counter arp myArpTable myArpCounter
+delete counter ip myIpTable myIpCounter
+delete counter ip6 myIp6Table myIp6Counter
+delete counter inet myInetTable myInetCounter
 
 delete type myIpTable myIpType
 delete type netdev myNetdevTable myNetdevType
@@ -462,6 +684,7 @@ monitor destroy rules
 monitor destroy elements
 monitor destroy trace 
 
+# COMPLEX EXAMPLES
 table arp A0b_._/RP_TABLE {
     chain ARP_INPUT_FILTER {
        type filter hook input priority 0;
@@ -480,10 +703,31 @@ table arp A0b_._/RP_TABLE {
     }
 }
 
+table netdev NETDEV_TABLE {
+    # mind the NIC, it must exists
+    chain ingress_filter_netdev_lo { 
+        type filter hook ingress device lo priority -100; 
+        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    };
+    chain red_ingress_netdev_eth0 { 
+        # You'll get a cryptic error if 'device eth0' is missing after 'chain'
+        type filter hook ingress device eth0 priority -100; 
+        policy accept;
+
+        include "netdev-table/ingress-hook/*.eth0.rule.nft";
+        tcp dport 80 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set jhash ip saddr . tcp sport mod 2 map { 0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    }
+}
+
 table bridge workstation_bridge {
     chain workstn_bridge_filter_input {
         type filter hook input priority -200;
         policy accept;
+        ct state established,related accept # handle 4
+        ct helper ftp-standard {
+            type "ftp" protocol tcp
+        }
     }
     chain workstn_bridge_filter_output {
         type filter hook output priority -200;
@@ -498,23 +742,6 @@ table bridge workstation_bridge {
         oif eth0 ip protocol icmp icmp type echo-request accept
         iif eth0 ip protocol icmp icmp type echo-reply accept
         counter log drop
-    }
-}
-
-table netdev NETDEV_TABLE {
-    # mind the NIC, it must exists
-    chain ingress_filter_netdev_lo { 
-        type filter hook ingress device lo priority -100; 
-        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
-    }
-    chain red_ingress_netdev_eth0 { 
-        # You'll get a cryptic error if 'device eth0' is missing after 'chain'
-        type filter hook ingress device eth0 priority -100; 
-        policy accept;
-
-        include "netdev-table/ingress-hook/*.eth0.rule.nft";
-        tcp dport 80 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set jhash ip saddr . tcp sport mod 2 map { 0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
-        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
     }
 }
 
@@ -695,6 +922,473 @@ table ip workstn_ip_nat {
     }
 }
 
+list counters table filter  # standard identifier
+
+list counter filter https-filter  # user-definable identifier
+
+# list quotas <ruleset_spec>
+list quotas
+# list quotas table <table_spec>
+list quotas table myIpTable
+list quotas table netdev myNetdevTable
+list quotas table bridge myBridgeTable
+list quotas table arp myArpTable
+list quotas table ip myIpTable
+list quotas table ip6 myIp6Table
+list quotas table inet myInetTable
+
+
+ct mark set meta mark
+
+table inet raw {
+    chain prerouting {
+        type filter hook prerouting priority -300;
+        ct zone set iif map { "eth1" : 1, "veth1" : 2 }
+    }
+    chain output {
+        type filter hook output priority -300;
+        ct zone set oif map { "eth1" : 1, "veth1" : 2 }
+    }
+}
+
+insert rule filter output ip daddr 192.168.0.0/24 accept # 'ip filter' is assumed
+add rule filter output ip daddr 192.168.0.0/24 accept # 'ip filter' is assumed
+# same command, slightly more verbose
+add rule ip filter output ip daddr 192.168.0.0/24 accept
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        ct state established,related accept # handle 4
+        ip saddr 10.1.1.1 tcp dport ssh accept # handle 5
+    }
+}
+table ip my_filter_table {
+    set my_connlimit {
+        type ipv4_addr
+        size 65535
+        flags dynamic
+    }
+
+    chain my_output_chain {
+        type filter hook output priority filter; policy accept;
+        ct state new add @my_connlimit { ip daddr ct count over 20 } counter packets 0 bytes 0 drop
+   }
+}
+
+table ip filter {
+    set myset {
+        type inet_service
+        flags timeout
+        elements = { http expires 9s}
+    }
+
+    chain input {
+        type filter hook input priority 0; policy accept;
+        update @myset { tcp dport timeout 1m }
+    }
+}
+
+table ip filter {
+    set myset {
+        type ipv4_addr
+        elements = { 1.1.1.1 }
+    }
+
+    chain input {
+        type filter hook input priority 0; policy accept;
+        add @myset { ip saddr }
+    }
+}
+
+table inet myfilter {
+    set myset {
+        type ipv4_addr
+        flags timeout
+        elements = { 10.0.0.1 timeout 10s expires 8s}
+    }
+}
+
+# fw.basic
+table ip filter {
+    chain input {
+        type filter hook input priority 0;
+        # accept traffic originated from us
+        ct state established,related accept
+        # accept any localhost traffic
+        iif lo accept
+        # count and drop any other traffic
+        counter drop
+    }
+}
+
+# fw6.basic
+table ip6 filter {
+    chain input {
+        type filter hook input priority 0;
+        # accept any localhost traffic
+        iif lo accept
+        # accept traffic originated from us
+        ct state established,related accept
+        # accept neighbour discovery otherwise connectivity breaks
+        icmpv6 type { nd-neighbor-solicit, echo-request, nd-router-advert, nd-neighbor-advert } accept
+        # count and drop any other traffic
+        counter drop
+    }
+}
+
+# fw.inet.basic
+table inet filter {
+    chain input {
+        type filter hook input priority 0;
+        # accept any localhost traffic
+        iif lo accept
+        # accept traffic originated from us
+        ct state established,related accept
+        # accept neighbour discovery otherwise connectivity breaks
+        ip6 nexthdr icmpv6 icmpv6 type { nd-neighbor-solicit, echo-request, nd-router-advert, nd-neighbor-advert } accept
+        # count and drop any other traffic
+        counter drop
+    }
+}
+
+# bridge filtering
+add rule bridge filter forward ether type ip tcp dport 22 accept
+add rule bridge filter forward ether type arp accept
+
+# multiple NATs
+add rule nat prerouting dnat 
+      tcp dport map { 1000 : 1.1.1.1, 2000 : 2.2.2.2, 3000 : 3.3.3.3} \
+      : tcp dport map { 1000 : 1234, 2000 : 2345, 3000 : 3456 }
+add rule nat postrouting snat \
+      ip saddr map { 192.168.1.1 : 1.1.1.1, 192.168.2.2 : 2.2.2.2, 192.168.3.3 : 3.3.3.3 }
+
+# classic perimetral firewall
+flush ruleset
+# include "./defines.nft"
+# interfaces
+define nic_inet = bond0
+define nic_dmz = bond1
+define nic_lan = bond2
+# network ranks
+define net_ipv4_dmz = 10.0.1.0/24
+define net_ipv6_dmz = fe00:1::/64
+define net_ipv4_lan = 10.0.2.0/24
+define net_ipv6_lan = fe00:2::/64
+# some machines
+define server1_ipv4 = 10.0.1.2
+define server1_ipv6 = fe00:1::2
+define workstation1_ipv4 = 10.0.2.2
+define workstation1_ipv6 = fe00:2::2
+table inet filter {
+    chain global {
+        ct state established,related accept
+        ct state invalid drop
+        ip protocol icmp accept
+        ip6 nexthdr icmpv6 accept
+        udp dport 53 accept
+    }
+# include "./inet-filter-sets.nft"
+    set myset_ipv4 {
+        type ipv4_addr;
+        elements = { $server1_ipv4 , $workstation1_ipv4 }
+    }
+    set myset_ipv6 {
+        type ipv6_addr;
+        elements = { $server1_ipv6 , $workstation1_ipv6 }
+    }
+# include "./inet-filter-forward.nft"
+    chain dmz_in {
+        # your rules for traffic to your dmz servers
+        ip saddr @myset_ipv4
+        ip6 saddr @myset_ipv6
+    }
+    chain dmz_out {
+        # your rules for traffic from the dmz to internet
+    }
+    chain lan_in {
+        # your rules for traffic to your LAN nodes
+    }
+    chain lan_out {
+        # your rules for traffic from the LAN to the internet
+    }
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+        jump global
+        oifname vmap { $nic_dmz : jump dmz_in , $nic_lan : jump lan_in }
+        oifname $nic_inet iifname vmap { $nic_dmz : jump dmz_out , $nic_lan : jump lan_out }
+    }
+# include "./inet-filter-local.nft"
+    chain input {
+        type filter hook input priority 0 ; policy drop;
+        jump global
+        # your rules for traffic to the firewall here
+    }
+    chain output {
+        type filter hook output priority 0 ; policy drop;
+        jump global
+        # your rules for traffic originated from the firewall itself here
+    }
+}
+
+# Port Knocking Example #1
+table inet portknock {
+    set clients_ipv4 {
+        type ipv4_addr
+        flags timeout
+    }
+    set clients_ipv6 {
+        type ipv6_addr
+        flags timeout
+    }
+    set candidates_ipv4 {
+        type ipv4_addr . inet_service
+        flags timeout
+    }
+    set candidates_ipv6 {
+        type ipv6_addr . inet_service
+        flags timeout
+    }
+    chain input {
+        type filter hook input priority -10; policy accept;
+
+        iifname "lo" return
+
+        tcp dport 123 add @candidates_ipv4 {ip  saddr . 234 timeout 1s}
+        tcp dport 123 add @candidates_ipv6 {ip6 saddr . 234 timeout 1s}
+        tcp dport 234 ip  saddr . tcp dport @candidates_ipv4 add @candidates_ipv4 {ip  saddr . 345 timeout 1s}
+        tcp dport 234 ip6 saddr . tcp dport @candidates_ipv6 add @candidates_ipv6 {ip6 saddr . 345 timeout 1s}
+        tcp dport 345 ip  saddr . tcp dport @candidates_ipv4 add @candidates_ipv4 {ip  saddr . 456 timeout 1s}
+        tcp dport 345 ip6 saddr . tcp dport @candidates_ipv6 add @candidates_ipv6 {ip6 saddr . 456 timeout 1s}
+        tcp dport 456 ip  saddr . tcp dport @candidates_ipv4 add @clients_ipv4 {ip  saddr timeout 10s} log prefix "Successful portknock: "
+        tcp dport 456 ip6 saddr . tcp dport @candidates_ipv6 add @clients_ipv6 {ip6 saddr timeout 10s} log prefix "Successful portknock: "
+        tcp dport $guarded_ports ip  saddr @clients_ipv4 counter accept
+        tcp dport $guarded_ports ip6 saddr @clients_ipv6 counter accept
+        tcp dport $guarded_ports ct state established,related counter accept
+        tcp dport $guarded_ports counter reject with tcp reset
+    }
+}
+
+# Port Knocking Example #2
+table ip Inet4 {
+    set Knocked_1 {
+        type ipv4_addr
+        flags timeout
+        timeout 10s
+        gc-interval 4s
+    }
+    set Knocked_2 {
+        type ipv4_addr
+        flags timeout
+        timeout 10s
+        gc-interval 4s
+    }
+    set Knocked_3 {
+        type ipv4_addr
+        flags timeout
+        timeout 10s
+        gc-interval 4s
+    }
+    set Knocked_4 {
+        type ipv4_addr
+        flags timeout
+        timeout 2m
+        gc-interval 4s
+    }
+
+    chain Knock_1 {
+        set add ip saddr @Knocked_1
+    }
+    chain Unknock_1 {
+        set update ip saddr timeout 0s @Knocked_1
+    }
+    chain Knock_2 {
+        set update ip saddr timeout 0s @Knocked_1
+        set add ip saddr @Knocked_2
+    }
+    chain Unknock_2 {
+        set update ip saddr timeout 0s @Knocked_2
+    }
+    chain Knock_3 {
+        set update ip saddr timeout 0s @Knocked_2
+        set add ip saddr @Knocked_3
+    }
+    chain Unknock_3 {
+        set update ip saddr timeout 0s @Knocked_3
+    }
+    chain Knock_4 {
+        set update ip saddr timeout 0s @Knocked_3
+        set add ip saddr @Knocked_4 log prefix "Port-Knock accepted: "
+    }
+    chain RefreshKnock {
+        set update ip saddr timeout 2m @Knocked_4
+    }
+    chain PortKnock {
+        ct state new ip saddr @Knocked_4 goto RefreshKnock
+        tcp dport 456 ct state new ip saddr @Knocked_3 goto Knock_4
+        tcp dport 345 ct state new ip saddr @Knocked_3 return
+        ip saddr @Knocked_3 ct state new goto Unknock_3
+        tcp dport 345 ct state new ip saddr @Knocked_2 goto Knock_3
+        tcp dport 234 ct state new ip saddr @Knocked_2 return
+        ip saddr @Knocked_2 ct state new goto Unknock_2
+        tcp dport 234 ct state new ip saddr @Knocked_1 goto Knock_2
+        tcp dport 123 ct state new ip saddr @Knocked_1 return
+        ip saddr @Knocked_1 ct state new goto Unknock_1
+        tcp dport 123 ct state new goto Knock_1
+    }
+    chain FilterIn {
+        type filter hook input priority 0
+        policy drop
+
+        # allow established/related connections
+        ct state established,related accept
+
+        # early drop of invalid connections
+        ct state invalid drop
+
+        # allow from loopback
+        meta iif lo accept
+
+        # allow icmp
+        ip protocol icmp accept
+
+        # port-knocking
+        jump PortKnock
+
+        # misc. filtering
+        # ...
+    }
+
+    chain FilterOut {
+        type filter hook output priority 0
+        policy accept
+    }
+}
+
+# Classification to tc structure
+table ip filter {
+   map subnet_map {
+       type ipv4_addr : verdict
+       flags interval
+       elements = { 10.20.255.48/29 : goto group_114, 10.20.255.88/29 : goto group_114,
+                    10.20.255.128/29 : goto group_114 }
+   }
+   set priority_set {
+       type ipv4_addr
+       flags interval
+       elements = { 8.8.8.8, 8.8.4.4 }
+   }   
+   map group_114 {
+       type ipv4_addr : classid
+       flags interval
+       elements = { 10.20.255.50 : 1:ffd8, 10.20.255.90 : 1:ffd5,
+                     10.20.255.130 : 1:ffd2 }
+   }
+   map group_114_prio {
+       type ipv4_addr : classid
+       flags interval
+       elements = { 10.20.255.50 : 1:ffd9, 10.20.255.90 : 1:ffd6,
+                     10.20.255.130 : 1:ffd3 }
+   }   
+   chain forward {
+       type filter hook forward priority filter; policy accept;
+       meta priority none ip daddr vmap @subnet_map counter packets 0 bytes 0
+       meta priority none ip saddr vmap @subnet_map counter packets 0 bytes 0
+       ip daddr 192.168.0.0/16 meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "total - "
+       ip saddr 192.168.0.0/16 meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "total - "
+       ip daddr 10.0.0.0/8 meta priority none meta priority set 1:ffff counter packets 38931 bytes 2926076 log prefix "total - "
+       ip saddr 10.0.0.0/8 meta priority none meta priority set 1:ffff counter packets 14 bytes 1064 log prefix "total - "
+       meta priority none meta priority set 1:2 counter packets 0 bytes 0 log prefix "non_shaped - "
+   }
+   chain input {
+       type filter hook input priority filter; policy accept;
+       meta priority none meta priority set 1:2 counter packets 419381 bytes 45041195
+   }
+   chain output {
+       type filter hook output priority filter; policy accept;
+       meta priority none meta priority set 1:2 counter packets 507779 bytes 51809859
+   }
+   chain group_114 {
+       meta priority none ip saddr @priority_set meta priority set ip daddr map @group_114_prio counter packets 0 bytes 0
+       meta priority none ip daddr @priority_set meta priority set ip saddr map @group_114_prio counter packets 0 bytes 0
+       meta priority none meta priority set ip daddr map @group_114 counter packets 0 bytes 0
+       meta priority none meta priority set ip saddr map @group_114 counter packets 0 bytes 0
+       meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "group_114 - "
+   }
+}
+
+# Will count all udp port 5060 packets towards the 
+# quota and drop all packets once the quota hits 
+# its "over 100 mbytes" threshold.
+table inet foo {
+    quota example { over 100 mbytes used 0 bytes }
+
+    chain dropafterquota {
+        type filter hook postrouting priority 0; policy accept;
+        udp port 5060 quota name "example" drop
+    }
+}
+
+# inet family:
+# handle ip dnat:
+add rule inet nat prerouting dnat ip to 10.0.2.99
+# handle ip6 dnat:
+add rule inet nat prerouting dnat ip6 to fe80::dead
+# this masquerades both ipv4 and ipv6:
+add rule inet nat postrouting meta oif ppp0 masquerade
+
+
+#Example for simple blacklist
+# declare a set, bound to table "filter", in family 
+# "ip". Timeout and size are mandatory because we 
+# will add elements from packet path.
+add set ip filter blackhole { type ipv4_addr; flags timeout; size 65536; }
+# whitelist internal interface.
+add rule ip filter input meta iifname "internal" accept
+# drop packets coming from blacklisted ip addresses.
+add rule ip filter input ip saddr @blackhole counter drop
+# add source ip addresses to the blacklist if more than 10 tcp connection requests occurred per second and ip address.
+# entries will timeout after one minute, after which they might be re-added if limit condition persists.
+add rule ip filter input tcp flags syn tcp dport ssh meter flood size 128000 { ip saddr timeout 10s limit rate over 10/second} add @blackhole { ip saddr timeout 1m } drop
+# inspect state of the rate limit meter:
+list meter ip filter flood
+# inspect content of blackhole:
+list set ip filter blackhole
+# manually add two addresses to the set:
+add element filter blackhole { 10.2.3.4, 10.23.1.42 }
+
+
+#Using the map statement
+# select DNAT target based on TCP dport:
+# connections to port 80 are redirected to 192.168.1.100,
+# connections to port 8888 are redirected to 192.168.1.101
+add rule ip nat prerouting dnat tcp dport map { 80 : 192.168.1.100, 8888 : 192.168.1.101 }
+# source address based SNAT:
+# packets from net 192.168.1.0/24 will appear as originating from 10.0.0.1,
+# packets from net 192.168.2.0/24 will appear as originating from 10.0.0.2
+add rule ip nat postrouting snat to ip saddr map { 192.168.1.0/24 : 10.0.0.1, 192.168.2.0/24 : 10.0.0.2 }
+
+
+#Using the vmap statement
+# jump to different chains depending on layer 4 protocol type:
+add rule ip filter input ip protocol vmap { tcp : jump tcp-chain, udp : jump udp-chain , icmp : jump icmp-chain }
+
+
+table ip x {
+    ct timeout "policy1" {
+        protocol tcp
+        timeouts = {
+            established: 120s
+            fin_wait: 30;
+        }
+    }
+    chain c {
+        ct timeout set saddr map {
+            192.168.0.14 :"policy1"
+        }
+    }
+}
+
 # SYNTAX ERRORS GOES PAST HERE
 " include Filespec  # intentional syntax error
 " include 'Filespec'  # intentional syntax error
@@ -714,4 +1408,4 @@ list table TABLE_NETDEV   ; asdf
 list flowtable netdev myIpTable myIpFT  # intentional syntax error
 list set myIpTable handle 123 # intentional syntax error
 list set inet myInetTable handle 123  # Intentional Syntax ERROR
-flush set inet myInetTable handle 123  # Intentional Syntax ERROR
+
