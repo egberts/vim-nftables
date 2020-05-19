@@ -6,48 +6,78 @@
 # the vim syntax highlighter for NFTABLES (yet `nft` takes it in just normally).
 # TODO: More todo, FIXME, FIXME: TODO: xxx XXX ARGH!
 #
-# include ";;;;;;;;;;";
-# include "Fil'espec"
-# include "Filespec"
-# include "Filespec"     
-# include "Filespec";
-# include "Filespec" ;
-# include "Filespec";   
-# include "Filespec"  ;
-# include "Filespec"  ;   
-# include "Filespec"# inline comment
-# include "Filespec"        # inline comment
-# include "Filespec";   # inline comment
-# include "Filespec";      # inline comment
-# include "Filespec???<>|\~`!@#$%^&*()\=+{}] /;:,._0123abcXYZ"  ;   # inline comment
-# include "Filespec"  ;      # inline comment
+include ";;;;;;;;;;";
+include "Fil'espec"
+include "Filespec"
+include "Filespec"     
+include "Filespec";
+include "Filespec" ;
+include "Filespec";   
+include "Filespec"  ;
+include "Filespec"  ;   
+include "Filespec"# inline comment
+include "Filespec"        # inline comment
+include "Filespec";   # inline comment
+include "Filespec";      # inline comment
+include "Filespec???<>|\~`!@#$%^&*()\=+{}] /;:,._0123abcXYZ"  ;   # inline comment
+include "Filespec"  ;      # inline comment
 #
+# <common_block>
 define my_public_wan = eth2
 define int_if1 = eth0
 define int_if2 = $my_public_wan
 define int_ifs = { virbr0, $int_if2, virbr1 }
+redefine my_public_wan = eth2
+redefine int_if1 = eth0
+redefine int_if2 = $my_public_wan
+redefine int_ifs = { virbr0, $int_if2, virbr1 }
+undefine int_ifs
 
-monitor tables;
-monitor chains
-monitor sets
-monitor rules
-monitor elements
-monitor trace
-
-monitor tables json;
-monitor chains json
-monitor sets json
-monitor rules json
-monitor elements json
-monitor trace json
-
+monitor 
+# monitor <monitor_event> 
 monitor new 
+# monitor <monitor_event> <monitor_object> 
 monitor new tables 
 monitor new chains
 monitor new sets
 monitor new rules
 monitor new elements 
+monitor new ruleset
 monitor new trace 
+monitor destroy tables 
+monitor destroy chains
+monitor destroy sets
+monitor destroy rules
+monitor destroy elements 
+monitor destroy ruleset
+monitor destroy trace 
+
+# monitor <monitor_object> 
+monitor tables;
+monitor chains
+monitor sets
+monitor rules
+monitor elements
+monitor ruleset
+monitor trace
+
+# monitor <monitor_event> <monitor_object> <monitor_format>
+monitor tables json;
+monitor chains xml
+monitor sets json
+monitor rules vm json
+monitor elements json
+monitor ruleset json
+monitor trace json
+monitor trace json
+
+monitor new tables xml
+monitor new chains json
+monitor new sets vm json
+monitor new rules json
+monitor new elements json
+monitor new ruleset json
+monitor new trace  json
 
 flush chain myIpTable myIpChain
 flush chain netdev myNetdev myNetdevChain
@@ -193,13 +223,15 @@ add chain arp myArpTable myArpChain
 add chain ip myIpTable myIpChain 
 add chain ip6 myIp6Table myIp6Chain 
 add chain inet myInetTable myInetChain 
+
 # add chain <chain_spec> <chain_block>
 add chain myIpTable myIpChain { type filter hook input priority 0; policy drop;}
 add chain myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
-add chain arp myArpTable myArpChain { type filter hook input priority 0; policy drop;}
+add chain arp myArpTable myArpChain { type filter hook input device eth1 priority 0; policy drop;}
 add chain arp myArpTable myArpChain { type filter hook output priority 0; policy drop;}
 add chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy accept;}
 add chain arp myArpTable myArpChain { type filter hook output device eth0 priority 0; policy accept;}
+add chain arp myArpTable myArpChain { type filter hook output devices = { eth0, eth1 }    priority 0; policy accept;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook input priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook output priority 0; policy drop;}
 add chain bridge myBridgeTable myBridgeChain { type filter hook prerouting priority 0; policy drop;}
@@ -232,45 +264,61 @@ add chain inet myInetTable myInetChain { type route hook output priority 0; poli
 add chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy drop;}
 
 # add rule <rule_position> <rule>
-#
-# add rule <table_id> <chain_id> <rule>
-# add rule <family_spec> <table_id> <chain_id> <rule>
+# add rule <chain_spec> <rule>
 # add rule <chain_spec> position <position_id> <rule>
 # add rule <chain_spec> handle <handle_id> <rule>
 # add rule <chain_spec> index <index_id> <rule>
-add rule netdev myNetdevTable myNetdevRule fwd to eth1
-add rule bridge myBridgeTable myBridgeRule jump BridgeSpan
-add rule arp myArpTable myArpRule jump ArpProxy
-add rule ip myIpTable myIpRule accept
-add rule ip myIpTable myIpRule accept
-add rule ip myIpTable myIpRule tcp dport 23 accept
-add rule ip myIpTable myIpRule tcp dport { 22, 80, 443 } accept
+# add rule <table_spec> <chain_id> <rule>
+# add rule <family_spec> <table_id> <chain_id> <rule>
+#
+add rule netdev myNetdevTable myNetdevChain fwd to eth1
+add rule bridge myBridgeTable myBridgeChain jump BridgeSpan
+add rule arp myArpTable myArpChain jump ArpProxy
+add rule ip myIpTable myIpChain accept
+add rule ip myIpTable myIpChain tcp dport 23 accept;
+add rule ip myIpTable myIpChain tcp dport { 22, http, 443 } accept
 add rule inet mytable myin jump nuts
 add rule inet mytable myin counter jump nuts;
 add rule inet mytable myin jump toMe accept;
 add rule inet mytable myin counter accept
 add rule inet mytable myin counter accept comment "foo bar"
 
+# add rule <family_spec> <table_id> <chain_id> position <id> <rule>
+# add rule <family_spec> <table_id> <chain_id> handle  <id> <rule>
+# add rule <family_spec> <table_id> <chain_id> position <id> <rule>
+add rule ip myIpTable myIpChain
 # real-world 'add rule'
 add rule filter output quota name tcp dport map @ports
 
 # add <table_id> <chain_id> <rule>
 # add <family_spec> <table_id> <chain_id> <rule>
-# add <chain_spec> position <position_id> <rule>
-# add <chain_spec> handle <handle_id> <rule>
-# add <chain_spec> index <index_id> <rule>
-add netdev myNetdevTable myNetdevRule fwd to eth1
-add bridge myBridgeTable myBridgeRule jump BridgeSpan
-add arp myArpTable myArpRule jump ArpProxy
-add ip myIpTable myIpRule accept
-add ip myIpTable myIpRule accept
-add ip myIpTable myIpRule tcp dport 23 accept
-add ip myIpTable myIpRule tcp dport { 22, 80, 443 } accept
+add netdev myNetdevTable myNetdevChain fwd to eth1
+add bridge myBridgeTable myBridgeChain jump BridgeSpan
+add arp myArpTable myArpChain jump ArpProxy
+add ip myIpTable myIpChain accept
+add ip myIpTable myIpChain accept
+add ip myIpTable myIpChain tcp dport 23 accept
+add ip myIpTable myIpChain tcp dport { 22, 80, 443 } accept
 add inet mytable myin jump nuts
 add inet mytable myin counter jump nuts;
 add inet mytable myin jump toMe accept;
 add inet mytable myin counter accept
 add inet mytable myin counter accept comment "foo bar"
+
+# more continuation of 'add rule'
+# add <chain_spec> position <position_id> <rule>
+# add <chain_spec> handle <handle_id> <rule>
+# add <chain_spec> index <index_id> <rule>
+add myIpTable myIpChain accept
+add ip myIpTable myIpChain accept
+add rule myIpTable myIpChain accept
+add rule ip myIpTable myIpChain accept
+add myIpTable myIpChain position 5 accept
+add ip myIpTable myIpChain handle 5 accept
+add rule myIpTable myIpChain position 5 accept
+add rule ip myIpTable myIpChain position 5 accept
+add myIpTable myIpChain handle 5 accept
+add myIpTable myIpChain index 5 accept
 
 add set myIpTable mySet { type mark; flags interval; timeout 15m; gc-interval 2d; size 1200; policy memory; auto-merge; }
 add set ip myIpTable mySet {   # comment
@@ -384,8 +432,9 @@ delete ct timeout ip6 myIp6Table ctt
 delete ct timeout inet myInetTable ctt
 
 add quota filter http-quota over 25 mbytes
+add quota filter http-quota { over 25 mbytes };
 add quota filter ssh-quota { 10 kbytes }
-add quota netdev myIpfilter http-quota over 25 mbytes
+add quota netdev myIpfilter http-quota over 25 mbytes;
 add quota bridge myIpfilter http-quota over 25 mbytes
 add quota arp myIpfilter http-quota over 25 mbytes
 add quota ip myIpfilter http-quota over 25 mbytes
@@ -694,7 +743,7 @@ table arp A0b_._/RP_TABLE {
     chain ARP_INPUT_FILTER {
        type filter hook prerouting priority 0;
        policy drop;
-       counter log drop
+       counter log return
     }
     chain workstation_arp_filter_output {
         type filter hook output priority 0;
@@ -706,8 +755,8 @@ table arp A0b_._/RP_TABLE {
 table netdev NETDEV_TABLE {
     # mind the NIC, it must exists
     chain ingress_filter_netdev_lo { 
-        type filter hook ingress device lo priority -100; 
-        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+        type filter hook ingress device lo priority -100; policy accept
+        udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 #map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
     };
     chain red_ingress_netdev_eth0 { 
         # You'll get a cryptic error if 'device eth0' is missing after 'chain'
@@ -1390,12 +1439,12 @@ table ip x {
 }
 
 # SYNTAX ERRORS GOES PAST HERE
-" include Filespec  # intentional syntax error
-" include 'Filespec'  # intentional syntax error
-" include 'Fil"espec'  # intentional syntax error
-" include "Filespec" bad stuff oppsie  # intentional syntax error
-" include "Filespec"  oopsie  # intentional syntax error
-" include "Filespec"  oopsie  ;  # intentional syntax error
+include Filespec  # intentional syntax error
+include 'Filespec'  # intentional syntax error
+include 'Fil"espec'  # intentional syntax error
+include "Filespec" bad stuff oppsie  # intentional syntax error
+include "Filespec"  oopsie  # intentional syntax error
+include "Filespec"  oopsie  ;  # intentional syntax error
 add table my\IpTable    # defaults to 'ip' family
 add table my_./\IpTable    # defaults to 'ip' family
 add chain arp my_/\./_ArpTable my\./_ArpChain 
@@ -1408,4 +1457,4 @@ list table TABLE_NETDEV   ; asdf
 list flowtable netdev myIpTable myIpFT  # intentional syntax error
 list set myIpTable handle 123 # intentional syntax error
 list set inet myInetTable handle 123  # Intentional Syntax ERROR
-
+add rule inet mytable myin counter comment "foo bar" accept  # comment is too early
