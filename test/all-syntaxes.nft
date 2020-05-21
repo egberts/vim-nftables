@@ -35,7 +35,7 @@ undefine int_ifs
 
 monitor 
 # monitor <monitor_event> 
-monitor new 
+monitor new  # monitor 'ANY'
 # monitor <monitor_event> <monitor_object> 
 monitor new tables 
 monitor new chains
@@ -52,7 +52,7 @@ monitor destroy elements
 monitor destroy ruleset
 monitor destroy trace 
 
-# monitor <monitor_object> 
+# monitor /* empty */ <monitor_object> 
 monitor tables;
 monitor chains
 monitor sets
@@ -61,7 +61,7 @@ monitor elements
 monitor ruleset
 monitor trace
 
-# monitor <monitor_event> <monitor_object> <monitor_format>
+# monitor /* empty */ <monitor_object> <monitor_format>
 monitor tables json;
 monitor chains xml
 monitor sets json
@@ -71,6 +71,7 @@ monitor ruleset json
 monitor trace json
 monitor trace json
 
+# monitor <monitor_event> <monitor_object> <monitor_format>
 monitor new tables xml
 monitor new chains json
 monitor new sets vm json
@@ -87,6 +88,7 @@ flush chain ip myIp myIpChain
 flush chain ip6 myIp6 myIp6Chain
 flush chain inet myInet myInetChain
 
+# flush table <table_spec>
 flush table myArpTable
 flush table netdev TABLE_NETDEV
 flush table bridge myBridgeTable
@@ -95,6 +97,7 @@ flush table ip myIpTable
 flush table ip6 myIp6Table
 flush table inet myInetTable
 
+# flush ruleset <ruleset_spec>
 flush ruleset
 flush ruleset netdev
 flush ruleset bridge
@@ -378,6 +381,25 @@ add element filter ports { 80 : "http-quota" }
 add element filter ports { 22 : "ssh-quota" }
 add element ip myIpTable myTestMap { 10.11.1.15 : jump test_1_15 }
 
+# add counter <obj_spec>
+add counter myIpTable https-filter
+add counter netdev myNetdevTable https-filter  
+add counter bridge myBridgeTable https-filter  
+add counter arp myArpTable https-filter  
+add counter ip myIpTable https-filter  
+add counter ip6 myIp6Table https-filter  
+add counter inet myInetTable https-filter  
+
+# delete counter <obj_spec>
+delete counter myIpTable https-filter  
+delete counter netdev myNetdevTable https-filter  
+delete counter bridge myBridgeTable https-filter  
+delete counter arp myArpTable https-filter  
+delete counter ip myIpTable https-filter  
+delete counter ip6 myIp6Table https-filter  
+delete counter inet myInetTable https-filter  
+
+# list quotas <ruleset_spec>
 create map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
 create map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
 create map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
@@ -410,9 +432,32 @@ add limit ip myIpTable myIpLimit { rate 1/second }
 add limit ip6 myIp6Table myIp6Limit { rate 1/second }
 add limit inet myInetTable myInetLimit { rate 1/second }
 
+# ct helper <obj_spec> { <ct_helper_block> }
+# ct helper <table_spec> <chain_id> { <ct_helper_block> }
+# ct helper <family_spec> <table_id> <chain_id> { <ct_helper_block> }
+# ct helper <obj_spec> { }
+# ct helper <obj_spec> { <common_block> }
+# ct helper <obj_spec> { <include> }
+# ct helper <obj_spec> { <define> }
+# ct helper <obj_spec> { <redefine> }
+# ct helper <obj_spec> { <undefine> }
+# ct helper <obj_spec> { <stmt_separator> }
+# ct helper <obj_spec> { <ct_helper_config> }
+# ct helper <obj_spec> { type <quoted_str> protocol <ct_l4protoname> }
+ct helper myIpTable myCTHchain ;
+ct helper myIpTable myCTHchain { };
+ct helper myIpTable myCTHchain { ; }
+ct helper myIpTable myCTHchain { ; };
+ct helper myIpTable myCTHchain { type "sip" protocol tcp; l3proto ip; }
 ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
 add ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
-delete  ct helper ip myIpTable cth
+delete ct helper myIpTable cth
+delete ct helper netdev myIpTable cth
+delete ct helper bridge myIpTable cth
+delete ct helper arp myIpTable cth
+delete ct helper ip myIpTable cth
+delete ct helper ip6 myIpTable cth
+delete ct helper inet myIpTable cth
 
 add ct expectation myTimeout { .... }
 add ct timeout myTimeout { .... }
@@ -445,7 +490,7 @@ add quota inet myIpfilter http-quota over 25 mbytes
 add secmark 
 add synproxy
 
-replace rule <ruleid_spec> <rule>
+# replace rule <ruleid_spec> <rule>  # TODO
 
 rename chain myIpTable myIpChain newMyIpChain
 rename chain netdev myNetdevTable myNetdevChain newMyNetdevChain    ;    
@@ -455,6 +500,7 @@ rename chain ip myIpTable myIpChain newMyIpChain    ;    # comment
 rename chain ip6 myIp6Table myIp6Chain newMyIp6Chain  # comment
 rename chain inet myInetTable myInetChain newMyInetChain
 
+# list limits <ruleset_spec>
 list limits
 list limits netdev
 list limits bridge
@@ -462,6 +508,8 @@ list limits arp
 list limits ip
 list limits ip6
 list limits inet
+
+# list limits table <table_spec>
 list limits table myIpTable
 list limits table netdev myNetdevTable
 list limits table bridge myBridgeTable
@@ -469,6 +517,14 @@ list limits table arp myArpTable
 list limits table ip myIpTable
 list limits table ip6 myIp6Table
 list limits table inet myInetTable
+
+list limit myIpTable myIpChain
+list limit netdev myNetdevTable myNetdevChain
+list limit ip myBridgeTable myBridgeChain
+list limit ip myArpTable myArpChain
+list limit ip myIpTable myIpChain
+list limit ip myIp6Table myIp6Chain
+list limit ip myInetTable myInetChain
 
 list counters
 list counters netdev
@@ -485,6 +541,16 @@ list counters table ip myIpTable
 list counters table ip6 myIp6Table
 list counters table inet myInetTable
 
+# list counter <obj_spec>
+list counter myIpTable https-filter
+list counter netdev myNetdevTable https-filter  
+list counter bridge myBridgeTable https-filter  
+list counter arp myArpTable https-filter  
+list counter ip myIpTable https-filter  
+list counter ip6 myIp6Table https-filter  
+list counter inet myInetTable https-filter  
+
+# list ruleset <ruleset_spec>
 list ruleset   
 list ruleset  ;  
 list ruleset netdev
@@ -493,9 +559,49 @@ list ruleset arp
 list ruleset ip
 list ruleset ip6
 list ruleset inet
+list ruleset inet
 
+# list flow tables <ruleset_spec>
+list flow tables   
+list flow tables  ;  
+list flow tables netdev
+list flow tables bridge
+list flow tables arp
+list flow tables ip
+list flow tables ip6
+list flow tables inet
+
+# list flow tables <ruleset_spec>
+list meters   
+list meters  ;  
+list meters netdev
+list meters bridge
+list meters arp
+list meters ip
+list meters ip6
+list meters inet
+
+# list flowtables <ruleset_spec>
+list flowtables   
+list flowtables  ;  
+list flowtables netdev
+list flowtables bridge
+list flowtables arp
+list flowtables ip
+list flowtables ip6
+list flowtables inet
+
+
+# list tables <ruleset_spec>
 list tables
+list tables netdev 
+list tables bridge 
+list tables arp 
+list tables ip 
+list tables ip6 
+list tables inet 
 
+list table TABLE_NETDEV
 list table netdev TABLE_NETDEV
 list table bridge TABLE_NETDEV
 list table arp TABLE_NETDEV
@@ -503,7 +609,14 @@ list table ip TABLE_NETDEV
 list table ip6 TABLE_NETDEV
 list table inet TABLE_NETDEV
 
+# list chains <ruleset_spec>
 list chains
+list chains netdev 
+list chains bridge 
+list chains arp 
+list chains ip 
+list chains ip6 
+list chains inet 
 
 list chain myIpTable myIpChain ; 
 list chain netdev myNetdev myNetdevchain
@@ -513,7 +626,24 @@ list chain ip myIp myIpchain
 list chain ip6 myIp6 myIp6chain
 list chain inet myInet myInetchain
 
+# list sets <ruleset_spec>
 list sets
+list sets netdev  
+list sets bridge  
+list sets arp  
+list sets ip  
+list sets ip6  
+list sets inet
+
+# list sets table <table_spec>
+list sets table myIpTable
+list sets table netdev myNetdevTable
+list sets table bridge myBridgeTable
+list sets table arp myArpTable
+list sets table ip myIpTable
+list sets table ip6 myIp6Table
+list sets table inet myInetTable
+
 
 list set TABLE_NETDEV SET_NETDEV
 list set ip myIpTable myIpSet
@@ -532,6 +662,16 @@ list map ip myIpTable myIpMap
 list map ip6 myIp6Table myIp6Map 
 list map inet myInetTable myInetMap 
 
+# list maps <ruleset_spec>
+list maps
+list maps netdev 
+list maps bridge 
+list maps arp 
+list maps ip 
+list maps ip6 
+list maps inet 
+
+list table netdev TABLE_NETDEV
 list \
     flowtable \
         myIpTable \
@@ -564,6 +704,22 @@ flush set ip myIpTable mySet
 flush set ip6 myIp6Table mySet
 flush set inet myInetTable mySet ; 
 
+flush meter myIpTable mySet
+flush meter netdev myNetdevTable mySet
+flush meter bridge myBridgeTable mySet
+flush meter arp myArpTable mySet
+flush meter ip myIpTable mySet
+flush meter ip6 myIp6Table mySet
+flush meter inet myInetTable mySet ; 
+
+flush flowtable myIpTable mySet
+flush flowtable netdev myNetdevTable mySet
+flush flowtable bridge myBridgeTable mySet
+flush flowtable arp myArpTable mySet
+flush flowtable ip myIpTable mySet
+flush flowtable ip6 myIp6Table mySet
+flush flowtable inet myInetTable mySet ; 
+
 ct helper myHelper { type "myFtp" protocol tcp ; l3proto ip }
 
 export json
@@ -581,6 +737,7 @@ reset counters arp
 reset counters ip
 reset counters ip6
 reset counters inet
+
 # reset counters table <table_spec>
 reset counters table myIpTable
 reset counters table netdev myNetdevTable
@@ -620,6 +777,7 @@ reset quotas arp
 reset quotas ip 
 reset quotas ip6 
 reset quotas inet 
+
 # reset quotas table <table_spec>
 reset quotas table myIpFilter
 reset quotas table netdev myIpFilter
@@ -704,6 +862,10 @@ delete set myIpTable handle 123
 delete set ip myIpTable handle 123
 delete set inet myInetTable handle 42 # comment
 
+delete rule myInetTable handle 42
+delete rule ip myInetTable handle 42
+delete rule ip myInetTable handle 42
+
 delete chain myIpTable myIpChain
 delete chain netdev myNetdev myNetdevChain
 delete chain bridge myBridge myBridgeChain
@@ -756,7 +918,7 @@ table netdev NETDEV_TABLE {
     # mind the NIC, it must exists
     chain ingress_filter_netdev_lo { 
         type filter hook ingress device lo priority -100; policy accept
-        udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 #map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+        udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
     };
     chain red_ingress_netdev_eth0 { 
         # You'll get a cryptic error if 'device eth0' is missing after 'chain'
@@ -764,7 +926,7 @@ table netdev NETDEV_TABLE {
         policy accept;
 
         include "netdev-table/ingress-hook/*.eth0.rule.nft";
-        tcp dport 80 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set jhash ip saddr . tcp sport mod 2 map { 0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+        # tcp dport 80 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set jhash ip saddr . tcp sport mod 2 map { 0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
         udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
     }
 }
@@ -971,12 +1133,35 @@ table ip workstn_ip_nat {
     }
 }
 
-list counters table filter  # standard identifier
 
-list counter filter https-filter  # user-definable identifier
+# delete counter <obj_spec>
+delete counter myIpTable https-filter  
+delete counter netdev myNetdevTable https-filter  
+delete counter bridge myBridgeTable https-filter  
+delete counter arp myArpTable https-filter  
+delete counter ip myIpTable https-filter  
+delete counter ip6 myIp6Table https-filter  
+delete counter inet myInetTable https-filter  
+
+# list quota <obj_spec>
+list quota
+list quota myInetTable myInetChain
+list quota netdev myNetdevTable myNetdevChain
+list quota bridge myBridgeTable myBridgeChain
+list quota arp myArpTable myArpChain
+list quota ip myIpTable myIpChain
+list quota ip6 myIp6Table myIp6Chain
+list quota inet myInetTable myInetChain
 
 # list quotas <ruleset_spec>
 list quotas
+list quotas netdev
+list quotas bridge
+list quotas arp
+list quotas ip
+list quotas ip6
+list quotas inet
+
 # list quotas table <table_spec>
 list quotas table myIpTable
 list quotas table netdev myNetdevTable
