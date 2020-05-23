@@ -6,6 +6,10 @@
 # the vim syntax highlighter for NFTABLES (yet `nft` takes it in just normally).
 # TODO: More todo, FIXME, FIXME: TODO: xxx XXX ARGH!
 #
+import ruleset xml
+import ruleset json
+import ruleset  vm json
+
 include ";;;;;;;;;;";
 include "Fil'espec"
 include "Filespec"
@@ -34,8 +38,10 @@ redefine int_ifs = { virbr0, $int_if2, virbr1 }
 undefine int_ifs
 
 monitor 
+
 # monitor <monitor_event> 
 monitor new  # monitor 'ANY'
+
 # monitor <monitor_event> <monitor_object> 
 monitor new tables 
 monitor new chains
@@ -113,44 +119,59 @@ create table my.IpTable
 create table my/IpTable
 create table my_IpTable
 create table my./_IpTable
-create table myIpTable { flags dormant; }
 create table netdev myNetdev 
-create table netdev myNetdev { flags dormant; }
 create table bridge myBridge 
-create table bridge myBridge { flags dormant; }
 create table arp myArpTable 
-create table arp myArpTable { flags dormant; }
 create table ip myIpTable 
-create table ip myIpTable { flags dormant; }
 create table ip6 myIp6Table 
-create table ip6 myIp6Table { flags dormant; }
 create table inet myInetTable 
+create table myIpTable { flags dormant; }
+create table netdev myNetdev { flags dormant; }
+create table bridge myBridge { flags dormant; }
+create table arp myArpTable { flags dormant; }
+create table ip myIpTable { flags dormant; }
+create table ip6 myIp6Table { flags dormant; }
 create table inet myInetTable { flags dormant; }
 
 # add table <table_spec>
-add table myIpTable    # defaults to 'ip' family
-add table my_IpTable    # defaults to 'ip' family
-add table my.IpTable    # defaults to 'ip' family
-add table my/IpTable    # defaults to 'ip' family
-add table netdev myNetdevTable
-add table bridge myBridgeTable
+add table myIpTable 
+add table my.IpTable
+add table my/IpTable
+add table my_IpTable
+add table my./_IpTable
+add table netdev myNetdev 
+add table bridge myBridge 
 add table arp myArpTable 
-add table ip myIpTable
-add table ip6 myIp6Table
-add table inet myInetTable
-
-# add table <table_spec> <table_block>
-# add table <table_spec> <common_block>
-#      <common_block> = <include>|<define>|<redefine>|<undefine>
-# add table <table_spec> <table_options>
-# add table <table_spec> chain <chain_id> { <chain_block> };
-add table myIpTable { flags dormant;}
-add table netdev myNetdevTable { flags dormant; }
-add table bridge myBridgeTable { flags dormant; }
+add table ip myIpTable 
+add table ip6 myIp6Table 
+add table inet myInetTable 
+add table myIpTable { flags dormant; }
+add table netdev myNetdev { flags dormant; }
+add table bridge myBridge { flags dormant; }
 add table arp myArpTable { flags dormant; }
 add table ip myIpTable { flags dormant; }
 add table ip6 myIp6Table { flags dormant; }
-add table inet myInetTable { flags dormant; };
+add table inet myInetTable { flags dormant; }
+
+# /* empty */ table <table_spec>  # base_cmd; No 'add table', no 'create table'
+table myIpTable 
+table my.IpTable
+table my/IpTable
+table my_IpTable
+table my./_IpTable
+table netdev myNetdev 
+table bridge myBridge 
+table arp myArpTable 
+table ip myIpTable 
+table ip6 myIp6Table 
+table inet myInetTable 
+table myIpTable { flags dormant; }
+table netdev myNetdev { flags dormant; }
+table bridge myBridge { flags dormant; }
+table arp myArpTable { flags dormant; }
+table ip myIpTable { flags dormant; }
+table ip6 myIp6Table { flags dormant; }
+table inet myInetTable { flags dormant; }
 
 # Two kinds of a base chain for syntax handling:
 #  1. Unidentified family chain
@@ -163,6 +184,7 @@ create chain myIpTable myIpChain { type filter hook output priority 0; policy dr
 create chain myIpTable myIpChain { type filter hook postrouting priority 0; policy drop;}
 create chain myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
 create chain arp myArpTable myArpChain 
+create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept; }
 create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept; }
 create chain arp myArpTable myArpChain { type filter hook output priority 0; policy accept; }
 create chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy accept; }
@@ -218,7 +240,12 @@ create chain ip myIpTable myIpChain { type nat hook postrouting devices = { eth0
 create chain ip6 myIp6Table myIp6Chain { type filter hook input devices = { eth0, eth1, eth2; } priority 0; policy drop;}
 create chain inet myInetTable myInetChain { type route hook output devices = { eth0, eth1, eth2; } priority 0; policy drop;}
 
+# chain comes in several flavors
 # add chain <chain_spec>
+# add chain <chain_spec> { <chain_block> }  # group of rules
+# add <rule_position> <rule>   # singular rule (base_cmd->ADD->add_cmd)
+# <rule_position> <rule>   # singular rule (part of base_cmd->add_cmd)
+#
 add chain myIpTable myIpChain 
 add chain netdev myNetdevTable myNetdevTable 
 add chain bridge myBridgeTable myBridgeChain 
@@ -230,6 +257,7 @@ add chain inet myInetTable myInetChain
 # add chain <chain_spec> <chain_block>
 add chain myIpTable myIpChain { type filter hook input priority 0; policy drop;}
 add chain myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
+add chain netdev myNetdevTable myNetdevChain { type filter hook ingress device eth1 priority 0; policy drop;}
 add chain arp myArpTable myArpChain { type filter hook input device eth1 priority 0; policy drop;}
 add chain arp myArpTable myArpChain { type filter hook output priority 0; policy drop;}
 add chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy accept;}
@@ -266,14 +294,82 @@ add chain inet myInetTable myInetChain { type nat hook postrouting priority 0; p
 add chain inet myInetTable myInetChain { type route hook output priority 0; policy accept; }
 add chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy drop;}
 
-# add rule <rule_position> <rule>
-# add rule <chain_spec> <rule>
-# add rule <chain_spec> position <position_id> <rule>
-# add rule <chain_spec> handle <handle_id> <rule>
-# add rule <chain_spec> index <index_id> <rule>
-# add rule <table_spec> <chain_id> <rule>
-# add rule <family_spec> <table_id> <chain_id> <rule>
+##########################################################
+# 4-way pit-stop for adding a singular rule
+#   (reminder: pair of curly braces provides a group of rules)
 #
+#    add rule
+#    add
+#    rule
+#    <just start typing in <table_id> <chain_id> <rule>
+#
+# Full Syntax:
+#    add rule <rule_position> <rule>
+#    add <rule_position> <rule>
+#    rule <rule_position> <rule>
+#    <rule_position> <rule>
+#
+# (base_cmd->ADD->add_cmd->RULE-><rule_position>+<rule>) 
+# (base_cmd->ADD->add_cmd->/*empty*/-><rule_position>+<rule>) 
+# (base_cmd->/*empty*/->add_cmd->RULE-><rule_position>+<rule>) 
+# (base_cmd->/*empty*/->add_cmd->/*empty*/-><rule_position>+<rule>) 
+#
+# Full-blown rule expansion (stopping short of expanding <rule>)
+#    add rule <table_id> <chain_id> ...
+#    add rule <table_id> <chain_id> position 7 ...
+#    add rule <table_id> <chain_id> handle 42 ...
+#    add rule <table_id> <chain_id> index 123 ...
+#    add rule <family> <table_id> <chain_id> ...
+#    add rule <family> <table_id> <chain_id> position <num> ...
+#    add rule <family> <table_id> <chain_id> handle <num> ...
+#    add rule <family> <table_id> <chain_id> index <num> ...
+#    add <table_id> <chain_id> ...
+#    add <table_id> <chain_id> position 7 ...
+#    add <table_id> <chain_id> handle 42 ...
+#    add <table_id> <chain_id> index 123 ...
+#    add <family> <table_id> <chain_id> ...
+#    add <family> <table_id> <chain_id> position <num> ...
+#    add <family> <table_id> <chain_id> handle <num> ...
+#    add <family> <table_id> <chain_id> index <num> ...
+#    rule <table_id> <chain_id> ...
+#    rule <table_id> <chain_id> position 7 ...
+#    rule <table_id> <chain_id> handle 42 ...
+#    rule <table_id> <chain_id> index 123 ...
+#    rule <family> <table_id> <chain_id> ...
+#    rule <family> <table_id> <chain_id> position <num> ...
+#    rule <family> <table_id> <chain_id> handle <num> ...
+#    rule <family> <table_id> <chain_id> index <num> ...
+#    <table_id> <chain_id> <rule>  # somehow, this didn't work for me
+#    <table_id> <chain_id> position 7 ...
+#    <table_id> <chain_id> handle 42 ...
+#    <table_id> <chain_id> index 123 ...
+#    <family> <table_id> <chain_id> ...
+#    <family> <table_id> <chain_id> position <num> ...
+#    <family> <table_id> <chain_id> handle <num> ...
+#    <family> <table_id> <chain_id> index <num> ...
+#
+# Template and organize it under:
+#    add rule <table_id> <chain_id> ...
+
+add rule filter output quota name tcp dport map @ports
+add rule myIpTable myIpChain accept
+add rule filter output ip daddr 192.168.0.0/24 accept # 'ip filter' is assumed
+# multiple NATs
+add rule nat prerouting dnat 
+      tcp dport map { 1000 : 1.1.1.1, 2000 : 2.2.2.2, 3000 : 3.3.3.3} \
+      : tcp dport map { 1000 : 1234, 2000 : 2345, 3000 : 3456 }
+add rule nat postrouting snat \
+      ip saddr map { 192.168.1.1 : 1.1.1.1, 192.168.2.2 : 2.2.2.2, 192.168.3.3 : 3.3.3.3 }
+
+
+#    add rule <table_id> <chain_id> position 7 ...
+#    add rule <table_id> <chain_id> handle 42 ...
+#    add rule <table_id> <chain_id> index 123 ...
+add rule myIpTable myIpChain position 5 accept
+
+#    add rule <family> <table_id> <chain_id> ...
+add rule ip myIpTable myIpChain accept
+add rule ip myIpTable myIpChain { type filter hook input priority 0; policy drop;}
 add rule netdev myNetdevTable myNetdevChain fwd to eth1
 add rule bridge myBridgeTable myBridgeChain jump BridgeSpan
 add rule arp myArpTable myArpChain jump ArpProxy
@@ -285,44 +381,89 @@ add rule inet mytable myin counter jump nuts;
 add rule inet mytable myin jump toMe accept;
 add rule inet mytable myin counter accept
 add rule inet mytable myin counter accept comment "foo bar"
+add rule ip filter output ip daddr 192.168.0.0/24 accept
+add rule bridge filter forward ether type ip tcp dport 22 accept
+add rule bridge filter forward ether type arp accept
+add rule inet nat prerouting dnat ip to 10.0.2.99
+add rule inet nat prerouting dnat ip6 to fe80::dead
+add rule inet nat postrouting meta oif ppp0 masquerade
+add rule ip filter input meta iifname "internal" accept
+add rule ip filter input ip saddr @blackhole counter drop
+add rule ip filter input tcp flags syn tcp dport ssh meter flood size 128000 { ip saddr timeout 10s limit rate over 10/second} add @blackhole { ip saddr timeout 1m } drop
+add rule ip nat prerouting dnat tcp dport map { 80 : 192.168.1.100, 8888 : 192.168.1.101 }
+add rule ip nat postrouting snat to ip saddr map { 192.168.1.0/24 : 10.0.0.1, 192.168.2.0/24 : 10.0.0.2 }
+add rule ip filter input ip protocol vmap { tcp : jump tcp-chain, udp : jump udp-chain , icmp : jump icmp-chain }
 
-# add rule <family_spec> <table_id> <chain_id> position <id> <rule>
-# add rule <family_spec> <table_id> <chain_id> handle  <id> <rule>
-# add rule <family_spec> <table_id> <chain_id> position <id> <rule>
-add rule ip myIpTable myIpChain
-# real-world 'add rule'
-add rule filter output quota name tcp dport map @ports
 
-# add <table_id> <chain_id> <rule>
-# add <family_spec> <table_id> <chain_id> <rule>
-add netdev myNetdevTable myNetdevChain fwd to eth1
-add bridge myBridgeTable myBridgeChain jump BridgeSpan
-add arp myArpTable myArpChain jump ArpProxy
-add ip myIpTable myIpChain accept
-add ip myIpTable myIpChain accept
-add ip myIpTable myIpChain tcp dport 23 accept
-add ip myIpTable myIpChain tcp dport { 22, 80, 443 } accept
-add inet mytable myin jump nuts
-add inet mytable myin counter jump nuts;
-add inet mytable myin jump toMe accept;
-add inet mytable myin counter accept
-add inet mytable myin counter accept comment "foo bar"
-
-# more continuation of 'add rule'
-# add <chain_spec> position <position_id> <rule>
-# add <chain_spec> handle <handle_id> <rule>
-# add <chain_spec> index <index_id> <rule>
-add myIpTable myIpChain accept
-add ip myIpTable myIpChain accept
-add rule myIpTable myIpChain accept
-add rule ip myIpTable myIpChain accept
-add myIpTable myIpChain position 5 accept
-add ip myIpTable myIpChain handle 5 accept
-add rule myIpTable myIpChain position 5 accept
+#    add rule <family> <table_id> <chain_id> position <num> ...
 add rule ip myIpTable myIpChain position 5 accept
+#    add rule <family> <table_id> <chain_id> handle <num> ...
+#    add rule <family> <table_id> <chain_id> index <num> ...
+#    add <table_id> <chain_id> ...
+
+#    add <table_id> <chain_id> position 7 ...
+add myIpTable myIpChain position 5 accept
+add myIpTable myIpChain accept
+#    add <table_id> <chain_id> handle 42 ...
 add myIpTable myIpChain handle 5 accept
+#    add <table_id> <chain_id> index 123 ...
 add myIpTable myIpChain index 5 accept
 
+#    add <family> <table_id> <chain_id> ...
+add ip myIpTable myIpChain accept
+#    add <family> <table_id> <chain_id> position <num> ...
+#    add <family> <table_id> <chain_id> handle <num> ...
+add ip myIpTable myIpChain handle 5 accept
+#    add <family> <table_id> <chain_id> index <num> ...
+#
+#    rule <table_id> <chain_id> ...
+#    rule <table_id> <chain_id> position 7 ...
+#    rule <table_id> <chain_id> handle 42 ...
+#    rule <table_id> <chain_id> index 123 ...
+
+#    rule <family> <table_id> <chain_id> ...
+rule netdev myNetdevTable myNetdevChain fwd to eth1
+rule bridge myBridgeTable myBridgeChain jump BridgeSpan
+rule arp myArpTable myArpChain jump ArpProxy
+rule ip myIpTable myIpChain accept
+rule ip myIpTable myIpChain tcp dport 23 accept
+rule ip myIpTable myIpChain tcp dport { 22, 80, 443 } accept
+rule inet mytable myin jump nuts
+rule inet mytable myin counter jump nuts;
+rule inet mytable myin jump toMe accept;
+rule inet mytable myin counter accept
+rule inet mytable myin counter accept comment "foo bar"
+rule ip myIpTable myIpChain { type filter hook input priority 0; policy drop;}
+rule netdev myNetdevTable myNetdevChain fwd to eth1
+rule bridge myBridgeTable myBridgeChain jump BridgeSpan
+rule arp myArpTable myArpChain jump ArpProxy
+rule ip myIpTable myIpChain accept
+rule ip myIpTable myIpChain tcp dport 23 accept;
+rule ip myIpTable myIpChain tcp dport { 22, http, 443 } accept
+rule inet mytable myin jump nuts
+rule inet mytable myin counter jump nuts;
+rule inet mytable myin jump toMe accept;
+rule inet mytable myin counter accept
+rule inet mytable myin counter accept comment "foo bar"
+
+#    rule <family> <table_id> <chain_id> position <num> ...
+#    rule <family> <table_id> <chain_id> handle <num> ...
+#    rule <family> <table_id> <chain_id> index <num> ...
+#
+#    <table_id> <chain_id> <rule>  # somehow, this didn't work for me
+#    <table_id> <chain_id> position 7 ...
+#    <table_id> <chain_id> handle 42 ...
+#    <table_id> <chain_id> index 123 ...
+
+
+#    <family> <table_id> <chain_id> ...
+ip myIpTable myIpChain { type filter hook input priority 0; policy drop;}
+#    <family> <table_id> <chain_id> position <num> ...
+#    <family> <table_id> <chain_id> handle <num> ...
+#    <family> <table_id> <chain_id> index <num> ...
+
+
+# add set
 add set myIpTable mySet { type mark; flags interval; timeout 15m; gc-interval 2d; size 1200; policy memory; auto-merge; }
 add set ip myIpTable mySet {   # comment
     type inet_proto;   # comment
@@ -348,6 +489,7 @@ add set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags time
 create set my_filter_table my_ssh_meter { type ipv4_addr . inet_proto; flags dynamic ;}
 create set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout . dynamic ;}
 
+# add element
 add element myIpTable myIpSet { element, element }
 add element netdev myNetdevTable myNetdevSet { element, element }
 add element bridge myBridgeTable myBridgeSet { element, element }
@@ -356,6 +498,16 @@ add element ip myIpTable myIpSet { element, element }
 add element ip6 myIp6Table myIp6Set { element, element }
 add element inet myInetTable myInetSet { element, element }
 
+# create element
+create element myIpTable myIpSet { element, element }
+create element netdev myNetdevTable myNetdevSet { element, element }
+create element bridge myBridgeTable myBridgeSet { element, element }
+create element arp myArpTable myArpSet { element, element }
+create element ip myIpTable myIpSet { element, element }
+create element ip6 myIp6Table myIp6Set { element, element }
+create element inet myInetTable myInetSet { element, element }
+
+# add map
 add map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
 add map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
 add map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
@@ -368,6 +520,16 @@ add map inet myInetTable myInetMap { type mark; flags interval; elements = { ine
 add map filter whitelist { type ipv4_addr . inet_service : ipv6_addr; }
 add map filter ports { type inet_service : ipv4_addr ; }
 
+# create map
+create map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+create map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+create map arp myArpTable myArpMap { type mark; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
+create map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
+
+# add element - full-syntax expansion template
 add element myIpTable myIpMap { elements = { ipv4_addr }; }
 add element netdev myNetdevTable myNetdevMap { elements = { ether_addr } ; }
 add element bridge myBridgeTable myBridgeMap { elements = { ether_addr } ; }
@@ -476,6 +638,32 @@ delete ct timeout ip myIpTable ctt
 delete ct timeout ip6 myIp6Table ctt
 delete ct timeout inet myInetTable ctt
 
+# add quota <obj_spec> <quota_obj>
+# add quota <obj_spec> <quota_config>
+# add quota <obj_spec> <quota_mode> NUM <quota_unit> <quota_used>
+# create quota <obj_spec> <quota_obj>
+# create quota <obj_spec> <quota_config>
+# create quota <obj_spec> <quota_mode> NUM <quota_unit> <quota_used>
+#
+# also as part of 'table':
+# <table_block> quota <quota_name> { <quota_block> }
+# table myTable {
+#     chain myChain {
+#         quota <quota_name> { <quota_block; ... }
+#         <quota_stmt>
+#         quota <quota_mode> NUM <quota_unit> <quota_used>
+#         quota name <stmt_expr>
+#     }
+# }
+# <rule>
+# <rule_alloc>
+# <rule_alloc> <comment>
+# <stmt_list> <comment>
+# <stmt> <comment>
+# <quota_stmt> <quota_stmt>
+# quota <quota_mode> NUM <quota_unit> <quota_used>
+# quota <quota_config>  # Let's use this condense version
+#
 add quota filter http-quota over 25 mbytes
 add quota filter http-quota { over 25 mbytes };
 add quota filter ssh-quota { 10 kbytes }
@@ -485,6 +673,16 @@ add quota arp myIpfilter http-quota over 25 mbytes
 add quota ip myIpfilter http-quota over 25 mbytes
 add quota ip6 myIpfilter http-quota until 525 kbytes
 add quota inet myIpfilter http-quota over 25 mbytes
+
+create quota filter http-quota over 25 mbytes
+create quota filter http-quota { over 25 mbytes };
+create quota filter ssh-quota { 10 kbytes }
+create quota netdev myIpfilter http-quota over 25 mbytes;
+create quota bridge myIpfilter http-quota over 25 mbytes
+create quota arp myIpfilter http-quota over 25 mbytes
+create quota ip myIpfilter http-quota over 25 mbytes
+create quota ip6 myIpfilter http-quota until 525 kbytes
+create quota inet myIpfilter http-quota over 25 mbytes
 
 # TODO Need to study syntax for secmark/synproxy
 add secmark 
@@ -581,6 +779,16 @@ list meters ip
 list meters ip6
 list meters inet
 
+# list ct helpers table <table_spec>
+list ct helpers table 
+list ct helpers table myIpTable
+list ct helpers table netdev myNetdevTable
+list ct helpers table bridge myBridgeTable
+list ct helpers table arp myArpTable
+list ct helpers table ip myIpTable
+list ct helpers table ip6 myIp6Table
+list ct helpers table inet myInetTable
+
 # list flowtables <ruleset_spec>
 list flowtables   
 list flowtables  ;  
@@ -591,7 +799,26 @@ list flowtables ip
 list flowtables ip6
 list flowtables inet
 
+# list flow table <set_spec>
+list flow table   
+list flow table  ;  
+list flow table myIpTable myIpFlow;  
+list flow table netdev myNetdevTable myNetdevFlow
+list flow table bridge myBridgeTable myBridgeFlow
+list flow table arp myArpTable myArpFlow
+list flow table ip myIpTable myIpFlow;  
+list flow table ip6 myIp6Table myIp6Flow
+list flow table inet myInetTable myInetFlow
 
+# list flowtable <set_spec>
+list flowtable   
+list flowtable  ;  
+list flowtable netdev
+list flowtable bridge
+list flowtable arp
+list flowtable ip
+list flowtable ip6
+list flowtable inet
 # list tables <ruleset_spec>
 list tables
 list tables netdev 
@@ -670,6 +897,16 @@ list maps arp
 list maps ip 
 list maps ip6 
 list maps inet 
+
+# list ct helpers table <table_spec>
+list ct helpers table myIpTable
+list ct helpers table netdev myNetdevTable
+list ct helpers table bridge myBridgeTable
+list ct helpers table arp myArpTable
+list ct helpers table ip myIpTable
+list ct helpers table ip6 myIp6Table
+list ct helpers table inet myInetTable
+
 
 list table netdev TABLE_NETDEV
 list \
@@ -760,6 +997,7 @@ reset counter arp myArpTable
 reset counter ip myIpTable
 reset counter ip6 myIp6Table
 reset counter inet myInetTable
+
 # reset counter <objid_spec>
 reset counter myIpTable handle 5
 reset counter netdev myNetdevTable handle 5
@@ -795,14 +1033,6 @@ reset quota arp myArpFilter https-quota
 reset quota ip myIpFilter https-quota
 reset quota ip6 myIp6Filter https-quota
 reset quota inet myInetFilter https-quota
-
-reset type myIpTable myIpType
-reset type netdev myNetdevTable myNetdevType
-reset type bridge myBridgeTable myBridgeType
-reset type arp myArpTable myArpType
-reset type ip myIpTable myIpType
-reset type ip6 myIp6Table myIp6Type
-reset type inet myInetTable myInetType
 
 delete counter myIpTable myIpCounter
 delete counter netdev myNetdevTable myNetdevCounter
@@ -1172,7 +1402,7 @@ list quotas table ip6 myIp6Table
 list quotas table inet myInetTable
 
 
-ct mark set meta mark
+# ct mark set meta mark
 
 table inet raw {
     chain prerouting {
@@ -1186,9 +1416,6 @@ table inet raw {
 }
 
 insert rule filter output ip daddr 192.168.0.0/24 accept # 'ip filter' is assumed
-add rule filter output ip daddr 192.168.0.0/24 accept # 'ip filter' is assumed
-# same command, slightly more verbose
-add rule ip filter output ip daddr 192.168.0.0/24 accept
 
 table inet filter {
     chain input {
@@ -1285,17 +1512,6 @@ table inet filter {
         counter drop
     }
 }
-
-# bridge filtering
-add rule bridge filter forward ether type ip tcp dport 22 accept
-add rule bridge filter forward ether type arp accept
-
-# multiple NATs
-add rule nat prerouting dnat 
-      tcp dport map { 1000 : 1.1.1.1, 2000 : 2.2.2.2, 3000 : 3.3.3.3} \
-      : tcp dport map { 1000 : 1234, 2000 : 2345, 3000 : 3456 }
-add rule nat postrouting snat \
-      ip saddr map { 192.168.1.1 : 1.1.1.1, 192.168.2.2 : 2.2.2.2, 192.168.3.3 : 3.3.3.3 }
 
 # classic perimetral firewall
 flush ruleset
@@ -1563,27 +1779,12 @@ table inet foo {
     }
 }
 
-# inet family:
-# handle ip dnat:
-add rule inet nat prerouting dnat ip to 10.0.2.99
-# handle ip6 dnat:
-add rule inet nat prerouting dnat ip6 to fe80::dead
-# this masquerades both ipv4 and ipv6:
-add rule inet nat postrouting meta oif ppp0 masquerade
-
 
 #Example for simple blacklist
 # declare a set, bound to table "filter", in family 
 # "ip". Timeout and size are mandatory because we 
 # will add elements from packet path.
 add set ip filter blackhole { type ipv4_addr; flags timeout; size 65536; }
-# whitelist internal interface.
-add rule ip filter input meta iifname "internal" accept
-# drop packets coming from blacklisted ip addresses.
-add rule ip filter input ip saddr @blackhole counter drop
-# add source ip addresses to the blacklist if more than 10 tcp connection requests occurred per second and ip address.
-# entries will timeout after one minute, after which they might be re-added if limit condition persists.
-add rule ip filter input tcp flags syn tcp dport ssh meter flood size 128000 { ip saddr timeout 10s limit rate over 10/second} add @blackhole { ip saddr timeout 1m } drop
 # inspect state of the rate limit meter:
 list meter ip filter flood
 # inspect content of blackhole:
@@ -1592,33 +1793,19 @@ list set ip filter blackhole
 add element filter blackhole { 10.2.3.4, 10.23.1.42 }
 
 
-#Using the map statement
-# select DNAT target based on TCP dport:
-# connections to port 80 are redirected to 192.168.1.100,
-# connections to port 8888 are redirected to 192.168.1.101
-add rule ip nat prerouting dnat tcp dport map { 80 : 192.168.1.100, 8888 : 192.168.1.101 }
-# source address based SNAT:
-# packets from net 192.168.1.0/24 will appear as originating from 10.0.0.1,
-# packets from net 192.168.2.0/24 will appear as originating from 10.0.0.2
-add rule ip nat postrouting snat to ip saddr map { 192.168.1.0/24 : 10.0.0.1, 192.168.2.0/24 : 10.0.0.2 }
-
-
-#Using the vmap statement
-# jump to different chains depending on layer 4 protocol type:
-add rule ip filter input ip protocol vmap { tcp : jump tcp-chain, udp : jump udp-chain , icmp : jump icmp-chain }
 
 
 table ip x {
+    chain c {
+        ct timeout set saddr map {
+            192.168.0.14 :"policy1"
+        }
+    }
     ct timeout "policy1" {
         protocol tcp
         timeouts = {
             established: 120s
             fin_wait: 30;
-        }
-    }
-    chain c {
-        ct timeout set saddr map {
-            192.168.0.14 :"policy1"
         }
     }
 }
