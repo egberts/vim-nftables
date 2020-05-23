@@ -69,7 +69,7 @@ hi link nftablesHL_Hook        Type
 hi link nftablesHL_Action      Special
 
 hi link nftables_ToDo nftablesHL_ToDo
-syn keyword nftables_ToDo xxx contained XXX FIXME TODO TODO: FIXME: skipwhite
+syn keyword nftables_ToDo xxx contained XXX FIXME TODO TODO: FIXME: TBS TBD TBA skipwhite
 
 hi link nftables_InlineComment nftablesHL_Comment
 syn region nftables_InlineComment start=/#/ end=/$/ contains=nftables_ToDo skipwhite
@@ -109,12 +109,6 @@ hi link nftables_Semicolon nftablesHL_Normal
 syn match nftables_Semicolon contained /[;]\{1,15}/  skipwhite
 \ nextgroup=nftables_EOL
 
-syn cluster nftablesClu_EOS 
-\ contains=
-\    nftables_Semicolon,
-\    nftables_InlineComment,
-\    nftables_EOS
-
 hi link nftables_define nftablesHL_Command
 syn keyword nftables_define contained define skipwhite 
 \ nextgroup=nftables_define_Identifier
@@ -144,7 +138,7 @@ syn keyword nftablesType_BooleanMnemonic contained skipwhite
 \    missing
 
 hi link nftablesType_BooleanLogic nftablesHL_Type
-syn keyword nftablesType_BooleanMnemonic contained skipwhite
+syn keyword nftablesType_BooleanLogic contained skipwhite
 \    true
 \    false
 \    1
@@ -450,12 +444,12 @@ syn cluster nftablesCluster_table_spec
 hi link nftables_TABLE_table_spec_block nftablesHL_Statement
 syn keyword nftables_TABLE_table_spec_block contained table skipwhite
 \ nextgroup=
-\    nftablesCmdTableFamily_Netdev,
-\    nftablesCmdTableFamily_Bridge,
-\    nftablesCmdTableFamily_Arp,
-\    nftablesCmdTableFamily_Ip,
-\    nftablesCmdTableFamily_Ip6,
-\    nftablesCmdTableFamily_Inet,
+\    nftables_table_spec_NETDEV_table_block,
+\    nftables_table_spec_BRIDGE_table_block,
+\    nftables_table_spec_ARP_table_block,
+\    nftables_table_spec_IP_table_block,
+\    nftables_table_spec_IP6_table_block,
+\    nftables_table_spec_INET_table_block,
 \    nftables_Semicolon,
 \    nftables_EOS
 
@@ -2345,6 +2339,7 @@ syn keyword nftables_MAP_set_spec contained map skipwhite
 \ nextgroup=@nftablesCluster_set_spec
 " End 'add map ...'
 
+
 " Begin 'add quota ...'
 hi link nftables_obj_spec_quota_obj_QuotaName nftablesHL_Quota
 syn match nftables_obj_spec_quota_obj_QuotaName contained skipwhite
@@ -2781,7 +2776,7 @@ syn cluster nftablesCluster_obj_spec
 \ contains=@nftablesCluster_table_spec_identifier
 
 syn keyword nftables_CHAIN_chain_spec contained chain skipwhite
-\ nextgroup=@nftablesCluster_chain_spec
+\ nextgroup=@nftablesCluster_table_spec_identifier
 " End <chain_spec>
 
 " Begin 'counter <obj_spec> <counter_obj>'
@@ -2868,20 +2863,19 @@ hi link nftables_TABLES_ruleset_spec  nftablesHL_Statement
 syn keyword nftables_TABLES_ruleset_spec  contained tables skipwhite
 \ nextgroup=@nftablesCluster_ruleset_spec
 
-hi link nftables_FLOW_TABLES_ruleset_spec nftablesHL_Option
-syn keyword nftables_FLOW_TABLES_ruleset_spec contained flow skipwhite
-\ nextgroup=
-\    nftables_TABLES_ruleset_spec,
-\    nftables_TABLE_set_spec 
-" End 'list flow tables <ruleset_spec>'
-
 " Begin 'list flowtables <ruleset_spec>'
 hi link nftables_FLOWTABLES_ruleset_spec nftablesHL_Option
 syn keyword nftables_FLOWTABLES_ruleset_spec contained flowtables skipwhite
 \ nextgroup=@nftablesCluster_ruleset_spec
 " End 'list flowtables <ruleset_spec>'
+"
+" Begin 'list flow ....'
+hi link nftables_list_FLOW nftablesHL_Option
+syn keyword nftables_list_FLOW contained flow skipwhite
+\ nextgroup=
+\    nftables_TABLES_ruleset_spec,
+\    nftables_TABLE_set_spec 
 
-" Begin 'list flow table <set_spec>'
 hi link nftables_FLOW_TABLE_set_spec nftablesHL_Option
 syn keyword nftables_FLOW_TABLE_set_spec contained flow skipwhite
 \ nextgroup= nftables_TABLE_set_spec 
@@ -2910,14 +2904,14 @@ syn keyword nftables_MAPS_ruleset_spec contained maps skipwhite
 " End 'list maps <ruleset_spec>'
 
 " Begin 'list meters <ruleset_spec>'
-hi link nftablesCmdList_MetersKeyword nftablesHL_Option
-syn keyword nftablesCmdList_MetersKeyword contained meters skipwhite
+hi link nftables_METERS_ruleset_spec nftablesHL_Option
+syn keyword nftables_METERS_ruleset_spec contained meters skipwhite
 \ nextgroup=@nftablesCluster_ruleset_spec
 " End 'list meters <ruleset_spec>'
 
 " Begin 'list meter <ruleset_spec>'
-hi link nftablesCmdList_MetersKeyword nftablesHL_Option
-syn keyword nftablesCmdList_MetersKeyword contained meters skipwhite
+hi link nftables_METER_ruleset_spec nftablesHL_Option
+syn keyword nftables_METER_ruleset_spec contained meter skipwhite
 \ nextgroup=@nftablesCluster_ruleset_spec
 " End 'list meter <ruleset_spec>'
 
@@ -3003,6 +2997,10 @@ hi link nftables_SET_set_spec nftablesHL_Statement
 syn keyword nftables_SET_set_spec contained set skipwhite
 \ nextgroup=@nftablesCluster_set_spec
 " End of 'list set [<family>] <table_name> <set_name>' 
+"
+hi link nftables_METER_set_spec nftablesHL_Statement
+syn keyword nftables_METER_set_spec contained meter skipwhite
+\ nextgroup=@nftablesCluster_set_spec
 
 " Begin 'list tables <ruleset_spec>'
 hi link nftables_TABLES_ruleset_spec nftablesHL_Statement
@@ -3152,8 +3150,8 @@ syn match nftablesTBridge_Name contained skipwhite
 \ nextgroup=
 \    nftablesTBridge_Section
 
-hi link nftablesCmdTableFamily_Bridge nftablesHL_Family
-syn keyword nftablesCmdTableFamily_Bridge contained bridge skipwhite
+hi link nftables_table_spec_BRIDGE_table_block nftablesHL_Family
+syn keyword nftables_table_spec_BRIDGE_table_block contained bridge skipwhite
 \ nextgroup=nftablesTBridge_Name
 " End of 'table bridge ...'
 "
@@ -3511,14 +3509,14 @@ syn keyword nftables_base_cmd list skipwhite
 \    nftables_LIMITS_ruleset_or_TABLE_table_spec,
 \    nftables_LIMIT_obj_spec,
 \    nftables_RULESET_ruleset_spec,
-\    nftables_FLOW_TABLES_ruleset_spec,
-\    nftables_FLOW_TABLE_set_spec,
+\    nftables_list_FLOW,
+\    nftables_METERS_ruleset_spec,
+\    nftables_METER_set_spec,
 \    nftables_FLOWTABLES_ruleset_spec,
 \    nftables_MAPS_ruleset_spec,
 \    nftables_MAP_set_spec,
 \    nftables_CT_HELPERS_TABLE_table_spec,
 \    nftables_CT_ct_obj_type_obj_spec,
-\    nftablesCmdList_MetersKeyword,
 \    nftablesCmdAdd_TypeKeyword,
 \    nftables_UnexpectedEOS
 
