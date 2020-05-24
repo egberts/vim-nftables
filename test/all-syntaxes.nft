@@ -367,17 +367,21 @@ add rule nat prerouting dnat
       : tcp dport map { 1000 : 1234, 2000 : 2345, 3000 : 3456 }
 add rule nat postrouting snat \
       ip saddr map { 192.168.1.1 : 1.1.1.1, 192.168.2.2 : 2.2.2.2, 192.168.3.3 : 3.3.3.3 }
+add rule filter input snat ip saddr map { 1.1.1.0/24 : 192.168.3.11, 2.2.2.0/24 : 192.168.3.12}
 
 #    add rule <table_id> <chain_id> position 7 ...
 add rule myIpTable myIpChain position 5 accept
 
 #    add rule <table_id> <chain_id> handle 42 ...
-#
+add rule myIpTable myIpChain handle 51 accept
+
 #    add rule <table_id> <chain_id> index 123 ...
 
 #    add rule <family> <table_id> <chain_id> ...
+add rule ip filter input tcp dport { 22, 80, 443 } counter
 add rule ip myIpTable myIpChain accept
 add rule ip myIpTable myIpChain { type filter hook input priority 0; policy drop;}
+add rule ip filter input ip daddr @blackhole counter accept
 add rule netdev myNetdevTable myNetdevChain fwd to eth1
 add rule bridge myBridgeTable myBridgeChain jump BridgeSpan
 add rule arp myArpTable myArpChain jump ArpProxy
@@ -484,6 +488,9 @@ create set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags t
 
 # add set
 add set myIpTable mySet { type mark; flags interval; timeout 15m; gc-interval 2d; size 1200; policy memory; auto-merge; }
+add set filter blackhole { type ipv4_addr ; }
+add set filter set1 { type ipv4_addr ; policy memory ; }
+add set filter set1 { type ipv4_addr ; policy performance ; }
 add set ip myIpTable mySet {   # comment
     type inet_proto;   # comment
     flags interval;   # comment
@@ -536,6 +543,7 @@ create element ip6 myIp6Table myIp6Set { element, element }
 create element inet myInetTable myInetSet { element, element }
 
 # add element <set_spec> <set_block_expr>
+add element filter blackhole { 192.168.0.1, 192.168.0.10 }
 add element myIpTable myIpMap { elements = { ipv4_addr }; }
 add element netdev myNetdevTable myNetdevMap { elements = { ether_addr } ; }
 add element bridge myBridgeTable myBridgeMap { elements = { ether_addr } ; }

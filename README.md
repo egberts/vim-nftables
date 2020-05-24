@@ -36,7 +36,7 @@ If you have any issues with this syntax file, see if you can:
 Debugging Vim Syntax
 --------------------
 If you are bold enough to try your hand on debugging Vim syntax file,
-see my [DEBUG.md](https://github.com/egberts/vim-syntax-bind-named/blob/master/DEBUG.md) on how to debug a Vim syntax file.
+see my [DEBUG.md](https://github.com/egberts/vim-syntax-bind-named/blob/master/DEBUG.md) on how to debug a Vim syntax file (for the Bind9 named.conf configuration file).
 
 Install
 -------

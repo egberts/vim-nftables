@@ -388,7 +388,7 @@ syn keyword nftables_HANDLE_NUM contained handle skipwhite
 \    nftables_UnexpectedEOS
 " End <HANDLE> <NUM>
 
-" begin <ruleset_spec
+" begin <ruleset_spec>
 hi link nftables_ruleset_spec_Family nftablesHL_Family
 syn keyword nftables_ruleset_spec_Family contained skipwhite
 \    netdev bridge arp ip ip6 inet
@@ -400,21 +400,21 @@ syn cluster nftablesCluster_ruleset_spec
 \    nftables_EOS
 " End <rulset_spec>
 
-" Begin '<rulset_spec>' and 'table <table_spec>'
+" Begin '<rulset_spec>' or 'table <table_spec>'
 syn cluster nftablesCluster_ruleset_or_TABLE_table_spec
 \ contains=
 \    nftables_ruleset_spec_Family,
 \    nftables_TABLE_table_spec,
 \    nftables_EOS
-" End '<rulset_spec>' and 'table <table_spec>'
+" End '<rulset_spec>' or 'table <table_spec>'
 
-" Begin 'table <table_spec>' and 'table <table_id_spec>'
+" Begin 'table <table_spec>' or 'table <table_id_spec>'
 syn cluster nftablesCluster_TABLE_table_and_tableid_specs
 \ contains=
 \    nftables_TABLE_table_spec,
 \    nftables_TABLE_table_id_spec,
 \    nftables_EOS
-" End '<rulset_spec>' and 'table <table_spec>'
+" End 'table <table_spec>' or 'table <table_id_spec>'
 
 " begin '<table_spec> <EOS>'
 hi link nftables_id_TableName nftablesHL_Table
@@ -435,12 +435,12 @@ syn cluster nftablesCluster_family_spec_identifier
 \    nftables_id_TableName
 " end '<table_spec> <EOS>'
 
-" begin '<table_spec>'
+" Begin '<table_spec>'
 syn cluster nftablesCluster_table_spec 
 \ contains=
 \    @nftablesCluster_family_spec_identifier
 
-" 'table <table_spec> { <table_block> }'
+" Begin 'table <table_spec> { <table_block> }'
 hi link nftables_TABLE_table_spec_block nftablesHL_Statement
 syn keyword nftables_TABLE_table_spec_block contained table skipwhite
 \ nextgroup=
@@ -3421,7 +3421,7 @@ syn keyword nftables_base_cmd skipwhite add skipempty
 \ nextgroup=
 \    nftables_TABLE_table_spec_table_block,
 \    nftables_CHAIN_chain_spec_block,
-\    nftables_CT_HELPER_obj_spec_block,
+\    nftables_CT_HELPER_obj_spec_ct_helper_block,
 \    nftables_ELEMENT_set_spec_set_block_expr,
 \    nftables_FLOWTABLE_spec_block,
 \    nftables_COUNTER_obj_spec_counter_obj,
@@ -3452,8 +3452,8 @@ syn keyword nftables_base_cmd skipwhite create skipempty
 \    nftables_FLOWTABLE_spec_block,
 \    nftables_COUNTER_obj_spec_counter_obj,
 \    nftables_add_QUOTA_obj_spec_quota_obj,
+\    nftables_CT_HELPER_obj_spec_ct_helper_block,
 \    @nftablesCluster_table_spec_table_block  " this is the last one
-" TODO nftables_CT_HELPER_obj_spec_block,
 " TODO nftables_LIMITS_obj_spec_limit_obj,
 
 hi link nftables_base_cmd nftablesHL_Command
