@@ -2,7 +2,7 @@
 
 VIM Syntax for NFTABLES.
 
-# ALPHA, it is in ALPHA stage #
+# BETA, it is in BETA stage #
 
 This VIM syntax proactively highlights typo errors in RED for:
 
