@@ -646,20 +646,24 @@ ct helper myIpTable myCTHchain { type "sip" protocol tcp; l3proto ip; }
 ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
 
 # create limit <obj_spec> <limit_obj>
-create limit myIpTable myIpLimit { rate 1/second }
-create limit netdev myNetdevTable myNetdevLimit { rate 1/second }
-create limit bridge myBridgeTable myBridgeLimit { rate 1/second }
-create limit ip myIpTable myIpLimit { rate 1/second }
-create limit ip6 myIp6Table myIp6Limit { rate 1/second }
-create limit inet myInetTable myInetLimit { rate 1/second }
+create limit myIpTable myIpLimit rate 1/second
+create limit netdev myNetdevTable myNetdevLimit rate 1/minute
+create limit bridge myBridgeTable myBridgeLimit rate 1/hour
+create limit ip myIpTable myIpLimit rate 1/day
+create limit ip6 myIp6Table myIp6Limit rate 1/week
+create limit inet myInetTable myInetLimit rate 1/second
+create limit myIpTable myIpLimit rate 1/second burst 15 packets
+create limit myIpTable myIpLimit rate 1/second burst 1514 bytes
 
 # add limit <obj_spec> <limit_obj>
-add limit myIpTable myIpLimit { rate 1/second }
-add limit netdev myNetdevTable myNetdevLimit { rate 1/second }
-add limit bridge myBridgeTable myBridgeLimit { rate 1/second }
-add limit ip myIpTable myIpLimit { rate 1/second }
-add limit ip6 myIp6Table myIp6Limit { rate 1/second }
-add limit inet myInetTable myInetLimit { rate 1/second }
+add limit myIpTable myIpLimit rate 1/second 
+add limit netdev myNetdevTable myNetdevLimit rate 1/minute 
+add limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
+add limit ip myIpTable myIpLimit rate 1/ day
+add limit ip6 myIp6Table myIp6Limit rate 1 / week
+add limit inet myInetTable myInetLimit rate 1/second
+add limit myIpTable myIpLimit rate 1/second burst 15 packets
+add limit myIpTable myIpLimit rate 1/second burst 1514 bytes
 
 add ct expectation myTimeout { .... }
 add ct timeout myTimeout { .... }

@@ -467,17 +467,17 @@ hi link nftablesExprEther_SetKeyword nftablesHL_Type
 syn keyword nftablesExprEther_SetKeyword contained set skipwhite
 \ nextgroup=
 \    nftables_EtherMAC,
-\    nftablesExpr_NumGen,
+\    nftablesExpr_NumGen
 
 hi link nftablesExprEther_AddrKeywords nftablesHL_Expression
 syn keyword nftablesExprEther_AddrKeywords contained saddr daddr skipwhite
 \ nextgroup=
-\    nftablesExprEther_SetKeyword,
+\    nftablesExprEther_SetKeyword
 
 hi link nftablesExprEther_TypeKeyword nftablesHL_Type
 syn keyword nftablesExprEther_TypeKeyword contained type skipwhite
 \ nextgroup=
-\    nftablesType_EtherType,
+\    nftablesType_EtherType
 " End  Expression... ether ...
 
 " Begin Expression... fwd ... (only within Netdev family)
@@ -621,8 +621,6 @@ syn keyword nftables_rule_MapKeyword contained map skipwhite
 hi link nftables_quota_used nftablesHL_Type
 syn keyword nftables_quota_used contained skipwhite
 \    /\d\{1,11}/
-\ nextgroup=
-\    nftables_quota_used
 
 hi link nftables_quota_unit nftablesHL_Type
 syn keyword nftables_quota_unit contained skipwhite
@@ -650,13 +648,6 @@ syn cluster nftablesCluster_quota_config
 hi link nftables_quota_stmt_QUOTA nftablesHL_Statement
 syn keyword nftables_quota_stmt_QUOTA contained quota skipwhite
 \ nextgroup=@nftablesCluster_quota_config
-
-syn cluster nftablesCluster_quota_obj
-\ contains=@nftablesCluster_quota_config
-
-syn keyword nftables_obj_spec_quota_obj_QUOTA contained quota skipwhite
-\ nextgroup=@nftablesCluster_quota_obj
-" End 'add rule ... quota'
 
 " statement stmt stmt_list rule_alloc rule
 syn cluster nftablesCluster_stmt 
@@ -2129,31 +2120,83 @@ syn keyword nftables_FLOWTABLE_spec_block contained flowtable skipwhite
 " End 'add flowtable ...'
 
 " Begin 'add limit ...'
-hi link nftablesCmdAddLimit_LimitName nftablesHL_Limit
-syn match nftablesCmdAddLimit_LimitName contained skipwhite
-\    /[A-Za-z][A-Za-z0-9\-_./]\{0,64}/ 
-\ nextgroup=nftablesCmdAddLimit_Section
+hi link nftables_limit_burst_type nftablesHL_Type
+syn keyword nftables_limit_burst_type contained packets bytes skipwhite
+\ nextgroup=
+\    nftables_Semicolon,
+\    nftables_EOS
 
-hi link nftablesCmdAddLimit_TableName nftablesHL_Table
-syn match nftablesCmdAddLimit_TableName contained skipwhite
-\    /[A-Za-z][A-Za-z0-9\-_./]\{0,64}/ 
-\ nextgroup=nftablesCmdAddLimit_LimitName
+hi link nftables_limit_burst_num nftablesHL_Number
+syn match nftables_limit_burst_num contained /\d\{1,11}/ skipwhite
+\ nextgroup=nftables_limit_burst_type
 
-hi link nftablesCmdAddLimit_Family nftablesHL_Family
-syn keyword nftablesCmdAddLimit_Family contained skipwhite
-\    netdev
-\    bridge
-\    arp
-\    ip
-\    ip6
-\    inet
+hi link nftables_limit_burst nftablesHL_Option
+syn keyword nftables_limit_burst contained burst skipwhite
+\ nextgroup=
+\    nftables_limit_burst_num
+
+hi link nftables_limit_string nftablesHL_Type
+syn keyword nftables_limit_unit contained skipwhite
+\    bytes kbytes mbytes
+\ nextgroup=
+\    nftables_limit_burst,
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftables_limit_time_unit nftablesHL_Type
+syn match nftables_limit_time_unit contained 
+\    /\(second\)\|\(minute\)\|\(hour\)\|\(day\)\|\(week\)/
+\ skipwhite skipempty skipnl
+\ nextgroup=
+\    nftables_limit_burst,
+\    nftables_Semicolon,
+\    nftables_EOS
+
+hi link nftables_limit_slash nftablesHL_Operator
+syn match nftables_limit_slash contained "/" skipwhite skipempty skipnl
+\ nextgroup=nftables_limit_time_unit
+
+hi link nftables_limit_num nftablesHL_Number
+syn match nftables_limit_num contained /\d\{1,11}/ skipwhite
+\ nextgroup=
+\    nftables_limit_slash,
+\    nftables_limit_string,
+
+hi link nftables_limit_mode nftablesHL_Type
+syn keyword nftables_limit_mode contained 
+\    until over
+\ nextgroup=nftables_limit_num
+
+hi link nftables_limit_config nftablesHL_Option
+syn keyword nftables_limit_config contained rate skipwhite
+\ nextgroup=
+\    nftables_limit_mode,
+\    nftables_limit_num
+
+syn cluster nftablesCluster_limit_obj
+\ contains=nftables_limit_config
+
+hi link nftables_obj_spec_limit_obj_LimitName nftablesHL_Limit
+syn match nftables_obj_spec_limit_obj_LimitName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\-_./]\{0,64}/ 
+\ nextgroup=@nftablesCluster_limit_obj
+
+hi link nftables_obj_spec_limit_obj_TableName nftablesHL_Table
+syn match nftables_obj_spec_limit_obj_TableName contained skipwhite
+\    /[A-Za-z][A-Za-z0-9\-_./]\{0,64}/ 
+\ nextgroup=nftables_obj_spec_limit_obj_LimitName
+
+hi link nftables_obj_spec_limit_obj_Family nftablesHL_Family
+syn keyword nftables_obj_spec_limit_obj_Family contained skipwhite
+\    netdev bridge arp ip ip6 inet
+\ nextgroup=nftables_obj_spec_limit_obj_TableName
 
 " Generic boilerplate for all-family limit 
 hi link nftables_LIMITS_obj_spec_limit_obj nftablesHL_Option
 syn keyword nftables_LIMITS_obj_spec_limit_obj contained limit skipwhite
 \ nextgroup=
-\    nftablesCmdAddLimit_Family,
-\    nftablesCmdAddLimit_TableName
+\    nftables_obj_spec_limit_obj_Family,
+\    nftables_obj_spec_limit_obj_TableName
 " End 'add limit ...'
 
 " Begin 'add map <set_spec> { <map_block> }'
@@ -2341,6 +2384,9 @@ syn keyword nftables_MAP_set_spec contained map skipwhite
 
 
 " Begin 'add quota ...'
+syn cluster nftablesCluster_quota_obj
+\ contains=@nftablesCluster_quota_config
+
 hi link nftables_obj_spec_quota_obj_QuotaName nftablesHL_Quota
 syn match nftables_obj_spec_quota_obj_QuotaName contained skipwhite
 \    /[A-Za-z][A-Za-z0-9\-_./]\{0,64}/ 
@@ -3421,16 +3467,15 @@ syn keyword nftables_base_cmd skipwhite add skipempty
 \ nextgroup=
 \    nftables_TABLE_table_spec_table_block,
 \    nftables_CHAIN_chain_spec_block,
-\    nftables_CT_HELPER_obj_spec_ct_helper_block,
+\    nftablesCmdAdd_RuleKeyword,
+\    nftables_SET_set_spec_block,
+\    nftables_MAP_set_spec_map_block,
 \    nftables_ELEMENT_set_spec_set_block_expr,
 \    nftables_FLOWTABLE_spec_block,
 \    nftables_COUNTER_obj_spec_counter_obj,
 \    nftables_add_QUOTA_obj_spec_quota_obj,
-\    nftables_obj_spec_quota_obj_QUOTA,
+\    nftables_CT_HELPER_obj_spec_ct_helper_block,
 \    nftables_LIMITS_obj_spec_limit_obj,
-\    nftables_MAP_set_spec_map_block,
-\    nftables_SET_set_spec_block,
-\    nftablesCmdAdd_RuleKeyword,
 \    nftablesCmdAdd_TypeKeyword,
 \    @nftablesCluster_TABLE_table_spec_block  " this is the last one
 " End 'add ' <add_cmd>
@@ -3444,7 +3489,6 @@ syn keyword nftables_base_cmd skipwhite add skipempty
 hi link nftables_base_cmd nftablesHL_Command
 syn keyword nftables_base_cmd skipwhite create skipempty 
 \ nextgroup=
-\    nftables_TABLE_table_spec_table_block,
 \    nftables_CHAIN_chain_spec_block,
 \    nftables_SET_set_spec_block,
 \    nftables_MAP_set_spec_map_block,
@@ -3453,8 +3497,9 @@ syn keyword nftables_base_cmd skipwhite create skipempty
 \    nftables_COUNTER_obj_spec_counter_obj,
 \    nftables_add_QUOTA_obj_spec_quota_obj,
 \    nftables_CT_HELPER_obj_spec_ct_helper_block,
-\    @nftablesCluster_table_spec_table_block  " this is the last one
-" TODO nftables_LIMITS_obj_spec_limit_obj,
+\    nftables_LIMITS_obj_spec_limit_obj,
+\    nftables_TABLE_table_spec_table_block,
+" \    @nftablesCluster_table_spec_table_block  " this is the last one
 
 hi link nftables_base_cmd nftablesHL_Command
 syn keyword nftables_base_cmd skipwhite ct skipempty 
