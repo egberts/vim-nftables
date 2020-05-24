@@ -2,7 +2,9 @@
 
 VIM Syntax for NFTABLES.
 
-# ALPHA, it is in ALPHA stage #
+# BETA, it is in BETA stage #
+Currently at v0.9.0.  Pretty solid but finer aspect of syntax enforcement is not fully implemented hence has been disabled for this release leaving just the basic keyword, identifier, variables, and type highlightings (which is still rather intensive).
+
 
 This VIM syntax proactively highlights typo errors in RED for:
 
