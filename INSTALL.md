@@ -17,8 +17,10 @@ mkdir $HOME/.vim
 If you do not have a `syntax` or `ftdetect` subdirectory under that `.vim` directory, create them as needed:
 
 ```bash
-mkdir $HOME/.vim/syntax
+mkdir $HOME/.vim/indent
 mkdir $HOME/.vim/ftdetect
+mkdir $HOME/.vim/ftplugin
+mkdir $HOME/.vim/syntax
 ```
 
 Copying Vim Syntax Files
@@ -29,15 +31,15 @@ settings:
 ```bash
 cd $HOME/myworkspace
 git clone https://github.com/egberts/vim-nftables
-cp -R vim-nftables/syntax/* ~/.vim/syntax/
 cp -R vim-nftables/indent/* ~/.vim/indent/
-cp -R vim-nftables/ftplugin/* ~/.vim/ftplugin/
 cp -R vim-nftables/ftdetect/* ~/.vim/ftdetect/
+cp -R vim-nftables/ftplugin/* ~/.vim/ftplugin/
+cp -R vim-nftables/syntax/* ~/.vim/syntax/
 ```
 
 See the Highlightings
 ---------------------
-To see highlighting in action, use the enclosed test file for highlighting of ISC Bind named configuration file:
+To see highlighting in action, use the enclosed test file for highlighting of `nftables` configuration file:
 
 ```bash
 vim vim-nftables/test/all-syntaxes.nft
