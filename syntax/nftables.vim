@@ -768,12 +768,12 @@ syn match nftablesStmtVerdicts_ChainTarget contained skipwhite
 
 function NftablesCreateStmtKeywords(mylabel, kywds, hlite, hi_opt)
   exec 'hi link '.a:mylabel.' nftablesHL_'.a:hlite
-  exec "syntax keyword nftables_rule_".a:mylabel." contained skipwhite ".a:kywds." ".a:hi_opt
+  exec 'syntax keyword nftables_rule_'.a:mylabel.' contained skipwhite '.a:kywds.' '.a:hi_opt
 endfunction
 
-call NftablesCreateStmtKeywords( "VerdictKeywords", 
-\  " accept drop continue return queue ", "Statement",
-\  " nextgroup=nftables_rule_CommentKeyword,nftables_EOS" )
+call NftablesCreateStmtKeywords( 'VerdictKeywords', 
+\  ' accept drop continue return queue ', 'Statement',
+\  ' nextgroup=nftables_rule_CommentKeyword,nftables_EOS' )
 
 " hi link nftables_rule_VerdictKeywords nftablesHL_Statement
 " syn keyword nftables_rule_VerdictKeywords contained skipwhite
@@ -966,7 +966,7 @@ syn keyword nftablesCmdAddChainArp_DevicesKeyword contained devices skipwhite
 \    nftablesCmdAddChainArp_DeviceEqual
 
 hi link nftablesCmdAddChainArp_DeviceName  nftablesHL_String
-execute "syn match nftablesCmdAddChainArp_DeviceName contained ".string(s:deviceNameRegex)." skipwhite nextgroup=nftables_hook_spec_PRIORITY"
+execute 'syn match nftablesCmdAddChainArp_DeviceName contained '.string(s:deviceNameRegex).' skipwhite nextgroup=nftables_hook_spec_PRIORITY'
 
 hi link nftablesCmdAddChainArp_DeviceKeyword nftablesHL_Option
 syn keyword nftablesCmdAddChainArp_DeviceKeyword contained device skipwhite
@@ -2775,6 +2775,7 @@ syn cluster nftablesCluster_flowtable_spec
 syn cluster nftablesCluster_obj_spec
 \ contains=@nftablesCluster_table_spec_identifier
 
+hi link nftables_CHAIN_chain_spec nftablesHL_Option
 syn keyword nftables_CHAIN_chain_spec contained chain skipwhite
 \ nextgroup=@nftablesCluster_table_spec_identifier
 " End <chain_spec>
@@ -2837,6 +2838,23 @@ syn keyword nftables_COUNTER_obj_spec contained counter skipwhite
 \    @nftablesCluster_obj_spec
 " End 'list counter <obj_spec>'
 " End 'reset counter <obj_spec>'
+
+" Begin 'delete counter ( <obj_spec> | <objid_spec> )'
+syn cluster nftablesCluster_obj_spec_objid_spec
+\ contains=@nftablesCluster_table_spec_and_handle_num
+
+hi link nftables_COUNTER_obj_spec_objid_spec nftablesHL_Option
+syn keyword nftables_COUNTER_obj_spec_objid_spec contained counter skipwhite
+\ nextgroup=
+\    @nftablesCluster_obj_spec_objid_spec
+" End 'delete counter ( <obj_spec> | <objid_spec> )'
+
+" Begin 'delete quota ( <obj_spec> | <objid_spec> )'
+hi link nftables_QUOTA_obj_spec_objid_spec nftablesHL_Option
+syn keyword nftables_QUOTA_obj_spec_objid_spec contained counter skipwhite
+\ nextgroup=
+\    @nftablesCluster_obj_spec_objid_spec
+" End 'delete quota ( <obj_spec> | <objid_spec> )'
 "
 " Begin 'list ct helpers table <table_spec>'
 hi link nftables_CT_HELPERS_TABLE_table_spec_HelpersKeyword nftablesHL_Option
@@ -3449,7 +3467,7 @@ syn keyword nftables_base_cmd skipwhite delete skipempty
 \    nftables_CHAIN_chain_and_chainid_spec,
 \    nftables_RULE_ruleid_spec,
 \    nftables_SET_set_and_setid_spec,
-\    nftables_COUNTER_obj_or_objid_spec,
+\    nftables_COUNTER_obj_spec_objid_spec,
 \    nftablesCmdDelete_CTKeyword,
 \    nftables_ELEMENT_set_spec_set_block_expr,
 \    nftables_MAP_set_spec,

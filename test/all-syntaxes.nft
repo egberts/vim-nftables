@@ -47,6 +47,7 @@ redefine int_ifs = { virbr0, $int_if2, virbr1 }
 undefine int_ifs
 
 # FLUSH
+# flush meter <set_spec>
 flush meter myIpTable mySet
 flush meter netdev myNetdevTable mySet
 flush meter bridge myBridgeTable mySet
@@ -55,6 +56,7 @@ flush meter ip myIpTable mySet
 flush meter ip6 myIp6Table mySet
 flush meter inet myInetTable mySet ; 
 
+# flush map <set_spec>
 flush map myIpTable myIpMap 
 flush map netdev myNetdevTable myNetdevMap 
 flush map bridge myBridgeTable myBridgeMap 
@@ -63,6 +65,7 @@ flush map ip myIpTable myIpMap
 flush map ip6 myIp6Table myIp6Map 
 flush map inet myInetTable myInetMap 
 
+# flush set <set_spec>
 flush set myIpTable mySet
 flush set netdev myNetdevTable mySet
 flush set bridge myBridgeTable mySet
@@ -71,6 +74,7 @@ flush set ip myIpTable mySet
 flush set ip6 myIp6Table mySet
 flush set inet myInetTable mySet ; 
 
+# flush flow table <flowtable_spec>
 flush flow table myIpTable mySet
 flush flow table netdev myNetdevTable mySet
 flush flow table bridge myBridgeTable mySet
@@ -79,6 +83,7 @@ flush flow table ip myIpTable mySet
 flush flow table ip6 myIp6Table mySet
 flush flow table inet myInetTable mySet ; 
 
+# flush chain <chain_spec>
 flush chain myIpTable myIpChain
 flush chain netdev myNetdev myNetdevChain
 flush chain bridge myBridge myBridgeChain
@@ -648,42 +653,6 @@ add limit ip myIpTable myIpLimit { rate 1/second }
 add limit ip6 myIp6Table myIp6Limit { rate 1/second }
 add limit inet myInetTable myInetLimit { rate 1/second }
 
-# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
-# delete counter <obj_spec>
-delete counter myIpTable https-filter  
-delete counter netdev myNetdevTable https-filter  
-delete counter bridge myBridgeTable https-filter  
-delete counter arp myArpTable https-filter  
-delete counter ip myIpTable https-filter  
-delete counter ip6 myIp6Table https-filter  
-delete counter inet myInetTable https-filter  
-
-# list quotas <ruleset_spec>
-create map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-create map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
-create map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
-create map arp myArpTable myArpMap { type mark; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-create map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-create map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
-create map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
-
-delete ct helper myIpTable cth
-delete ct helper netdev myIpTable cth
-delete ct helper bridge myIpTable cth
-delete ct helper arp myIpTable cth
-delete ct helper ip myIpTable cth
-delete ct helper ip6 myIpTable cth
-delete ct helper inet myIpTable cth
-
-# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
-delete ct timeout myIpTable ctt
-delete ct timeout netdev myNetdevTable ctt
-delete ct timeout bridge myBridgeTable ctt
-delete ct timeout arp myArpTable ctt
-delete ct timeout ip myIpTable ctt
-delete ct timeout ip6 myIp6Table ctt
-delete ct timeout inet myInetTable ctt
-
 add ct expectation myTimeout { .... }
 add ct timeout myTimeout { .... }
 add ct timeout myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
@@ -1064,6 +1033,7 @@ reset quotas table ip myIpFilter
 reset quotas table ip6 myIpFilter
 reset quotas table inet myIpFilter
 
+# reset quota <obj_spec>
 reset quota myIpTable myIpFilter
 reset quota myIpFilter https-quota
 reset quota netdev myNetDevFilter https-quota
@@ -1073,6 +1043,10 @@ reset quota ip myIpFilter https-quota
 reset quota ip6 myIp6Filter https-quota
 reset quota inet myInetFilter https-quota
 
+# delete quota <obj_spec>
+# delete quota <objid_spec>
+
+# delete counter <obj_spec>
 delete counter myIpTable myIpCounter
 delete counter netdev myNetdevTable myNetdevCounter
 delete counter bridge myBridgeTable myBridgeCounter
@@ -1080,29 +1054,31 @@ delete counter arp myArpTable myArpCounter
 delete counter ip myIpTable myIpCounter
 delete counter ip6 myIp6Table myIp6Counter
 delete counter inet myInetTable myInetCounter
+delete counter myIpTable https-filter  
+delete counter netdev myNetdevTable https-filter  
+delete counter bridge myBridgeTable https-filter  
+delete counter arp myArpTable https-filter  
+delete counter ip myIpTable https-filter  
+delete counter ip6 myIp6Table https-filter  
+delete counter inet myInetTable https-filter  
+# delete counter <objid_spec>
+delete counter netdev myNetdevTable handle 1
+delete counter bridge myBridgeTable position 1
+delete counter arp myArpTable index 1
 
-delete type myIpTable myIpType
-delete type netdev myNetdevTable myNetdevType
-delete type bridge myBridgeTable myBridgeType
-delete type arp myArpTable myArpType
-delete type ip myIpTable myIpType
-delete type ip6 myIp6Table myIp6Type
-delete type inet myInetTable myInetType
-delete type inet myInetTable handle 3
-
+# delete flowtable <flowtable_spec>
 delete flowtable myIpTable myIpFT
 delete flowtable ip myIpTable myIpFT
 delete flowtable ip6 myIp6Table myIp6FT
 delete flowtable inet myInetTable myInetFT
 
-delete element myIpTable myIpSet { element, element }
+# delete element <set_spec> <set_block_expr>
 delete element netdev myNetdevTable myNetdevSet { element, element }
 delete element bridge myBridgeTable myBridgeSet { element, element }
 delete element arp myArpTable myArpSet { element, element }
 delete element ip myIpTable myIpSet { element, element }
 delete element ip6 myIp6Table myIp6Set { element, element }
 delete element inet myInetTable myInetSet { element, element }
-
 delete element myIpTable myIpMap { elements = { element, element }; }
 delete element netdev myNetdevTable myNetdevMap { elements = { element, element } ; }
 delete element bridge myBridgeTable myBridgeMap { elements = { element, element } ; }
@@ -1111,7 +1087,7 @@ delete element ip myIpTable myIpMap { elements = { element, element } ; }
 delete element ip6 myIp6Table myIp6Map { elements = { element, element } ; }
 delete element inet myInetTable myInetMap { elements = { element, element } ; }
 
-
+# delete map <set_spec>
 delete map myIpTable myIpMap 
 delete map netdev myNetdevTable myNetdevMap 
 delete map bridge myBridgeTable myBridgeMap 
@@ -1120,6 +1096,7 @@ delete map ip myIpTable myIpMap
 delete map ip6 myIp6Table myIp6Map 
 delete map inet myInetTable myInetMap 
 
+# delete set <set_spec>
 delete set myIpTable myIpSet
 delete set netdev myNetdevTable mySet
 delete set bridge myBridgeTable myBridgeSet
@@ -1127,14 +1104,17 @@ delete set arp myArpTable myArpSet
 delete set ip myIpTable myIpSet
 delete set ip6 myIp6Table myIp6Set
 delete set inet myInetTable myInetSet
+# delete set <setid_spec>
 delete set myIpTable handle 123
 delete set ip myIpTable handle 123
 delete set inet myInetTable handle 42 # comment
 
+# delete rule <ruleid_spec>
 delete rule myInetTable handle 42
 delete rule ip myInetTable handle 42
 delete rule ip myInetTable handle 42
 
+# delete chain <chain_spec>
 delete chain myIpTable myIpChain
 delete chain netdev myNetdev myNetdevChain
 delete chain bridge myBridge myBridgeChain
@@ -1142,9 +1122,11 @@ delete chain arp myArp myArpChain
 delete chain ip myIp myIpChain
 delete chain ip6 myIp6 myIp6Chain
 delete chain inet myInet myInetChain
+# delete chain <chainid_spec>
 delete chain myInet handle 123123
 delete chain inet myInet handle 42 # comment
 
+# delete table <table_spec>
 delete table myIpTable
 delete table netdev myNetdevTable
 delete table bridge myBridgeTable
@@ -1152,8 +1134,27 @@ delete table arp myArpTable
 delete table ip myIpTable
 delete table ip6 myIp6Table
 delete table inet myInetTable
+# delete table <tableid_spec>
 delete table netdev handle 123
-delete table handle 4321 # comment
+delete table handle 4321  # comment
+
+# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
+delete ct timeout myIpTable ctt
+delete ct timeout netdev myNetdevTable ctt
+delete ct timeout bridge myBridgeTable ctt
+delete ct timeout arp myArpTable ctt
+delete ct timeout ip myIpTable ctt
+delete ct timeout ip6 myIp6Table ctt
+delete ct timeout inet myInetTable ctt
+
+# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
+delete ct helper myIpTable cth
+delete ct helper netdev myIpTable cth
+delete ct helper bridge myIpTable cth
+delete ct helper arp myIpTable cth
+delete ct helper ip myIpTable cth
+delete ct helper ip6 myIpTable cth
+delete ct helper inet myIpTable cth
 
 
 # MONITOR
