@@ -2897,7 +2897,7 @@ syn keyword nftables_COUNTER_obj_spec_objid_spec contained counter skipwhite
 
 " Begin 'delete quota ( <obj_spec> | <objid_spec> )'
 hi link nftables_QUOTA_obj_spec_objid_spec nftablesHL_Option
-syn keyword nftables_QUOTA_obj_spec_objid_spec contained counter skipwhite
+syn keyword nftables_QUOTA_obj_spec_objid_spec contained quota skipwhite
 \ nextgroup=
 \    @nftablesCluster_obj_spec_objid_spec
 " End 'delete quota ( <obj_spec> | <objid_spec> )'
@@ -3512,12 +3512,12 @@ syn keyword nftables_base_cmd skipwhite delete skipempty
 \    nftables_CHAIN_chain_and_chainid_spec,
 \    nftables_RULE_ruleid_spec,
 \    nftables_SET_set_and_setid_spec,
-\    nftables_COUNTER_obj_spec_objid_spec,
-\    nftablesCmdDelete_CTKeyword,
-\    nftables_ELEMENT_set_spec_set_block_expr,
 \    nftables_MAP_set_spec,
+\    nftables_ELEMENT_set_spec_set_block_expr,
 \    nftablesCmdDelete_FlowtableKeyword,
-\    nftablesCmdDelete_TypeKeyword,
+\    nftables_COUNTER_obj_spec_objid_spec,
+\    nftables_QUOTA_obj_spec_objid_spec,
+\    nftablesCmdDelete_CTKeyword,
 
 hi link nftables_base_cmd nftablesHL_Command
 syn keyword nftables_base_cmd describe skipwhite 

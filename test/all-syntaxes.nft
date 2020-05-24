@@ -1056,7 +1056,18 @@ reset quota ip6 myIp6Filter https-quota
 reset quota inet myInetFilter https-quota
 
 # delete quota <obj_spec>
+delete quota myIpFilter myIpQuota
+delete quota netdev myNetdevFilter myNetdevQuota
+delete quota bridge myBridgeFilter myBridgeQuota
+delete quota arp myArpFilter myArpQuota
+delete quota ip myIpFilter myIpQuota
+delete quota ip6 myIp6Filter myIp6Quota
+delete quota inet myInetFilter myInetQuota
+
 # delete quota <objid_spec>
+delete quota inet myInetFilter handle 123
+delete quota inet myInetFilter position 234
+delete quota inet myInetFilter index 345
 
 # delete counter <obj_spec>
 delete counter myIpTable myIpCounter
