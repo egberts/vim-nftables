@@ -44,7 +44,7 @@ redefine my_public_wan = eth2
 redefine int_if1 = eth0
 redefine int_if2 = $my_public_wan
 redefine int_ifs = { virbr0, $int_if2, virbr1 }
-undefine int_ifs
+undefine int_ifs 
 
 # FLUSH
 # flush meter <set_spec>

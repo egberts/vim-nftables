@@ -3708,7 +3708,7 @@ syn match nftables_undefine_Variable contained skipwhite
 hi link nftablesUndefineKeyword nftablesHL_Command
 syn match nftablesUndefineKeyword /^\s*undefine/ skipwhite skipempty
 \ nextgroup=
-\    nftablesUndefine_Variable
+\    nftables_undefine_Variable
 " End Command-less actions: undefine
 " End  <common_block> (Vim least prioritized pattern yet 'not contained')
 
