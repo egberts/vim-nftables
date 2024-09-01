@@ -1247,7 +1247,6 @@ syn match nft_monitor_object "\v(tables|chains|sets|rules(et)?|elements|trace)" 
 
 " monitor_event (via monitor_cmd)
 hi link nft_monitor_event_object_format nftHL_Operator
-syn match nft_monitor_event_object_format "\v(xml|json|vm\s+json)|((tables|chains|sets|rules[et]|elements|trace)(\s{1,15}(xml|json|vm\s+json))?)" skipwhite keepend contained
 syn match nft_monitor_event_object_format "\v(xml|json|vm\s+json)|((tables|chains|sets|rules(et)?|elements|trace)(\s{1,15}(xml|json|vm\s+json))?)|([a-zA-Z0-9\_\-]+(\s+)?)" skipwhite keepend contained
 \ contains=
 \    nft_identifier,
@@ -1267,13 +1266,64 @@ syn match nft_base_cmd_monitor "\vmonitor" skipwhite contained
 \ nextgroup=
 \    @nft_c_monitor_cmd
 
+" base_cmd 'import' (via base_cmd)
+hi link nft_import_cmd nftHL_Operator
+syn match nft_import_cmd "\v(ruleset)?(\s+(xml|json|vm\s+json))" skipwhite keepend contained
+\ contains=
+\    nft_markup_format
+\ nextgroup=
+\    nft_markup_format
+
+" import_cmd (via base_cmd)
+hi link nft_base_cmd_import nftHL_Command
+syn match nft_base_cmd_import "\vimport" skipwhite contained
+\ nextgroup=nft_import_cmd
+
+" export_cmd markup_format (via export_cmd)
+hi link nft_export_cmd nftHL_Operator
+syn match nft_export_cmd "\v(ruleset)?(\s+(xml|json|vm\s+json))" skipwhite keepend contained
+\ contains=
+\    nft_markup_format
+\ nextgroup=
+\    nft_markup_format
+
+" base_cmd 'export' (via base_cmd)
+hi link nft_base_cmd_export nftHL_Command
+syn match nft_base_cmd_export "\vexport" skipwhite contained
+\ nextgroup=nft_export_cmd
+
+
+hi link nft_add_table_block nftHL_Special
+syn region nft_add_table_block start="{" end="}" keepend skipwhite contained
+
+" add_table <family_spec> identifier
+hi link nft_add_table_identifier nftHL_Identifier
+syn match nft_add_table_identifier "\v\w{1,32}" skipwhite contained
+\ nextgroup=nft_add_table_block
+" syn match nft_add_table_identifier "?!(ip)6)?|inet|arp|bridge|netdev)" skipwhite contained
+
+
+" base_cmd 'add table'/'table' (via base_cmd)
+hi link   nft_add_table_spec nftHL_Command  " _add_ to make 'table_spec' pathway unique
+syn match nft_add_table_spec "\v(ip(6)?|inet|arp|bridge|netdev)" skipwhite contained
+\ nextgroup=nft_add_table_identifier
+
+" base_cmd 'add table'/'table' (via base_cmd)
+hi link   nft_base_cmd_add nftHL_Command
+syn match nft_base_cmd_add "\v(add\s{1,15}table|table)" skipwhite contained
+\ nextgroup=
+\    nft_add_table_spec,
+\    nft_add_table_identifier
+
 """"""""""""""""" BASE CMD """""""""""""""""""""""""""""""""""""
 " base_cmd 
 syn cluster nft_c_base_cmd
 \ contains=
 \    nft_base_cmd_describe,
 \    nft_base_cmd_monitor,
-"\    nft_base_cmd_add,
+\    nft_base_cmd_import,
+\    nft_base_cmd_export,
+\    nft_base_cmd_add,
 "\    nft_base_cmd_replace,
 "\    nft_base_cmd_create,
 "\    nft_base_cmd_insert,
@@ -1283,8 +1333,6 @@ syn cluster nft_c_base_cmd
 "\    nft_base_cmd_reset,
 "\    nft_base_cmd_flush,
 "\    nft_base_cmd_rename,
-"\    nft_base_cmd_import,
-"\    nft_base_cmd_export,
 "\    nft_base_cmd_destroy,
 
 hi link nft_comment_whole_line nftHL_Comment
