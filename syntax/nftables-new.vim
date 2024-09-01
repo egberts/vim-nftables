@@ -10,6 +10,13 @@
 " Remarks:
 " Bug Report:   https://github.com/egberts/vim-nftables/issues
 
+" TIPS:
+" - always add '\v' to any OR-combo list like '\v(opt1|opt2|opt3)' in `syntax match`
+" - always add '\v' to any OR-combo list like '\v[a-zA-Z0-9_]' in `syntax match`
+" - place any 'contained' keyword at end of line (EOL)
+" - never use '?' in `match` statements
+" - 'contains=' ordering MATTERS in `cluster` statements
+
 " quit if terminal is a black and white
 if &t_Co == 0
   finish
@@ -33,7 +40,10 @@ setlocal isident=.,48-58,A-Z,a-z,\_,\/,-
 let s:cpo_save = &cpo
 set cpo&vim  " Line continuation '\' at EOL is used here
 
+syn sync clear
+syn sync maxlines=1000
 " syn sync match nftablesSync grouphere NONE \"^(table|chain|set)\"
+" syn sync fromstart "^(monitor|table|set)"
 syn sync fromstart
 
 let s:save_cpo = &cpoptions
@@ -79,15 +89,26 @@ hi link nftHL_Action      Special
 
 hi link nft_ToDo nftHL_ToDo
 syn keyword nft_ToDo xxx contained XXX FIXME TODO TODO: FIXME: TBS TBD TBA skipwhite
+"\ containedby=nft_InlineComment
 
 hi link nft_InlineComment nftHL_Comment
-syn region nft_InlineComment start=/#/ end=/$/ contains=nft_ToDo skipwhite contained
+syn match nft_InlineComment "\# " skipwhite contained
 
-hi link nft_EOS nftHL_Error
-syn match nft_EOS /[^ \t]*[^\n;# ]/ contained
+"hi link nft_EOS nftHL_Error
+"syn match nft_EOS /\v[^ \t]*[^\n;# ]/ contained
 
-hi link nft_UnexpectedSemicolon nftHL_Error
-syn match nft_UnexpectedSemicolon /;\+/ skipwhite skipempty contained
+"""""hi link nft_UnexpectedSemicolon nftHL_Error
+"""""syn match nft_UnexpectedSemicolon /;\+/ skipwhite skipempty contained
+
+" stmt_separator (via nft_chain_block, nft_chain_stmt, @nft_c_common_block,
+"                     counter_block, ct_expect_block, ct_expect_config,
+"                     ct_helper_block, ct_helper_config, ct_timeout_block,
+"                     ct_timeout_config, flowtable_block, limit_block,
+"                     nft_line, nft_map_block, nft_quota_block,
+"                     nft_secmark_block, nft_set_block, nft_synproxy_block,
+"                     nft_synproxy_config, table_block )
+hi link nft_stmt_separator nftHL_Normal
+syn match nft_stmt_separator "\v(\n|;)"
 
 
 syn match nft_Set contained /{.*}/ contains=nft_SetEntry
@@ -113,54 +134,148 @@ syn match nft_Error /[ \ta-zA-Z0-9_./]\{1,64}/   " uncontained, on purpose
 "hi link nft_UnexpectedEOS nftHL_Error
 "syn match nft_UnexpectedEOS contained skipwhite /[;\n]\+/
 
-syn match nft_EOL /[\n\r]\{1,16}/ contained skipwhite
+" expected end-of-line (iterator capped for speed)
+syn match nft_EOL /[\n\r]\{1,16}/ skipwhite contained
 
-hi link nft_Semicolon nftHL_Normal
-syn match nft_Semicolon contained /[;]\{1,15}/  skipwhite
-\ nextgroup=nft_EOL
+" hi link nft_Semicolon nftHL_Normal
+" syn match nft_Semicolon contained /[;]\{1,15}/  skipwhite
+" \ nextgroup=nft_EOL
 
-hi link nft_define nftHL_Command
-syn keyword nft_define contained define skipwhite 
-\ nextgroup=nft_define_Identifier
+hi link nft_identifier nftHL_Identifier
+syn match nft_identifier "\v[a-zA-Z0-9\_\-]" skipwhite  contained
 
-hi link nft_redefine nftHL_Command
-syn keyword nft_redefine contained redefine skipwhite 
-\ nextgroup=nft_define_Identifier
+" variable_expr (via chain_expr, dev_spec, extended_prio_spec, flowtable_expr,
+"                    flowtable_expr_member, policy_expr, queue_expr,
+"                    queue_stmt_expr_simple, set_block_expr, set_ref_expr
+"                    symbol_expr
+syn match nft_variable_expr "\$" skipwhite contained
+\ nextgroup=nft_identifier
 
-hi link nft_undefine nftHL_Command
-syn keyword nft_undefine contained undefine skipwhite 
-\ nextgroup=nft_undefine_Identifier
+hi link nft_string_unquoted nftHL_String
+syn match nft_string_unquoted "\v[a-zA-Z0-9\/\\\[\]]+" keepend contained
 
-syn cluster nft_c_common_block
+hi link nft_string_sans_double_quote nftHL_String
+syn match nft_string_sans_double_quote "\v[a-zA-Z0-9\/\\\[\]\"]+" keepend contained
+
+hi link nft_string_sans_single_quote nftHL_String
+syn match nft_string_sans_single_quote "\v[a-zA-Z0-9\/\\\[\]\']+" keepend contained
+
+hi link nft_quoted_string_single nftHL_String
+syn region nft_quoted_string_single start="'" end="'" keepend contained
+\ contains=nft_string_sans_double_quote
+
+hi link nft_quoted_string_double nftHL_String
+syn region nft_quoted_string_double start="\"" end="\"" keepend contained
+\ contains=nft_string_sans_single_quote
+
+syn cluster nft_c_quoted_string
 \ contains=
-\    nft_include,
-\    nft_define,
-\    nft_redefine,
-\    nft_undefine,
-\    nft_InlineComment,
-\    nft_Semicolon,
-\    nft_EOS
+\    nft_quoted_string_single,
+\    nft_quoted_string_double
+
+hi link nft_asterisk_string nftHL_String
+syn region nft_asterisk_string start="\*" end="\*" keepend contained
+\ contains=nft_string_unquoted
+
+hi link nft_string nftHL_String
+syn cluster nft_string
+\ contains=
+\    nft_string_unquoted,
+\    @nft_c_quoted_string,
+\    nft_asterisk_string
+
+" nft_identifier_last (via identifer)
+hi link  nft_identifier_last nftHL_Identifier
+syn match nft_identifier_last "\vlast" skipwhite contained
+
+" identifier
+syn cluster nft_identifier
+\ contains=
+\    nft_string,
+\    nft_identifier_last
+
+"hi link nft_common_block_define_redefine_identifier nftHL_String
+"syn match nft_common_block_define_redefine_identifier "\v[a-zA-Z0-9\_]+" skipwhite contained
+
+" common_block 'define'/'redefine' value (via nft_common_block_define_redefine_equal)
+hi link nft_common_block_define_redefine_value nftHL_String
+syn match nft_common_block_define_redefine_value "\v[\'\"\$\{\}:a-zA-Z0-9\_\/\\\. \,]+" skipwhite contained
+
+" common_block 'define'/'redefine' '=' (via nft_common_block_define_redefine_define_identifier_set)
+hi link nft_common_block_define_redefine_equal nftHL_Operator
+syn match nft_common_block_define_redefine_equal "=" skipwhite contained
+\ nextgroup=nft_common_block_define_redefine_value
+
+" common_block 'define'/'redefine' identifier (via common_block 'redefine'/'define')
+hi link nft_common_block_define_redefine_identifier nftHL_Identifier
+syn match   nft_common_block_define_redefine_identifier "\v[a-zA-Z0-9\_]+" skipwhite contained
+\ nextgroup=nft_common_block_define_redefine_equal
+
+" 'define' (via "
+" common_block 'define' (via common_block)
+hi link nft_common_block_define nftHL_Command
+syn match nft_common_block_define contained "^\s*define" skipwhite contained
+\ nextgroup=nft_common_block_define_redefine_identifier
+
+" commmon_block 'redefine' (via common_block)
+hi link nft_common_block_redefine nftHL_Command
+syn match nft_common_block_redefine contained "^\s*redefine" skipwhite contained
+\ nextgroup=nft_common_block_define_redefine_identifier
+
+" common_block 'undefine' identifier (via common_block 'undefine')
+hi link nft_common_block_undefine_identifier nftHL_Identifier
+syn match nft_common_block_undefine_identifier "\v[a-zA-Z0-9\_]+" skipwhite contained
+
+" commmon_block 'undefine' (via common_block)
+hi link nft_common_block_undefine nftHL_Command
+syn match nft_common_block_undefine contained "^\s*undefine" skipwhite contained
+\ nextgroup=nft_common_block_undefine_identifier
+
+hi link nft_filespec_sans_double_quote nftHL_Normal
+syn match nft_filespec_sans_double_quote "\v[a-zA-Z0-9\/\\\[\]\"]+" keepend contained
+
+hi link nft_filespec_sans_single_quote nftHL_Normal
+syn match nft_filespec_sans_single_quote "\v[a-zA-Z0-9\/\\\[\]\']+" keepend contained
+
+hi link nft_filespec_quoted_single nftHL_Include
+syn region nft_filespec_quoted_single start="'" end="'" keepend contained
+\ contains=nft_filespec_sans_double_quote
+
+hi link nft_filespec_quoted_double nftHL_Include
+syn region nft_filespec_quoted_double start="\"" end="\"" keepend contained
+\ contains=nft_filespec_sans_single_quote
+
+hi link nft_c_filespec_quoted nftHL_Identifier
+syn cluster nft_c_filespec_quoted
+\ contains=
+\    nft_filespec_quoted_single,
+\    nft_filespec_quoted_double
+
+hi link nft_include nftHL_Include
+syn match nft_include "\v^\s*include" skipwhite keepend contained
+\ nextgroup=@nft_c_filespec_quoted
+
 """""""""""""""" NEW WORK BEGINS HERE """""""""""""""""""""""""""""""
 "  All fields are in output order of bgnault's Railroad
 
 " exthdr_key
 hi link nft_exthdr_key_hbh nftHL_Action
-syn match nft_exthdr_key_hbh "\vhbh" contained skipwhite
+syn match nft_exthdr_key_hbh "hbh" contained skipwhite
 
 hi link nft_exthdr_key_rt nftHL_Action
-syn match nft_exthdr_key_rt "\vrt" contained skipwhite
+syn match nft_exthdr_key_rt "rt" contained skipwhite
 
 hi link nft_exthdr_key_frag nftHL_Action
-syn match nft_exthdr_key_frag "\vfrag" contained skipwhite
+syn match nft_exthdr_key_frag "frag" contained skipwhite
 
 hi link nft_exthdr_key_dst nftHL_Action
-syn match nft_exthdr_key_dst "\vdst" contained skipwhite
+syn match nft_exthdr_key_dst "dst" contained skipwhite
 
 hi link nft_exthdr_key_mh nftHL_Action
-syn match nft_exthdr_key_mh "\vmh" contained skipwhite
+syn match nft_exthdr_key_mh "mh" contained skipwhite
 
 hi link nft_exthdr_key_ah nftHL_Action
-syn match nft_exthdr_key_ah "\vah" contained skipwhite
+syn match nft_exthdr_key_ah "ah" contained skipwhite
 
 syn cluster nft_c_exthdr_key
 \ contains=
@@ -171,10 +286,10 @@ syn cluster nft_c_exthdr_key
 \    nft_exthdr_key_mh,
 \    nft_exthdr_key_ah
 
-" exthdr_exists_expr
+" exthdr_exists_expr (via nft_c_primary_expr)
 hi link nft_exthdr_exists_expr nftHL_Statement
 syn match nft_exthdr_exists_expr "\vexthdr" skipwhite contained
-\ nextgroup=@nft_exthdr_key
+\ nextgroup=@nft_c_exthdr_key
 
 
 " mh_hdr_field
@@ -226,23 +341,22 @@ syn match nft_dst_hdr_expr "\vdst" skipwhite contained
 
 " frag_hdr_field
 hi link nft_frag_hdr_field_nexthdr nftHL_Action
-syn match nft_frag_hdr_field_nexthdr "\vnexthdr" contained skipwhite
+syn match nft_frag_hdr_field_nexthdr "\vnexthdr" skipwhite contained
 
 hi link nft_frag_hdr_field_reserved nftHL_Action
-syn match nft_frag_hdr_field_reserved "\vreserved" contained skipwhite
+syn match nft_frag_hdr_field_reserved "\vreserved" skipwhite contained
 
 hi link nft_frag_hdr_field_frag_off nftHL_Action
-syn match nft_frag_hdr_field_frag_off "\vfrag_off" contained skipwhite
+syn match nft_frag_hdr_field_frag_off "\vfrag-off" skipwhite contained
 
 hi link nft_frag_hdr_field_reserved2 nftHL_Action
-syn match nft_frag_hdr_field_reserved2 "\vreserved2" contained skipwhite
+syn match nft_frag_hdr_field_reserved2 "\vreserved2" skipwhite contained
 
 hi link nft_frag_hdr_field_more_fragments nftHL_Action
-syn match nft_frag_hdr_field_more_fragments "\vmore_fragments" contained skipwhite
+syn match nft_frag_hdr_field_more_fragments "\vmore\-fragments" skipwhite contained
 
 hi link nft_frag_hdr_field_id nftHL_Action
-syn match nft_frag_hdr_field_id "\vid" contained skipwhite
-
+syn match nft_frag_hdr_field_id "\vid" skipwhite contained
 syn cluster nft_c_frag_hdr_field
 \ contains=
 \    nft_frag_hdr_field_nexthdr,
@@ -260,7 +374,7 @@ syn match nft_frag_hdr_expr "\vfrag" skipwhite contained
 
 " rt4_hdr_field
 hi link nft_rt4_hdr_field_last_ent nftHL_Action
-syn match nft_rt4_hdr_field_last_ent "\vlast_ent" contained skipwhite
+syn match nft_rt4_hdr_field_last_ent "\vlast\-entry" contained skipwhite
 
 hi link nft_rt4_hdr_field_flags nftHL_Action
 syn match nft_rt4_hdr_field_flags "\vflags" contained skipwhite
@@ -287,71 +401,60 @@ syn cluster nft_c_rt4_hdr_field
 
 " rt4_hdr_expr (via exthdr_expr)
 hi link nft_rt4_hdr_expr nftHL_Statement
-syn match nft_c_rt4_hdr_expr "\vrt4" skipwhite contained
+syn match nft_rt4_hdr_expr "rt4" skipwhite contained
 \ nextgroup=@nft_c_rt4_hdr_field
 
 
 " rt2_hdr_field (via rt2_hdr_expr)
 hi link nft_rt2_hdr_field_addr nftHL_Action
-syn match nft_rt2_hdr_field_addr "\vaddr" contained skipwhite
-
+syn match nft_rt2_hdr_field_addr "addr" skipwhite contained
 syn cluster nft_c_rt2_hdr_field
 \ contains=
 \    nft_rt2_hdr_field_addr
 
 " rt2_hdr_expr (via exthdr_expr)
 hi link nft_rt2_hdr_expr nftHL_Statement
-syn match nft_rt2_hdr_expr "\vrt2" skipwhite contained
+syn match nft_rt2_hdr_expr "rt2" skipwhite contained
 \ nextgroup=@nft_c_rt2_hdr_field
 
-
-" rt0_hdr_field (via rt0_hdr_expr)
-hi link nft_rt0_hdr_field_addr_num nftHL_Action
-syn match nft_rt0_hdr_field_addr_num "\v[0-9]+" contained skipwhite
-
-hi link nft_rt0_hdr_field_addr_num_block nftHL_Command
+hi link nft_rt0_hdr_field_addr_num_block nftHL_Identifier
 " keepend because brackets should be on same line
-syn match nft_rt0_hdr_field_addr_num_block "\v\[\s*\d\s*\]" contained
+syn match nft_rt0_hdr_field_addr_num_block "\v\[\s*[0-9]+\s*\]\s*" contained keepend
+" Tough to highlight certain number inside a regex'd block, instead of a syntax region block"
 
-hi link nft_rt0_hdr_field_addr nftHL_Action
-syn match nft_rt0_hdr_field_addr "\vaddr" contained skipwhite
-\ nextgroup=nft_rt0_hdr_field_addr_num_block
+hi link nft_UnexpectedEmptyBrackets nftHL_Error
+syn match nft_UnexpectedEmptyBrackets "\v\[\s*\]" skipwhite contained " do not use 'keepend' here
 
-syn cluster nft_c_rt0_hdr_field
-\ contains=
-\    nft_rt0_hdr_field_addr
+hi link nft_rt0_hdr_field nftHL_Action
+syn match nft_rt0_hdr_field "addr" skipwhite contained
+\ nextgroup=
+\    nft_rt0_hdr_field_addr_num_block,
+\    nft_UnexpectedEmptyBrackets
 
 " rt0_hdr_expr (via exthdr_expr)
 hi link nft_rt0_hdr_expr nftHL_Statement
-syn match nft_rt0_hdr_expr "\vrt0" skipwhite contained
-\ nextgroup=@nft_c_rt0_hdr_field
-
+syn match nft_rt0_hdr_expr "rt0" skipwhite contained
+\ nextgroup=
+\    nft_rt0_hdr_field
 
 " rt_hdr_field (via rt_hdr_expr)
-hi link nft_rt_hdr_field_nexthdr nftHL_Action
-syn match nft_rt_hdr_field_nexthdr "\vnexthdr" contained skipwhite
-
-hi link nft_rt_hdr_field_hdrlength nftHL_Action
-syn match nft_rt_hdr_field_hdrlength "\vhdrlength" contained skipwhite
-
-hi link nft_rt_hdr_field_type nftHL_Action
-syn match nft_rt_hdr_field_type "\vtype" contained skipwhite
-
-hi link nft_rt_hdr_field_seg_left nftHL_Action
-syn match nft_rt_hdr_field_seg_left "\vseg_left" contained skipwhite
-
-syn cluster nft_c_rt_hdr_field
-\ contains=
+hi link nft_rt_hdr_field nftHL_Action
+syn match nft_rt_hdr_field "\v(nexthdr|hdrlength|type|seg\-left)" skipwhite contained
+\ nextgroup=
 \    nft_rt_hdr_field_nexthdr,
 \    nft_rt_hdr_field_hdrlength,
 \    nft_rt_hdr_field_type,
 \    nft_rt_hdr_field_seg_left
 
+syn cluster nft_c_rt_hdr_expr_keywords
+\ contains=nft_rt_hdr_field
+" \v(nexthdr|hdrlength|type|seg_left)" skipwhite contained
+" syn match nft_rt_hdr_expr_keywords "\v(nexthdr|hdrlength|type|seg\-left)" skipwhite contained
+
 " rt_hdr_expr (via exthdr_expr)
 hi link nft_rt_hdr_expr nftHL_Statement
-syn match nft_rt_hdr_expr "\vrt" skipwhite contained
-\ nextgroup=@nft_c_rt_hdr_field
-
+syn match nft_rt_hdr_expr "rt " skipwhite contained
+\ nextgroup=@nft_c_rt_hdr_expr_keywords
 
 " hdh_hdr_field (via hbh_hdr_expr)
 hi link nft_hbh_hdr_field_nexthdr nftHL_Action
@@ -374,10 +477,10 @@ syn match nft_hbh_hdr_expr "\vhbh" skipwhite contained
 syn cluster nft_c_exthdr_expr
 \ contains=
 \    nft_hbh_hdr_expr,
-\    nft_rt_hdr_expr,
 \    nft_rt0_hdr_expr,
 \    nft_rt2_hdr_expr,
 \    nft_rt4_hdr_expr,
+\    nft_rt_hdr_expr,
 \    nft_frag_hdr_expr,
 \    nft_dst_hdr_expr,
 \    nft_mh_hdr_expr
@@ -396,7 +499,7 @@ syn cluster nft_c_th_hdr_field
 
 " th_hdr_expr (via payload_expr, inner_inet_expr)
 hi link nft_th_hdr_expr nftHL_Statement
-syn match nft_th_hdr_expr "\vtransport_hdr" skipwhite contained
+syn match nft_th_hdr_expr "\vth" skipwhite contained
 \ nextgroup=@nft_c_th_hdr_field
 
 
@@ -440,7 +543,7 @@ syn cluster nft_c_sctp_chunk_common_field
 
 " sctp_chunk_type (via sctp_chunk_alloc)
 hi link nft_sctp_chunk_type nftHL_Action
-syn match nft_chunk_type /(data|init_ack|init|sack|heartbeat_ack|heartbeat|abort|shutdown_complete|shutdown_ack|error|cookie_echo|cookie_ack|ecne|cwr|shutdown|asconf_ack|forward_tsn|asconf)/ skipwhite contained
+syn match nft_chunk_type /(data|init\-ack|init|sack|heartbeat\-ack|heartbeat|abort|shutdown\-complete|shutdown\-ack|error|cookie\-echo|cookie\-ack|ecne|cwr|shutdown|asconf\-ack|forward\-tsn|asconf)/ skipwhite contained
 \ nextgroup=
 \    @sctp_c_chunk_common_field,
 \    nft_EOL
@@ -455,7 +558,7 @@ syn match nft_sctp_chunk_alloc_data_keyword "\vdata" skipwhite contained
 \ nextgroup=@nft_sctp_chunk_alloc_data_field
 
 " sctp_chunk_init_field
-syn match nft_c_sctp_chunk_init_field "\v(init_tag|a_rwnd|num_ostream|num_istreams|init_tsn)" skipwhite contained
+syn match nft_c_sctp_chunk_init_field "\v(init\-tag|a\-rwnd|num\-outbound\-stream|num_inbound\-streams|initial\-tsn)" skipwhite contained
 
 " sctp_chunk_alloc 'init' (via sctp_hdr_expr)
 syn match nft_sctp_chunk_alloc_init "\v(init_ack|init)" skipwhite contained
@@ -463,7 +566,7 @@ syn match nft_sctp_chunk_alloc_init "\v(init_ack|init)" skipwhite contained
 
 " sctp_chunk_alloc 'sack' (via sctp_hdr_expr)
 hi link nft_c_sctp_chunk_sack_field nftHL_Action
-syn match nft_c_sctp_chunk_sack_field "\v(cum_tsn_ack|a_rwnd|num_gack_blocks|num_dup_tsns)" skipwhite contained
+syn match nft_c_sctp_chunk_sack_field "\v(cum\-tsn\-ack|a\-rwnd|num\-gap\-ack\-blocks|num\-dup\-tsns)" skipwhite contained
 
 " sctp_chunk_alloc 'sack' (via sctp_hdr_expr)
 hi link nft_sctp_chunk_sack nftHL_Action
@@ -517,7 +620,7 @@ syn cluster nft_c_sctp_chunk_alloc
 \    nft_sctp_chunk_type,
 \    nft_sctp_chunk_alloc_data,
 \    nft_sctp_chunk_alloc_init,
-\    nft_sctp_chunk_alloc_sack
+\    nft_sctp_chunk_alloc_sack,
 \    nft_sctp_chunk_alloc_shutdown,
 \    nft_sctp_chunk_alloc_ecne_cwr,
 \    nft_sctp_chunk_alloc_asconf_ack,
@@ -577,7 +680,7 @@ syn match nft_tcp_hdr_option_sack "\v(sack0|sack1|sack2|sack3|sack)" skipwhite c
 
 " tcp_hdr_option_type (via optstrip_stmt, tcp_hdr_expr, tcp_hdr_option)
 hi link nft_tcp_hdr_option_types nftHL_Action
-syn match nft_tcp_hdr_option_types "\v(echo|eol|fastopen|md5sig|mptcp|mss|nop|sack_perm|timestamp|window|num)" skipwhite contained
+syn match nft_tcp_hdr_option_types "\v(echo|eol|fastopen|md5sig|mptcp|mss|nop|sack\-permitted|timestamp|window|num)" skipwhite contained
 syn cluster nft_c_tcp_hdr_option_type
 \ contains=
 \    nft_tcp_hdr_option_sack,
@@ -661,7 +764,7 @@ hi link nft_geneve_hdr_expr nftHL_Action
 syn match nft_geneve_hdr_expr "\vgeneve" skipwhite contained
 \ nextgroup=
 \    nft_geneve_hdr_field,
-"\    nft_c_inner_expr
+\    nft_c_inner_expr
 
 " vxlan_hdr_field (via vxlan_hdr_expr)
 hi link nft_vxlan_hdr_field nftHL_Action
@@ -672,15 +775,15 @@ hi link nft_vxlan_hdr_expr nftHL_Action
 syn match nft_vxlan_hdr_expr "\vvxlan" skipwhite contained
 \ nextgroup=
 \    nft_vxlan_hdr_field,
-"\    nft_c_inner_expr
+\    nft_c_inner_expr
 
 " ETHER ETHER ETHER ETHER
 " arp_hdr_field_addr_ether (via arp_hdr_field)
-hi link nft_arp_hdr_field_addr_ether
+hi link nft_arp_hdr_field_addr_ether nftHL_Action
 syn match nft_arp_hdr_field_addr_ether "\vether" skipwhite contained
 
 " arp_hdr_field_ip_ether (via arp_hdr_field)
-hi link nft_arp_hdr_field_ip_ether
+hi link nft_arp_hdr_field_ip_ether nftHL_Action
 syn match nft_arp_hdr_field_ip_ether "\vip" skipwhite contained
 
 " arp_hdr_field_addrs 'saddr'/'daddr' (via arp_hdr_field)
@@ -821,7 +924,7 @@ syn match nft_auth_hdr_expr "\vauth" skipwhite contained
 
 " icmp6_hdr_field (via icmp6_hdr_expr)
 hi link nft_icmp6_hdr_field nftHL_Statement
-syn match nft_icmp6_hdr_field "\v(type|code|checksum|pptr|mtu|id|sequence|maxdelay|taddr|daddr)" skipwhite contained
+syn match nft_icmp6_hdr_field "\v(type|code|checksum|param\-problem|mtu|id|sequence|max\-delay|taddr|daddr)" skipwhite contained
 
 " icmp6_hdr_expr (via inner_inet_expr, payload_expr)
 hi link nft_icmp6_hdr_expr nftHL_Statement
@@ -884,44 +987,65 @@ syn match nft_ip_hdr_expr "\vip" skipwhite contained
 \    nft_ip_hdr_field,
 \    nft_ip_hdr_expr_option
 
+hi link nft_payload_raw_len nftHL_Number
 syn match nft_payload_raw_len "\v\d+" skipwhite contained
+hi link nft_payload_raw_len_via_payload_expr_set nftHL_Number
+syn match nft_payload_raw_len_via_payload_expr_set "\v\d+" skipwhite contained
 
+hi link nft_payload_raw_expr_comma2 nftHL_Operator
 syn match nft_payload_raw_expr_comma2 "\v," skipwhite contained
 \ nextgroup=nft_payload_raw_len
+hi link nft_payload_raw_expr_comma2_via_payload_expr_set nftHL_Operator
+syn match nft_payload_raw_expr_comma2_via_payload_expr_set "\v," skipwhite contained
+\ nextgroup=nft_payload_raw_len
 
+hi link nft_payload_raw_expr_num nftHL_Number
 syn match nft_payload_raw_expr_num "\v\d+" skipwhite contained
 \ nextgroup=nft_payload_raw_expr_comma2
+hi link nft_payload_raw_expr_num_via_payload_expr_set nftHL_Number
+syn match nft_payload_raw_expr_num_via_payload_expr_set "\v\d+" skipwhite contained
+\ nextgroup=nft_payload_raw_expr_comma2_via_payload_expr_set
 
+hi link nft_payload_raw_expr_comma1 nftHL_Operator
 syn match nft_payload_raw_expr_comma1 "\v," skipwhite contained
 \ nextgroup=nft_payload_raw_expr_num
+hi link nft_payload_raw_expr_comma1_via_payload_expr_set nftHL_Operator
+syn match nft_payload_raw_expr_comma1_via_payload_expr_set "\v," skipwhite contained
+\ nextgroup=nft_payload_raw_expr_num_via_payload_expr_set
 
 " payload_base_spec (via payload_raw_expr)
 hi link nft_payload_base_spec nftHL_Action
-syn match nft_payload_base_spec "\vll_hdr|network_hdr|transport_hdr|string" skipwhite contained
+syn match nft_payload_base_spec "\vll|nh|th|string" skipwhite contained
 \ nextgroup=nft_payload_raw_expr_comma1
+hi link nft_payload_base_spec_via_payload_expr_set nftHL_Action
+syn match nft_payload_base_spec_via_payload_expr_set "\vll|nh|th|string" skipwhite contained
+\ nextgroup=nft_payload_raw_expr_comma1_via_payload_expr_set
 
 " payload_raw_expr (via payload_expr)
 hi link nft_payload_raw_expr nftHL_Action
 syn match nft_payload_raw_expr "\vat" skipwhite contained
 \ nextgroup=nft_payload_base_spec
+hi link  nft_payload_raw_expr_via_payload_expr_set nftHL_Action
+syn match  nft_payload_raw_expr_via_payload_expr_set "\vat" skipwhite contained
+\ nextgroup=nft_payload_base_spec_via_payload_expr_set
 
 " inner_inet_expr (via gre_hdr_expr, inner_expr)
 syn cluster nft_c_inner_inet_expr
 \ contains=
+\    nft_ip_hdr_expr,
+\    nft_icmp_hdr_expr,
+\    nft_igmp_hdr_expr,
+\    nft_ip6_hdr_expr,
+\    nft_icmp6_hdr_expr,
+\    nft_auth_hdr_expr,
+\    nft_esp_hdr_expr,
+\    nft_comp_hdr_expr,
+\    nft_udp_hdr_expr,
+\    nft_udplite_hdr_expr,
 \    nft_tcp_hdr_expr,
 \    nft_dccp_hdr_expr,
 \    nft_sctp_hdr_expr,
 \    nft_th_hdr_expr
-"\    nft_ip_hdr_expr,
-"\    nft_icmp_hdr_expr,
-"\    nft_igmp_hdr_expr,
-"\    nft_ip6_hdr_expr,
-"\    nft_icmp6_hdr_expr,
-"\    nft_auth_hdr_expr,
-"\    nft_esp_hdr_expr,
-"\    nft_comp_hdr_expr,
-"\    nft_udp_hdr_expr,
-"\    nft_udplite_hdr_expr,
 
 " inner_expr (via geneve_hdr_expr, gretap_hdr_expr, vxlan_hdr_expr)
 syn cluster nft_c_inner_expr
@@ -929,49 +1053,127 @@ syn cluster nft_c_inner_expr
 \    @nft_c_inner_eth_expr,
 \    @nft_c_inner_inet_expr
 
-" payload_expr (via payload_stmt, primary_expr, primary_stmt_expr)
-syn cluster nft_c_payload_expr
-\ contains=
-\    nft_payload_raw_expr
-"\    nft_eth_expr,
-"\    nft_vlan_expr,
-"\    nft_arp_expr,
-"\    nft_ip_expr,
-"\    nft_icmp_expr,
-"\    nft_igmp_expr,
-"\    nft_ip6_expr,
-"\    nft_icmp6_expr,
-"\    nft_auth_expr,
-"\    nft_esp_expr,
-"\    nft_comp_expr,
-"\    nft_udp_expr,
-"\    nft_udplite_expr,
-"\    nft_tcp_expr,
-"\    nft_dccp_expr,
-"\    nft_sctp_expr,
-"\    nft_th_expr,
-"\    nft_vxlan_expr,
-"\    nft_geneve_expr,
-"\    nft_gre_expr,
-"\    nft_gretap_expr
 
-" payload_stmt
-syn cluster nft_c_payload_stmt
+" NEED TO DUPLICATE in payload_stmt but without nextgroup='set'
+" Add 'nextgroup=nft_payload_stmt_set' toward each here
+" payload_expr (via payload_stmt, *primary_expr*, primary_stmt_expr)
+syn cluster nft_c_payload_expr_via_primary_expr
 \ contains=
-"
+\    nft_payload_raw_expr,
+\    nft_eth_hdr_expr,
+\    nft_vlan_hdr_expr,
+\    nft_arp_hdr_expr,
+\    nft_ip_hdr_expr,
+\    nft_icmp_hdr_expr,
+\    nft_igmp_hdr_expr,
+\    nft_ip6_hdr_expr,
+\    nft_icmp6_hdr_expr,
+\    nft_auth_hdr_expr,
+\    nft_esp_hdr_expr,
+\    nft_comp_hdr_expr,
+\    nft_udp_hdr_expr,
+\    nft_udplite_hdr_expr,
+\    nft_tcp_hdr_expr,
+\    nft_dccp_hdr_expr,
+\    nft_sctp_hdr_expr,
+\    nft_th_hdr_expr,
+\    nft_vxlan_hdr_expr,
+\    nft_geneve_hdr_expr,
+\    nft_gre_hdr_expr,
+\    nft_gretap_hdr_expr
+
+" nft_payload_expr_basic_stmt_expr
+syn region nft_payload_expr_basic_stmt_expr start="(" end=")" skipwhite keepend contained
+"\ contains=nft_c_basic_stmt_expr
+
+hi link nft_integer_expr nftHL_Number
+syn match nft_integer_expr "\v\d+" skipwhite contained
+
+" NEED TO DUPLICATE in primary_stmt but without nextgroup='set'
+" Add 'nextgroup=nft_payload_stmt_set' toward each here
+" payload_expr (via payload_stmt, primary_expr, *primary_stmt_expr*)
+syn cluster nft_c_payload_expr_via_primary_stmt_expr
+\ contains=
+\    nft_payload_raw_expr,
+\    nft_eth_hdr_expr,
+\    nft_vlan_hdr_expr,
+\    nft_arp_hdr_expr,
+\    nft_ip_hdr_expr,
+\    nft_icmp_hdr_expr,
+\    nft_igmp_hdr_expr,
+\    nft_ip6_hdr_expr,
+\    nft_icmp6_hdr_expr,
+\    nft_auth_hdr_expr,
+\    nft_esp_hdr_expr,
+\    nft_comp_hdr_expr,
+\    nft_udp_hdr_expr,
+\    nft_udplite_hdr_expr,
+\    nft_tcp_hdr_expr,
+\    nft_dccp_hdr_expr,
+\    nft_sctp_hdr_expr,
+\    nft_th_hdr_expr,
+\    nft_vxlan_hdr_expr,
+\    nft_geneve_hdr_expr,
+\    nft_gre_hdr_expr,
+\    nft_gretap_hdr_expr
+
+hi link nft_symbol_stmt_expr_nested_comma namedHL_Type
+syn match nft_symbol_stmt_expr_nested_comma /,/ skipwhite skipnl skipempty contained
+\ nextgroup=
+\    nft_symbol_stmt_expr_recursive,
+\    nft_symbol_stmt_expr_nested_commma
+
+" stmt_expr/symbol_stmt_expr
+syn cluster nft_symbol_stmt_expr
+\ contains=nft_symbol_stmt_expr_nested_comma
+
+
+" keyword_expr (via primary_rhs_expr, primary_stmt_expr, symbol_stmt_expr)
+syn match nft_c_keyword_expr "\v(ether|ip6|ip |vlan|arp|dnat|snat|ecn|reset|destroy|original|reply|label|last)" skipwhite contained
+
+" symbol_expr (via primary_expr, primary_rhs_expr, primary_stmt_expr, symbol_stmt_expr)
+syn cluster nft_c_symbol_expr
+\ contains=
+\    nft_variable_expr,
+\    nft_string
+
+" symbol_stmt_expr (via stmt_expr)
+syn cluster nft_c_symbol_stmt_expr
+\ contains=
+\    nft_symbol_expr,
+\    nft_keyword_expr
+
+" stmt_expr (via ct_stmt, dup_stmt, fwd_stmt, masq_stmt_args, meta_stmt, nat_stmt,
+"                objref_stmt_counter, objref_stmt_ct, objref_stmt_limit, objref_stmt_quota,
+"                objref_stmt_synproxy, payload_stmt, redir_stmt_arg, tproxy_stmt)
+syn cluster nft_c_stmt_expr
+\ contains=
+\    symbol_stmt_expr
+"\    map_stmt_expr,
+"\    multiton_stmt_expr,
+
+" symbol_stmt_expr ',' (via stmt_expr)
+hi link nft_symbol_stmt_expr_recursive nftHL_Operator
+syn match nft_symbol_stmt_expr_recursive "," skipwhite contained
+\ contains=
+\    nft_symbol_stmt_expr,
+\    nft_symbol_stmt_expr_nested_comma
+\ nextgroup=
+\    nft_symbol_stmt_expr_nested_comma,
+\    nft_symbol_stmt_expr_recursive
+
+syn cluster nft_c_stmt_expr
+\ contains=nft_symbol_stmt_expr
+
+" primary_expr (via primary_stmt, primary_expr, primary_stmt_expr)
 syn cluster nft_c_primary_expr
 \ contains=
+\    nft_integer_expr,
+\    @nft_c_payload_expr,
 \    @nft_c_exthdr_expr,
-\    nft_exthdr_exists_expr
-
-hi link nft_base_cmd_describe nftHL_Command
-syn match nft_base_cmd_describe "\vdescribe" skipwhite contained
-\ nextgroup=
-\    @nft_c_primary_expr
+\    nft_exthdr_exists_expr,
+\    nft_meta_expr,
 "\    nft_symbol_expr,
-"\    nft_integer_expr,
-"\    nft_payload_expr,
-"\    nft_meta_expr,
 "\    nft_socket_expr,
 "\    nft_rt_expr,
 "\    nft_ct_expr,
@@ -982,19 +1184,95 @@ syn match nft_base_cmd_describe "\vdescribe" skipwhite contained
 "\    nft_xfrm_expr,
 "\    nft_basic_expr
 
-""""""""""""""""" BASE CMD """""""""""""""""""""""""""""""""""""
+" payload_stmt <payload_expr> 'set' (via payload_stmt <payload_expr>)
+hi link nft_payload_stmt_before_set nftHL_Statement
+syn match nft_payload_stmt_before_set "\vset" skipwhite contained
+\ nextgroup=nft_stmt_expr
 
-hi link nft_comment nftHL_Comment
-syn region nft_comment start="^\s*#" end="$" contained
+" payload_stmt <payload_expr> (via payload_stmt)
+syn cluster nft_c_payload_expr_via_payload_stmt
+\ contains=
+\    nft_payload_raw_expr_via_payload_expr_set,
+\    nft_eth_hdr_expr_via_payload_expr_set,
+\    nft_vlan_hdr_expr_via_payload_expr_set,
+\    nft_arp_hdr_expr_via_payload_expr_set,
+\    nft_ip_hdr_expr_via_payload_expr_set,
+\    nft_icmp_hdr_expr_via_payload_expr_set,
+\    nft_igmp_hdr_expr_via_payload_expr_set,
+\    nft_ip6_hdr_expr_via_payload_expr_set,
+\    nft_icmp6_hdr_expr_via_payload_expr_set,
+\    nft_auth_hdr_expr_via_payload_expr_set,
+\    nft_esp_hdr_expr_via_payload_expr_set,
+\    nft_comp_hdr_expr_via_payload_expr_set,
+\    nft_udp_hdr_expr_via_payload_expr_set,
+\    nft_udplite_hdr_expr_via_payload_expr_set,
+\    nft_tcp_hdr_expr_via_payload_expr_set,
+\    nft_dccp_hdr_expr_via_payload_expr_set,
+\    nft_sctp_hdr_expr_via_payload_expr_set,
+\    nft_th_hdr_expr_via_payload_expr_set,
+\    nft_vxlan_hdr_expr_via_payload_expr_set,
+\    nft_geneve_hdr_expr_via_payload_expr_set,
+\    nft_gre_hdr_expr_via_payload_expr_set,
+\    nft_gretap_hdr_expr_via_payload_expr_set
 
-"""""""""""""""" TOP-LEVEL SYNTAXES """"""""""""""""""""""""""""
-" `line` main top-level syntax, do not add 'contained' here.
-syn match nft_line '^\v'
+hi link nft_payload_stmt nftHL_Statement
+syn cluster nft_c_payload_stmt
+\ contains=@nft_c_payload_expr_via_payload_stmt
+
+" base_cmd 'describe' (via line)
+hi link nft_base_cmd_describe nftHL_Command
+syn match nft_base_cmd_describe "\vdescribe" skipwhite contained
 \ nextgroup=
+\    @nft_c_primary_expr,
+
+
+
+"
+" markup_format (via monitor_cmd '@nft_c_monitor_object'
+hi link nft_markup_format nftHL_Number
+syn match nft_markup_format "\v(xml|json|vm\s+json)" skipwhite contained
+
+" monitor_format via monitor_cmd '@nft_c_monitor_object'
+syn cluster nft_c_monitor_format
+\ contains=
+\    nft_markup_format,
+\    nft_EOL
+
+" monitor_object via monitor_cmd '@nft_c_monitor_event'
+hi link nft_monitor_object nftHL_Expression
+syn match nft_monitor_object "\v(tables|chains|sets|rules(et)?|elements|trace)" skipwhite contained
+\ nextgroup=
+\    nft_markup_format,
+\    nft_monitor_format
+
+" monitor_event (via monitor_cmd)
+hi link nft_monitor_event_object_format nftHL_Operator
+syn match nft_monitor_event_object_format "\v(xml|json|vm\s+json)|((tables|chains|sets|rules[et]|elements|trace)(\s{1,15}(xml|json|vm\s+json))?)" skipwhite keepend contained
+syn match nft_monitor_event_object_format "\v(xml|json|vm\s+json)|((tables|chains|sets|rules(et)?|elements|trace)(\s{1,15}(xml|json|vm\s+json))?)|([a-zA-Z0-9\_\-]+(\s+)?)" skipwhite keepend contained
+\ contains=
+\    nft_identifier,
+\    nft_monitor_object,
+\    nft_markup_format
+\ nextgroup=
+\    nft_monitor_object,
+\    nft_markup_format
+
+" monitor_cmd monitor_event (via base_cmd)
+syn cluster nft_c_monitor_cmd 
+\    add=nft_monitor_event_object_format  " NESTING: we do not include nft_monitor_object nor nft_monitor_format here ... yet
+
+" base_cmd 'monitor' (via line)
+hi link nft_base_cmd_monitor nftHL_Command
+syn match nft_base_cmd_monitor "\vmonitor" skipwhite contained
+\ nextgroup=
+\    @nft_c_monitor_cmd
+
+""""""""""""""""" BASE CMD """""""""""""""""""""""""""""""""""""
+" base_cmd 
+syn cluster nft_c_base_cmd
+\ contains=
 \    nft_base_cmd_describe,
-\    nft_stmt_separator,
-\    nft_comment,
-\    nft_common_block
+\    nft_base_cmd_monitor,
 "\    nft_base_cmd_add,
 "\    nft_base_cmd_replace,
 "\    nft_base_cmd_create,
@@ -1007,9 +1285,36 @@ syn match nft_line '^\v'
 "\    nft_base_cmd_rename,
 "\    nft_base_cmd_import,
 "\    nft_base_cmd_export,
-"\    nft_base_cmd_monitor,
 "\    nft_base_cmd_destroy,
-"\    nft_stmt_separator,
+
+hi link nft_comment_whole_line nftHL_Comment
+syn match nft_comment_whole_line "^\s*#.*$" keepend contained
+
+"""""""""""""""" TOP-LEVEL SYNTAXES """"""""""""""""""""""""""""
+" `line` main top-level syntax, do not add 'contained' here.
+syn match nft_line '^\v'
+\ nextgroup=
+\    @nft_c_common_block,
+\    nft_stmt_separator,
+\    @nft_c_base_cmd,
+\    nft_comment_whole_line,
+
+" opt_newline (via flowtable_expr, set_expr, set_list_member_expr, verdict_map_expr,
+"                  verdict_map_list_member_exp)
+syn match nft_opt_newline "\v[\n]*" skipwhite contained
+
+" common_block (via chain_block, counter_block, ct_expect_block, ct_helper_block,
+"                   ct_timeout_block, flowtable_block, limit_block, line, map_block,
+"                   quota_block, secmark_block, set_block, synproxy_block, table_block
+syn cluster nft_c_common_block
+\ contains=
+\    nft_include,
+\    nft_common_block_define,
+\    nft_common_block_redefine,
+\    nft_common_block_undefine,
+\    nft_stmt_separator,
+\    nft_EOL
+"\    nft_InlineComment,
 
 """""""""""""""""""""" END OF SYNTAX """"""""""""""""""""""""""""
 
