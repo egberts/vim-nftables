@@ -1,5 +1,5 @@
 
-When setting verbosity, the level are described below:
+When setting verbosity for an edit session in `vim`, the level are described below:
 
 ```vim
 :verbose 20
