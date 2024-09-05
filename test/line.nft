@@ -1,0 +1,39 @@
+#!/usr/sbin/nft -f
+# File: line.nft
+# Description: A test NFT file to exercise Vim syntax highlightings for 'line' group.
+#
+
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+# line
+#
+# line common_block 'include' <QUOTED_STRING>
+include "filespec"
+include "filename.filetype"
+include "directory/filename.filetype"
+include "https://directory/filename.filetype"
+
+# line common_block 'define' identifier '=' initializer_expr
+#
+# line common_block 'redefine' identifier '=' initializer_expr
+
+# line common_block 'undefine' identifier 
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+define ABC = 1  # missing stmt_separator
+define A = $ABC  # missing stmt_separator
+redefine A = 123  # missing stmt_separator
+redefine A = $ABC  # missing stmt_separator
+undefine ABC
+undefine A

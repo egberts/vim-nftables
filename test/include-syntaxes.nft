@@ -1,0 +1,45 @@
+#!/usr/sbin/nft -f
+# File: all-syntaxes.nft
+# Description: A test NFT file to exercise all Vim syntax highlightings.
+#
+# This is the part where you can add your own esoteric setting(s) if it breaks
+# the vim syntax highlighter for NFTABLES (yet `nft` takes it in just normally).
+# TODO: More todo, FIXME, FIXME: TODO: xxx XXX ARGH!
+
+
+# <common_block>
+# INCLUDE
+include ";;;;;;;;;;";
+include "Fil'espec"
+include "Filespec"
+include "Filespec"     
+include "File spec" # space in filename
+include "Filespec";
+include " Filespec";  # space at pos 0
+include " Filespec ";  # space at pos 0 & len-1
+include "Filespec ";  # space at pos len-1
+include "Filespec" ;
+include "Filespec";   
+include "Filespec"  ;
+include "Filespec"  ;   
+include "Filespec"# inline comment
+include "Filespec"        # inline comment
+include "Filespec";   # inline comment
+include "Filespec";      # inline comment
+include "Filespec???<>|\~`!@#$%^&*()\=+{}] /;:,._0123abcXYZ"  ;   # inline comment
+include "Filespec"  ;      # inline comment
+include "File\"spec";  # OK, double-quote inside double-quotes
+# include "./defines.nft"
+
+#
+#  ERROR SYNTAX (intentional)
+#  They should not be highlighted
+# SYNTAX ERRORS GOES PAST HERE
+
+include Filespec  # intentional syntax error
+include 'Filespec'  # intentional syntax error
+include 'Fil"espec'  # intentional syntax error
+include "Filespec" bad stuff oppsie  # intentional syntax error
+include "Filespec"  oopsie  # intentional syntax error
+include "Filespec"  oopsie  ;  # intentional syntax error
+
