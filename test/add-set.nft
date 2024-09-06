@@ -1,0 +1,45 @@
+#!/usr/sbin/nft -f
+# File: all-set
+# Description: A test NFT file to exercise '[add] set' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'set' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_set
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# base_cmd add_cmd 'set'
+
+set T C
+set ip S
+set T C ;
+set ip T C { typeof b };
+set T C { typeof a.b.c.d.e.f };
+set T C { flags constant }
+set T C { flags interval; }
+set T C { flags timeout };
+set T C { flags dynamic ; } ;
+set T C { flags constant, interval, timeout, dynamic };
+set T C { flags constant; flags interval; flags timeout; flags dynamic };
+set T C { timeout 15:00:01 }
+set T C { gc-interval 1:00:1 }
+set T C { elements = 1:00:1 }
+set T C { automerge }
+set T C { comment *A comment string* }
+set T C { comment "A comment string" }
+set T C { comment 'A comment string' }
+set T C { comment single-word }
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################

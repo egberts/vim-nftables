@@ -10,13 +10,13 @@
 ##################################################################################
 
 # base_cmd add_cmd 'table' table_spec family_spec family_spec_explicit
-table ip
-table ip6
-table inet
-table bridge
-table netdev
-table arp
-table T
+table ip  # that one creates an empty table
+table ip6  # that one creates an emtpy table
+table inet  # that one creates an empty table
+table bridge  # that one creates an empty table
+table netdev  # that one creates an empty table
+table arp  # that one creates an empty table
+table T  # that one creates an empty table
 # base_cmd add_cmd 'table' table_spec identifier <STRING>
 table xxxx
 # base_cmd add_cmd 'table' table_spec identifier 'last'
@@ -50,8 +50,11 @@ table T {
 }
 # base_cmd add_cmd 'table' table_spec table_block common_block 'undefine'
 table T { undefine A }
+table xxxx { undefine abc ; }
+table xxxx { undefine abc ; } ; 
 
 # base_cmd add_cmd 'table' table_spec table_block table_options 'comment'
+# base_cmd add_cmd 'table' table_spec table_block 'comment' string
 table T { comment Hello } 
 table bridge T { comment 'Hello world!' }
 table T { comment "Hello world!" }
@@ -61,37 +64,66 @@ table xxxx { comment 'test' };
 table T { comment *Hello world!* ;  }
 table arp xxxx { comment test;  };
 
-# base_cmd add_cmd 'table' table_spec table_block table_options 'flags'
-table T { flags flag_1 }
-table T { flags flag_2, flag_3 }
+# base_cmd add_cmd 'table' table_spec table_block 'policy' 'offload'
+# base_cmd add_cmd 'table' table_spec table_block hook_spec 'type' 
+# base_cmd add_cmd 'table' table_spec table_block 'flags' flag_spec
+table T { flags member_1 }
+table T { flags member_2, member_3 }
 # base_cmd add_cmd 'table' table_spec table_block { table_options ';' }
-table T { flags flag_1 } ;
+table T { flags member_1 } ;
 table ip xxxx { flags a, b, c};
+table xxxx { ; flags a, b, c; comment "new stuff"; };
+table T { flags a, b, c; chain C { type ; }; };
 
+# base_cmd add_cmd 'table' table_spec table_block 'rule' rule
+# base_cmd add_cmd 'table' table_spec table_block 'devices=' rule
 ######################
+table T { devices = eth0 }
 
 table T { comment "unique, uh?"; flags a, b, c; chain C { type ; }; };
-table ip MyTable { chain C { type filter hook ingress devices = { a }; };
-table xxxx { ; flags a, b, c; comment "new stuff"; };
-# nft_line/nft_c_base_cmd/nft_base_cmd_add/nft_add_table_spec
 table xxxx {
     comment test;
     include "add-more-table-xxxx.nft";
 };
 
-table T { flags a, b, c; chain C { type ; }; };
+table T { chain last }
+table T { chain last; }
+table T { chain last; };
+table xxxx { 
+    chain last  
+}
+table xxxx { 
+    chain last; };
+table T { chain C }
+table T { chain C };
+table T { chain C ; } ;
+table T { chain C ; } ;
+table T { chain C { }; };
+
+
+# nft_line/nft_c_base_cmd/nft_base_cmd_add/nft_add_table_spec
+add table ip T { ip chain C { type ; }; };   # supposed to be highlighted (incomplete type)
 table T { chain C { type filter hook ingress device $MY_DEVICE ; }; };
 table T { chain C { type filter hook ingress device $MY_DEVICE ; }; };
 table T { chain C { type filter hook ingress devices = $MY_DEVICE ; }; };
 table T { chain C { type filter hook ingress devices = $MY_DEVICE }; };
 table T { chain C { type filter hook ingress devices = { a }; };
+table ip MyTable { chain C { type filter hook ingress devices = { a }; };
 table T { chain C { type filter hook ingress device eth0 priority 256 }; };
 table T { chain C { type filter hook ingress device eth0 priority 1; } };
 table T { chain C { type filter hook ingress device eth0 priority 1; } };
 add table T { chain C { type filter hook ingress device eth0 priority 1; }; };
+
 table T { chain C { policy $MYPOLICY; };};
 table T { chain C { policy accept; };};
-table xxxx { chain last ;};
+table T { chain C { flags offload; }; };
+table T { chain C { comment "asdf" ;  }; };
+table T { chain C { rule define = 1; comment "asdf" ;  }; };
+table T { chain C { devices = eth0;  } }
+table T { chain C { devices = $eth0;  }; };
+table T { chain C { devices = $MYDEVICE;  }; };
+table T { chain C { devices = { eth0 } }; };
+
 table myIpTable { flags dormant; }
 table netdev myNetdev { flags dormant; }
 table bridge myBridge { flags dormant; }
@@ -99,11 +131,9 @@ table arp myArpTable { flags dormant; }
 table ip myIpTable { flags dormant; }
 table ip6 myIp6Table { flags dormant; }
 table inet myInetTable { flags dormant; }
-table xxxx { undefine abc; chain last { undefine abc; }; };
-table xxxx { undefine abc }
-table xxxx { 
-    chain last; };
+# END OF WORK
 
+table xxxx { undefine abc; chain last { undefine abc; }; };
 table inet MyIpNet {
     chain MyForwardChain {
         type filter hook prerouting device wlan0 priority 1;
@@ -794,7 +824,6 @@ add table my_./\IpTable    # defaults to 'ip' family
 ##################################################################################
 table xxxx { chain 'MyIpNet' { chain }; };
 table xxxx { chain "MyIpNet" { chain }; };
-add table ip T { ip chain C { type ; }; };
 ( describe 1; );
 table xxxx { flags ,, b, c };  " oopsie
 table xxxx { flags a, b,  };  " oopsie
