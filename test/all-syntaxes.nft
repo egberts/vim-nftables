@@ -28,10 +28,10 @@ table ip MyTable { chain C { type filter hook ingress devices = { a }; };
 table inet MyIpNet {
     chain MyForwardChain {
         type filter hook prerouting device wlan0 priority 1;
-        flags a, b, c;
-        policy abc;
-        policy abc drop;
-        policy abc allow;
+        flags offload;
+        policy $IDENTIFIER;
+        policy drop;
+        policy accept;
     }
     flags a, b, c
     comment "unique"

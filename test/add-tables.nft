@@ -10,6 +10,8 @@
 ##################################################################################
 
 # base_cmd add_cmd 'table' table_spec family_spec family_spec_explicit
+add table filter
+
 table ip  # that one creates an empty table
 table ip6  # that one creates an emtpy table
 table inet  # that one creates an empty table

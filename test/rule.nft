@@ -1,0 +1,37 @@
+#!/usr/sbin/nft -f
+# File: rule
+# Description: A test NFT file to exercise '[add] rule' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'rule' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_rule
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# base_cmd add_cmd 'rule'
+
+add rule      ip      T      C      position      1 comment "oh well"
+add rule ip6 T C handle 2
+add rule arp T C index 3
+add rule inet T C position 4
+add rule bridge T C position 55555
+add rule netdev T C position 6
+add rule T C index 1 comment "a comment quote"
+rule T C handle 2
+T C position 12 comment "yet another comment"
+T C handle 12
+T C index 12
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
