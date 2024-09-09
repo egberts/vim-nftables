@@ -117,13 +117,17 @@ table T { chain C { type filter hook ingress device eth0 priority 1; } };
 add table T { chain C { type filter hook ingress device eth0 priority 1; }; };
 
 table T { chain C { policy $MYPOLICY; };};
+table T { chain C { policy drop; };};
 table T { chain C { policy accept; };};
 table T { chain C { flags offload; }; };
 table T { chain C { comment "asdf" ;  }; };
 table T { chain C { rule define = 1; comment "asdf" ;  }; };
+table T { chain C { devices=$MYDEVICE;  }; };
+table T { chain C { devices =$MYDEVICE;  }; };
+table T { chain C { devices= $MYDEVICE;  }; };
 table T { chain C { devices = eth0;  } }
-table T { chain C { devices = $eth0;  }; };
-table T { chain C { devices = $MYDEVICE;  }; };
+table T { chain C { devices =    $eth0;  }; };
+table T { chain C { xxx devices = $MYDEVICE;  }; };
 table T { chain C { devices = { eth0 } }; };
 
 table myIpTable { flags dormant; }
@@ -139,10 +143,9 @@ table xxxx { undefine abc; chain last { undefine abc; }; };
 table inet MyIpNet {
     chain MyForwardChain {
         type filter hook prerouting device wlan0 priority 1;
-        flags a, b, c;
-        policy abc;
-        policy abc drop;
-        policy abc allow;
+        flags offload;
+        policy drop;
+        policy accept;
     }
     flags a, b, c
     comment "unique"
@@ -152,10 +155,6 @@ table xxxx { chain last {
     include "file";
     define a = 123;
 }; };
-table xxxx { chain MyIpNet {
-    chain last;  # oopsie
-    };
-};
 table arp A0b_._/RP_TABLE {
     chain ARP_INPUT_FILTER {
        type filter hook input priority 0;
@@ -836,3 +835,7 @@ table T { chain C { type filter hook ingress ; }; };  # incomplete
 table T { chain C { type filter hook ingress devices ; }; };  # incomplete
 table T { chain C { type filter hook ingress devices = ; }; };  # incomplete
 table T { chain C { type filter hook ingress device eth0 priority ; }; };  # incomplete
+table xxxx { chain MyIpNet {
+    chain last;  # oopsie
+    };
+};

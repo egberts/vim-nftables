@@ -12,11 +12,12 @@
 # base_cmd add_cmd 'rule'
 
 add rule      ip      T      C      position      1 comment "oh well"
-add rule ip6 T C handle 2
+add rule ip6 filter input handle 2
 add rule arp T C index 3
 add rule inet T C position 4
 add rule bridge T C position 55555
 add rule netdev T C position 6
+add rule netdev Tabcdef Charger position 6
 add rule T C index 1 comment "a comment quote"
 rule T C handle 2
 T C position 12 comment "yet another comment"

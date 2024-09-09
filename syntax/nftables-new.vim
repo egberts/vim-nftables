@@ -1500,12 +1500,6 @@ syn match nft_add_table_table_block_chain_block_hook_spec "type" keepend skipwhi
 \ nextgroup=nft_add_table_table_block_chain_block_hook_spec_type_id
 
 " add_cmd 'table' table_block 'chain' chain_block policy_spec 'policy' variable_expr
-hi link   nft_add_table_table_block_chain_chain_policy_spec_policy_expr_variable_expr_identifier nftHL_Identifier
-syn match nft_add_table_table_block_chain_chain_policy_spec_policy_expr_variable_expr_identifier
-\ "\v[A-Za-z0-9\-\_]{1,64}" skipwhite contained
-\ nextgroup=nft_Semicolon
-
-" add_cmd 'table' table_block 'chain' chain_block policy_spec 'policy' variable_expr
 hi link   nft_add_table_table_block_chain_chain_policy_spec_policy_expr_variable_expr_variable nftHL_Variable
 syn match nft_add_table_table_block_chain_chain_policy_spec_policy_expr_variable_expr_variable
 \ "\v\$[A-Za-z0-9\-\_]{1,64}" skipwhite contained
@@ -1520,8 +1514,7 @@ syn match nft_add_table_table_block_chain_chain_policy_spec_policy_expr_chain_po
 syn cluster nft_c_add_table_table_block_chain_chain_policy_spec_policy_expr
 \ contains=
 \    nft_add_table_table_block_chain_chain_policy_spec_policy_expr_chain_policy,
-\    nft_add_table_table_block_chain_chain_policy_spec_policy_expr_variable_expr_variable,
-\    nft_add_table_table_block_chain_chain_policy_spec_policy_expr_variable_expr_identifier
+\    nft_add_table_table_block_chain_chain_policy_spec_policy_expr_variable_expr_variable
 
 " add_cmd 'table' table_block 'chain' chain_block policy_spec 'policy'
 hi link   nft_add_table_table_block_chain_chain_block_policy_spec nftHL_Command
@@ -1548,13 +1541,13 @@ syn match nft_add_table_table_block_chain_chain_block_flags_spec_flags "flags" s
 
 " add_cmd 'table' table_block 'chain' chain_block comment_spec 'comment' string
 hi link   nft_add_table_table_block_chain_chain_block_comment_spec_string_unquoted nftHL_String
-syn match nft_add_table_table_block_chain_chain_block_comment_spec_string_unquoted "\v[a-zA-Z0-9\/\\\[\]]+" keepend contained
+syn match nft_add_table_table_block_chain_chain_block_comment_spec_string_unquoted "\v[a-zA-Z0-9\/\\\[\]]{1,64}" keepend contained
 
 hi link   nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_double_quote nftHL_String
-syn match nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_double_quote "\v[a-zA-Z0-9\/\\\[\]\"]+" keepend contained
+syn match nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_double_quote "\v[a-zA-Z0-9\/\\\[\]\"]{1,64}" keepend contained
 
 hi link   nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_single_quote nftHL_String
-syn match nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_single_quote "\v[a-zA-Z0-9\/\\\[\]\']+" keepend contained
+syn match nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_single_quote "\v[a-zA-Z0-9\/\\\[\]\']{1,64}" keepend contained
 
 hi link    nft_add_table_table_block_chain_chain_block_comment_spec_string_single nftHL_String
 syn region nft_add_table_table_block_chain_chain_block_comment_spec_string_single start="'" end="'" keepend contained
@@ -1605,10 +1598,9 @@ syn match nft_add_table_table_block_chain_chain_block_rule "rule" skipwhite cont
 
 
 
-
 " add_cmd 'table' table_block 'chain' chain_block 'devices' '=' flowtable_expr flowtable_block variable_expr
-hi link   nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_variable_expr nftHL_Identifier
-syn match nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_variable_expr "\v(\$)?[a-zA-Z0-9\-\_]{1,64}" skipwhite contained
+hi link   nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_variable_expr nftHL_Variable
+syn match nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_variable_expr "\v\$[a-zA-Z0-9\-\_]{1,64}" skipwhite contained
 
 " add_cmd 'table' table_block 'chain' chain_block 'devices' '=' flowtable_expr '{' flowtable_member_expr '}'
 hi link   nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_block_flowtable_member_expr nftHL_Identifier
@@ -1621,18 +1613,25 @@ syn region nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_bl
 \ start=/{/ end=/}/ keepend skipwhite contained
 \ contains=
 \    nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_block_flowtable_member_expr
+\ nextgroup=nft_UnexpectedEOS
+\ nextgroup=nft_Semicolon
 
 " add_cmd 'table' table_block 'chain' chain_block 'devices' '='
 hi link   nft_add_table_table_block_chain_chain_block_devices_equal nftHL_Operator
-syn match nft_add_table_table_block_chain_chain_block_devices_equal /=/ skipwhite contained
+syn match nft_add_table_table_block_chain_chain_block_devices_equal "=" skipwhite contained
 \ nextgroup=
 \    nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_block,
-\    nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_variable_expr
+\    nft_add_table_table_block_chain_chain_block_devices_flowtable_expr_variable_expr,
+\    nft_chainError
 
 " add_cmd 'table' table_block 'chain' chain_block 'devices'
 hi link   nft_add_table_table_block_chain_chain_block_devices nftHL_Statement
 syn match nft_add_table_table_block_chain_chain_block_devices "devices" skipwhite contained
 \ nextgroup=nft_add_table_table_block_chain_chain_block_devices_equal
+\ nextgroup=nft_add_table_table_block_chain_chain_block_devices_variable_expr
+
+hi link nft_chainError nftHL_Error
+syn match nft_chainError /\v[a-zA-Z0-9\_\.\/;:]{1,64}/ skipwhite contained
 
 " add_cmd 'table' table_block 'chain' chain_block
 " common_block is contains=lastly due to 'comment' in chain_block & chain_block/rule
@@ -1644,10 +1643,10 @@ syn region nft_add_table_table_block_chain_chain_block start=/{/ end=/}/ skipnl 
 \    nft_add_table_table_block_chain_chain_block_flags_spec_flags,
 \    nft_add_table_table_block_chain_chain_block_rule,
 \    nft_add_table_table_block_chain_chain_block_devices,
-\    nft_add_table_table_block_chain_chain_block_comment_spec,
-\    @nft_c_common_block
+\    nft_add_table_table_block_chain_chain_block_comment_spec
 \ contains=ALLBUT,
 \    nft_add_table_options_flag_keyword
+\ nextgroup=nft_Semicolon
 "\ contains=
 "\ nextgroup=
 "\    nft_add_table_table_block_chain_flags_spec,
@@ -1661,14 +1660,14 @@ syn region nft_add_table_table_block_chain_chain_block start=/{/ end=/}/ skipnl 
 
 " add_cmd 'table' table_block 'chain' chain_block
 hi link   nft_add_table_table_block_chain_chain_identifier_string_unquoted nftHL_Chain
-syn match nft_add_table_table_block_chain_chain_identifier_string_unquoted "\v[a-zA-Z0-9\/\\\[\]]+" skipwhite contained
+syn match nft_add_table_table_block_chain_chain_identifier_string_unquoted "\v[a-zA-Z0-9\/\\\[\]]{1,64}" skipwhite contained
 \ nextgroup=nft_add_table_table_block_chain_chain_block
 
 hi link   nft_add_table_table_block_chain_chain_identifier_string_sans_double_quote nftHL_Chain
-syn match nft_add_table_table_block_chain_chain_identifier_string_sans_double_quote "\v[a-zA-Z0-9\/\\\[\]\"]+" keepend contained
+syn match nft_add_table_table_block_chain_chain_identifier_string_sans_double_quote "\v[a-zA-Z0-9\/\\\[\]\"]{1,64}" keepend contained
 
 hi link   nft_add_table_table_block_chain_chain_identifier_string_sans_single_quote nftHL_Chain
-syn match nft_add_table_table_block_chain_chain_identifier_string_sans_single_quote "\v[a-zA-Z0-9\/\\\[\]\']+" keepend contained
+syn match nft_add_table_table_block_chain_chain_identifier_string_sans_single_quote "\v[a-zA-Z0-9\/\\\[\]\']{1,64}" keepend contained
 
 hi link    nft_add_table_table_block_chain_chain_identifier_string_single nftHL_Chain
 syn region nft_add_table_table_block_chain_chain_identifier_string_single start="'" end="'" keepend contained
@@ -1703,7 +1702,7 @@ syn match nft_keyword_last "last" skipwhite contained
 """"" BEGIN OF add_cmd_/'chain'/chain_spec """""
 " add_cmd 'chain' chain_spec identifier
 hi link   nft_add_chain_table_spec_identifier nftHL_Identifier
-syn match nft_add_chain_table_spec_identifier "\v[a-zA-Z0-9\-\_]+" skipwhite contained
+syn match nft_add_chain_table_spec_identifier "\v[a-zA-Z0-9\-\_]{1,64}" skipwhite contained
 \ contains=nft_keyword_last
 \ nextgroup=nft_add_table_table_block_chain_chain_block  " TODO LET'S TRY THAT AND SEE WHERE IT GOES
 " This is really interesting, reusing a chain_block may work after all TODO"
