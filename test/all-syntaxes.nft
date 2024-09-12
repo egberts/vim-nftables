@@ -2,6 +2,10 @@
 # File: all-syntaxes.nft
 # Description: A test NFT file to exercise all Vim syntax highlightings.
 #
+#     Not expected to pass `nft -c -f all-syntaxes.nft` but to
+#     solely exercise the highlighting capability set.
+#
+define MYPOLICY=accept
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_table
 # base_cmd add_cmd 'table' table_spec family_spec
 # base_cmd add_cmd 'table' table_spec family_spec family_spec_explicit

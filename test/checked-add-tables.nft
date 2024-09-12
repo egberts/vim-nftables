@@ -1,0 +1,160 @@
+#!/usr/sbin/nft
+#
+# Title: `add table` validator that passes `nft -c` checks.
+
+add table inet INET_TABLE
+add chain inet INET_TABLE workstation_inet_filter_input;
+add chain inet INET_TABLE workstation_arp_filter_input ;
+
+table inet INET_TABLE {
+    define interface_name2 = "br0";
+    chain prerouting {
+        # Things that make this chain unique (input, filter)
+        type filter hook input priority 0; policy accept;
+        iif lo accept
+        # Things that make this chain unique ('eth0', input, filter)
+        # meta iifname != $interface_name2 drop;  # workstation wants all intfs
+        # Let things back in if they've been established before new firewall
+        ct state established,related accept;
+        #  DNS
+        tcp dport 53 counter accept
+        udp dport 53 counter accept
+        #  Multicast DNS
+        tcp dport 5353 counter accept
+        # RFC 6092 - Simple Security in IPv6 Gateway CPE
+        # recommends that the DEFAULT
+        #   operating mode for residential IPv6 simple security be to treat
+        #   Generic Packet Tunneling [RFC2473] and similar protocols as opaque
+        #   transport layers, i.e., inbound tunnel initiations are denied and
+        #   outbound tunnel initiations are accepted.
+
+        # To facilitate the use of IPsec in support of IPv6
+        # mobility, the Internet Key Exchange (IKE) protocol [RFC5996] and the
+        # Host Identity Protocol (HIP) [RFC5201] should also be permitted in
+        # the DEFAULT operating mode.
+        #  Workstation
+        icmp type {
+            destination-unreachable,
+            time-exceeded,
+            parameter-problem
+        } counter accept
+
+        # Router/Gateway
+        icmp type {
+            destination-unreachable,
+            redirect,
+            time-exceeded,
+            parameter-problem,
+            router-advertisement,
+            router-solicitation,
+            router-solicitation
+            } counter accept
+
+        # All ICMP
+        icmp type {
+            echo-reply,
+            destination-unreachable,
+            source-quench, redirect,
+            echo-request,
+            time-exceeded,
+            parameter-problem,
+            timestamp-request,
+            timestamp-reply,
+            info-request,
+            info-reply,
+           address-mask-request,
+            address-mask-reply,
+            router-advertisement,
+            router-solicitation
+            } counter accept
+
+        tcp dport 25 counter accept    # smtp
+        tcp dport 465 counter accept   # submission
+        # SSH server
+        tcp dport ssh counter accept
+
+        tcp dport 514 counter accept    # syslog
+        tcp dport 6514 counter accept   # secured syslog
+        tcp dport 80 counter accept
+        tcp dport 443 counter accept
+
+        # IP-specific
+        # meta ip goto workstation_inet_filter_input_ip
+        # meta ip6 goto workstation_inet_filter_input_ip6
+        # meta vlan goto workstation_inet_filter_input_vlan
+        # meta arp goto workstation_inet_filter_input_arp
+
+        # Just in case that someone screws up our 'policy drop'
+
+        # multi-family reject, using the icmpx keyword
+        counter log reject with icmpx type admin-prohibited
+    };
+    # ARP filter input
+    chain prerouting {
+        type filter hook input priority 0;
+        policy drop;
+        counter log reject
+    }
+    # ARP filter output
+    chain filter {
+        type filter hook input priority 0;
+        policy drop;
+        #  Multicast DNS
+        tcp dport 5353 counter accept
+        #  DNS
+        tcp dport 53 counter accept
+        udp dport 53 counter accept
+
+        #  Workstation
+        icmp type {
+            destination-unreachable,
+            redirect,
+            time-exceeded,
+            parameter-problem,
+            router-advertisement,
+            router-solicitation
+            } counter accept
+       # All ICMP
+        icmp type {
+            echo-reply,
+            destination-unreachable,
+            source-quench, redirect,
+            echo-request,
+            time-exceeded,
+            parameter-problem,
+            timestamp-request,
+            timestamp-reply,
+            info-request,
+            info-reply,
+            address-mask-request,
+            address-mask-reply,
+            router-advertisement,
+            router-solicitation
+           } counter accept
+
+        tcp dport 25 counter accept    # smtp
+        tcp dport 465 counter accept   # submission
+        # SSH server
+        tcp dport ssh counter accept
+
+        tcp dport 514 counter accept    # syslog
+        tcp dport 6514 counter accept   # secured syslog
+
+        tcp dport 80 counter accept
+        tcp dport 443 counter accept
+
+        counter log reject
+    }
+    #IPv6 filtering
+    chain prerouting {
+        counter log reject
+    }
+    #IPv6 filtering
+    chain filter {
+        counter log reject
+    }
+    #IPv6 filtering
+    chain workstation_inet_filter_input_ip6 {
+        counter log reject
+    }
+}
