@@ -1,4 +1,4 @@
-/* converted on Thu Sep 12, 2024, 11:11 (UTC-05) by bison-to-w3c v0.67 which is Copyright (c) 2011-2024 by Gunther Rademacher <grd@gmx.net> */
+/* converted on Thu Sep 12, 2024, 11:21 (UTC-05) by bison-to-w3c v0.67 which is Copyright (c) 2011-2024 by Gunther Rademacher <grd@gmx.net> */
 
 input    ::= line*
 stmt_separator
@@ -18,7 +18,11 @@ close_scope_ct
          ::=
 close_scope_counter
          ::=
+close_scope_last
+         ::=
 close_scope_dccp
+         ::=
+close_scope_destroy
          ::=
 close_scope_dst
          ::=
@@ -35,6 +39,8 @@ close_scope_fib
 close_scope_frag
          ::=
 close_scope_fwd
+         ::=
+close_scope_gre
          ::=
 close_scope_hash
          ::=
@@ -127,6 +133,7 @@ base_cmd ::= ADD? add_cmd
            | EXPORT export_cmd close_scope_export
            | MONITOR monitor_cmd close_scope_monitor
            | DESCRIBE describe_cmd
+           | DESTROY destroy_cmd close_scope_destroy
 add_cmd  ::= TABLE table_spec ( table_block_alloc '{' table_block '}' )?
            | CHAIN chain_spec ( chain_block_alloc '{' chain_block '}' )?
            | RULE? rule_position rule
@@ -167,6 +174,20 @@ obj_or_id_spec
            | objid_spec
 delete_cmd
          ::= TABLE table_or_id_spec
+           | CHAIN ( chain_or_id_spec | chain_spec chain_block_alloc '{' chain_block '}' )
+           | RULE ruleid_spec
+           | SET set_or_id_spec
+           | MAP set_spec
+           | ELEMENT set_spec set_block_expr
+           | FLOWTABLE ( flowtable_spec ( flowtable_block_alloc '{' flowtable_block '}' )? | flowtableid_spec )
+           | COUNTER obj_or_id_spec close_scope_counter
+           | QUOTA obj_or_id_spec close_scope_quota
+           | CT ct_obj_type obj_spec ct_obj_alloc close_scope_ct
+           | LIMIT obj_or_id_spec close_scope_limit
+           | SECMARK obj_or_id_spec close_scope_secmark
+           | SYNPROXY obj_or_id_spec close_scope_synproxy
+destroy_cmd
+         ::= TABLE table_or_id_spec
            | CHAIN chain_or_id_spec
            | RULE ruleid_spec
            | SET set_or_id_spec
@@ -199,9 +220,13 @@ basehook_device_name
 basehook_spec
          ::= ruleset_spec basehook_device_name?
 reset_cmd
-         ::= ( COUNTERS | QUOTAS ) ( ruleset_spec | TABLE table_spec )
+         ::= ( COUNTERS | QUOTAS ) ( ruleset_spec | TABLE? table_spec )
            | COUNTER obj_spec close_scope_counter
            | QUOTA obj_spec close_scope_quota
+           | RULES ( ruleset_spec | TABLE? table_spec | CHAIN? chain_spec )
+           | RULE ruleid_spec
+           | ELEMENT set_spec set_block_expr
+           | ( SET | MAP ) set_or_id_spec
 flush_cmd
          ::= TABLE table_spec
            | CHAIN chain_spec
@@ -229,22 +254,30 @@ describe_cmd
 table_block_alloc
          ::=
 table_options
-         ::= FLAGS STRING
+         ::= FLAGS table_flag ( COMMA table_flag )*
            | comment_spec
+table_flag
+         ::= STRING
 table_block
-         ::= ( common_block | ( table_options | ( CHAIN chain_identifier chain_block_alloc '{' chain_block | SET set_identifier set_block_alloc '{' set_block | MAP set_identifier map_block_alloc '{' map_block | FLOWTABLE flowtable_identifier flowtable_block_alloc '{' flowtable_block ) '}' | CT ( HELPER obj_identifier obj_block_alloc '{' ct_helper_block | TIMEOUT obj_identifier obj_block_alloc '{' ct_timeout_block | EXPECTATION obj_identifier obj_block_alloc '{' ct_expect_block ) '}' close_scope_ct )? stmt_separator | COUNTER obj_identifier obj_block_alloc '{' counter_block '}' stmt_separator close_scope_counter | QUOTA obj_identifier obj_block_alloc '{' quota_block '}' stmt_separator close_scope_quota | LIMIT obj_identifier obj_block_alloc '{' limit_block '}' stmt_separator close_scope_limit | SECMARK obj_identifier obj_block_alloc '{' secmark_block '}' stmt_separator close_scope_secmark | SYNPROXY obj_identifier obj_block_alloc '{' synproxy_block '}' stmt_separator close_scope_synproxy )*
+         ::= ( common_block | ( table_options | ( CHAIN chain_identifier chain_block_alloc '{' chain_block | SET set_identifier set_block_alloc '{' set_block | MAP set_identifier map_block_alloc '{' map_block | FLOWTABLE flowtable_identifier flowtable_block_alloc '{' flowtable_block ) '}' )? stmt_separator | COUNTER obj_identifier obj_block_alloc '{' counter_block '}' stmt_separator close_scope_counter | QUOTA obj_identifier obj_block_alloc '{' quota_block '}' stmt_separator close_scope_quota | CT ( HELPER obj_identifier obj_block_alloc '{' ct_helper_block | TIMEOUT obj_identifier obj_block_alloc '{' ct_timeout_block | EXPECTATION obj_identifier obj_block_alloc '{' ct_expect_block ) '}' stmt_separator close_scope_ct | LIMIT obj_identifier obj_block_alloc '{' limit_block '}' stmt_separator close_scope_limit | SECMARK obj_identifier obj_block_alloc '{' secmark_block '}' stmt_separator close_scope_secmark | SYNPROXY obj_identifier obj_block_alloc '{' synproxy_block '}' stmt_separator close_scope_synproxy )*
 chain_block_alloc
          ::=
 chain_block
-         ::= ( common_block | ( hook_spec | policy_spec | flags_spec | rule | comment_spec )? stmt_separator )*
-typeof_data_expr
+         ::= ( common_block | ( hook_spec | policy_spec | flags_spec | rule | DEVICES '=' flowtable_expr | comment_spec )? stmt_separator )*
+typeof_verdict_expr
          ::= ( typeof_expr DOT )? primary_expr
+typeof_data_expr
+         ::= INTERVAL typeof_expr
+           | typeof_verdict_expr
 typeof_expr
          ::= primary_expr ( DOT primary_expr )*
 set_block_alloc
          ::=
+typeof_key_expr
+         ::= TYPEOF typeof_expr
+           | TYPE data_type_expr close_scope_type
 set_block
-         ::= ( common_block | ( TYPEOF typeof_expr | FLAGS set_flag_list | ( TIMEOUT | GC_INTERVAL ) time_spec | stateful_stmt_list | set_mechanism | comment_spec )? stmt_separator | TYPE data_type_expr stmt_separator close_scope_type | ELEMENTS '=' set_block_expr | AUTOMERGE )*
+         ::= ( common_block | ( typeof_key_expr | FLAGS set_flag_list | ( TIMEOUT | GC_INTERVAL ) time_spec | stateful_stmt_list | set_mechanism | comment_spec )? stmt_separator | ELEMENTS '=' set_block_expr | AUTOMERGE )*
 set_block_expr
          ::= set_expr
            | variable_expr
@@ -256,14 +289,22 @@ set_flag ::= CONSTANT
            | DYNAMIC
 map_block_alloc
          ::=
+ct_obj_type_map
+         ::= TIMEOUT
+           | EXPECTATION
 map_block_obj_type
          ::= COUNTER close_scope_counter
            | QUOTA close_scope_quota
            | LIMIT close_scope_limit
            | SECMARK close_scope_secmark
            | SYNPROXY close_scope_synproxy
+map_block_obj_typeof
+         ::= map_block_obj_type
+           | CT ct_obj_type_map close_scope_ct
+map_block_data_interval
+         ::= INTERVAL?
 map_block
-         ::= ( common_block | ( TIMEOUT time_spec | FLAGS set_flag_list | stateful_stmt_list | comment_spec | set_mechanism | TYPEOF typeof_expr COLON ( typeof_data_expr | INTERVAL typeof_expr ) )? stmt_separator | TYPE data_type_expr COLON ( INTERVAL? data_type_expr | map_block_obj_type ) stmt_separator close_scope_type | ELEMENTS '=' set_block_expr )*
+         ::= ( common_block | ( ( TIMEOUT | GC_INTERVAL ) time_spec | FLAGS set_flag_list | stateful_stmt_list | comment_spec | set_mechanism | TYPEOF typeof_expr COLON ( typeof_data_expr | map_block_obj_typeof ) )? stmt_separator | TYPE data_type_expr COLON ( map_block_data_interval data_type_expr | map_block_obj_type ) stmt_separator close_scope_type | ELEMENTS '=' set_block_expr )*
 set_mechanism
          ::= POLICY set_policy_spec close_scope_policy
            | SIZE NUM
@@ -335,11 +376,15 @@ chain_policy
            | DROP
 identifier
          ::= STRING
+           | LAST
 string   ::= STRING
            | QUOTED_STRING
            | ASTERISK_STRING
 time_spec
          ::= STRING
+time_spec_or_num_s
+         ::= NUM
+           | time_spec
 family_spec
          ::= family_spec_explicit?
 family_spec_explicit
@@ -394,11 +439,28 @@ rule_alloc
          ::= stmt+
 stateful_stmt_list
          ::= stateful_stmt+
+objref_stmt_counter
+         ::= COUNTER NAME stmt_expr close_scope_counter
+objref_stmt_limit
+         ::= LIMIT NAME stmt_expr close_scope_limit
+objref_stmt_quota
+         ::= QUOTA NAME stmt_expr close_scope_quota
+objref_stmt_synproxy
+         ::= SYNPROXY NAME stmt_expr close_scope_synproxy
+objref_stmt_ct
+         ::= CT ( TIMEOUT | EXPECTATION ) SET stmt_expr close_scope_ct
+objref_stmt
+         ::= objref_stmt_counter
+           | objref_stmt_limit
+           | objref_stmt_quota
+           | objref_stmt_synproxy
+           | objref_stmt_ct
 stateful_stmt
          ::= counter_stmt close_scope_counter
            | limit_stmt
            | quota_stmt
            | connlimit_stmt
+           | last_stmt close_scope_last
 stmt     ::= verdict_stmt
            | match_stmt
            | meter_stmt
@@ -419,7 +481,8 @@ stmt     ::= verdict_stmt
            | chain_stmt
            | optstrip_stmt
            | xt_stmt close_scope_xt
-xt_stmt  ::= XT STRING STRING
+           | objref_stmt
+xt_stmt  ::= XT STRING string
 chain_stmt_type
          ::= JUMP
            | GOTO
@@ -440,9 +503,11 @@ connlimit_stmt
 counter_stmt
          ::= counter_stmt_alloc counter_arg*
 counter_stmt_alloc
-         ::= COUNTER ( NAME stmt_expr )?
+         ::= COUNTER
 counter_arg
          ::= ( PACKETS | BYTES ) NUM
+last_stmt
+         ::= LAST ( USED ( NEVER | time_spec ) )?
 log_stmt ::= log_stmt_alloc log_arg*
 log_stmt_alloc
          ::= LOG
@@ -462,7 +527,7 @@ log_flag_tcp
          ::= SEQUENCE
            | OPTIONS
 limit_stmt
-         ::= LIMIT ( RATE limit_mode ( limit_rate_pkts limit_burst_pkts | limit_rate_bytes limit_burst_bytes ) | NAME stmt_expr ) close_scope_limit
+         ::= LIMIT RATE limit_mode ( limit_rate_pkts limit_burst_pkts | limit_rate_bytes limit_burst_bytes ) close_scope_limit
 quota_mode
          ::= ( OVER | UNTIL )?
 quota_unit
@@ -471,7 +536,7 @@ quota_unit
 quota_used
          ::= ( USED NUM quota_unit )?
 quota_stmt
-         ::= QUOTA ( quota_mode NUM quota_unit quota_used | NAME stmt_expr ) close_scope_quota
+         ::= QUOTA quota_mode NUM quota_unit quota_used close_scope_quota
 limit_mode
          ::= ( OVER | UNTIL )?
 limit_burst_pkts
@@ -509,7 +574,7 @@ tproxy_stmt
 synproxy_stmt
          ::= synproxy_stmt_alloc synproxy_arg*
 synproxy_stmt_alloc
-         ::= SYNPROXY ( NAME stmt_expr )?
+         ::= SYNPROXY
 synproxy_arg
          ::= ( MSS | WSCALE ) NUM
            | TIMESTAMP
@@ -622,12 +687,7 @@ set_stmt_op
            | DELETE
 map_stmt ::= set_stmt_op set_ref_expr '{' set_elem_expr_stmt stateful_stmt_list? COLON set_elem_expr_stmt '}'
 meter_stmt
-         ::= flow_stmt_legacy_alloc flow_stmt_opt+ '{' meter_key_expr stmt '}'
-           | meter_stmt_alloc
-flow_stmt_legacy_alloc
-         ::= FLOW
-flow_stmt_opt
-         ::= TABLE identifier
+         ::= meter_stmt_alloc
 meter_stmt_alloc
          ::= METER identifier ( SIZE NUM )? '{' meter_key_expr stmt '}'
 match_stmt
@@ -695,21 +755,27 @@ meter_key_expr
 meter_key_expr_alloc
          ::= concat_expr
 set_elem_expr
-         ::= set_elem_expr_alloc set_elem_expr_option*
+         ::= set_elem_expr_alloc ( set_elem_expr_options set_elem_stmt_list? )?
 set_elem_key_expr
          ::= set_lhs_expr
            | ASTERISK
 set_elem_expr_alloc
-         ::= set_elem_key_expr set_elem_stmt*
+         ::= set_elem_key_expr set_elem_stmt_list?
 set_elem_options
          ::= set_elem_option+
 set_elem_option
          ::= ( TIMEOUT | EXPIRES ) time_spec
            | comment_spec
+set_elem_expr_options
+         ::= set_elem_expr_option+
+set_elem_stmt_list
+         ::= set_elem_stmt+
 set_elem_stmt
          ::= COUNTER ( PACKETS NUM BYTES NUM )? close_scope_counter
            | LIMIT RATE limit_mode ( limit_rate_pkts limit_burst_pkts | limit_rate_bytes limit_burst_bytes ) close_scope_limit
            | CT COUNT OVER? NUM close_scope_ct
+           | QUOTA quota_mode NUM quota_unit quota_used close_scope_quota
+           | LAST USED ( NEVER | time_spec ) close_scope_last
 set_elem_expr_option
          ::= ( TIMEOUT | EXPIRES ) time_spec
            | comment_spec
@@ -750,7 +816,7 @@ ct_helper_config
          ::= TYPE QUOTED_STRING PROTOCOL ct_l4protoname stmt_separator close_scope_type
            | L3PROTOCOL family_spec_explicit stmt_separator
 timeout_state
-         ::= STRING COLON NUM
+         ::= STRING COLON time_spec_or_num_s
 ct_timeout_config
          ::= ( PROTOCOL ct_l4protoname | L3PROTOCOL family_spec_explicit ) stmt_separator
            | POLICY '=' '{' timeout_state ( COMMA timeout_state )* '}' stmt_separator close_scope_policy
@@ -793,9 +859,11 @@ keyword_expr
            | ( DNAT | SNAT ) close_scope_nat
            | ECN
            | RESET close_scope_reset
+           | DESTROY close_scope_destroy
            | ORIGINAL
            | REPLY
            | LABEL
+           | LAST close_scope_last
 primary_rhs_expr
          ::= symbol_expr
            | integer_expr
@@ -808,6 +876,7 @@ primary_rhs_expr
            | AH close_scope_ah
            | ( ICMP | ICMP6 ) close_scope_icmp
            | IGMP
+           | GRE close_scope_gre
            | COMP close_scope_comp
            | DCCP close_scope_dccp
            | SCTP close_scope_sctp
@@ -945,7 +1014,7 @@ ct_key_dir_optional
 symbol_stmt_expr
          ::= symbol_expr
            | keyword_expr
-ct_stmt  ::= CT ( ct_key | TIMEOUT | EXPECTATION | ct_dir ct_key_dir_optional ) SET stmt_expr close_scope_ct
+ct_stmt  ::= CT ( ct_key | ct_dir ct_key_dir_optional ) SET stmt_expr close_scope_ct
 payload_stmt
          ::= payload_expr SET stmt_expr
 payload_expr
@@ -967,8 +1036,14 @@ payload_expr
            | dccp_hdr_expr
            | sctp_hdr_expr
            | th_hdr_expr
+           | vxlan_hdr_expr
+           | geneve_hdr_expr
+           | gre_hdr_expr
+           | gretap_hdr_expr
+payload_raw_len
+         ::= NUM
 payload_raw_expr
-         ::= AT payload_base_spec COMMA NUM COMMA NUM close_scope_at
+         ::= AT payload_base_spec COMMA NUM COMMA payload_raw_len close_scope_at
 payload_base_spec
          ::= LL_HDR
            | NETWORK_HDR
@@ -1063,6 +1138,8 @@ icmp6_hdr_field
            | ID
            | SEQUENCE
            | MAXDELAY
+           | TADDR
+           | DADDR
 auth_hdr_expr
          ::= AH auth_hdr_field close_scope_ah
 auth_hdr_field
@@ -1097,7 +1174,47 @@ udplite_hdr_field
            | CSUMCOV
            | CHECKSUM
 tcp_hdr_expr
-         ::= TCP ( tcp_hdr_field | OPTION ( tcp_hdr_option_type | tcp_hdr_option_kind_and_field | AT close_scope_at tcp_hdr_option_type COMMA NUM COMMA NUM ) )
+         ::= TCP ( tcp_hdr_field | OPTION ( tcp_hdr_option_type | tcp_hdr_option_kind_and_field | AT close_scope_at tcp_hdr_option_type COMMA NUM COMMA payload_raw_len ) )
+inner_inet_expr
+         ::= ip_hdr_expr
+           | icmp_hdr_expr
+           | igmp_hdr_expr
+           | ip6_hdr_expr
+           | icmp6_hdr_expr
+           | auth_hdr_expr
+           | esp_hdr_expr
+           | comp_hdr_expr
+           | udp_hdr_expr
+           | udplite_hdr_expr
+           | tcp_hdr_expr close_scope_tcp
+           | dccp_hdr_expr
+           | sctp_hdr_expr
+           | th_hdr_expr
+inner_eth_expr
+         ::= eth_hdr_expr
+           | vlan_hdr_expr
+           | arp_hdr_expr
+inner_expr
+         ::= inner_eth_expr
+           | inner_inet_expr
+vxlan_hdr_expr
+         ::= VXLAN ( vxlan_hdr_field | inner_expr )
+vxlan_hdr_field
+         ::= VNI
+           | FLAGS
+geneve_hdr_expr
+         ::= GENEVE ( geneve_hdr_field | inner_expr )
+geneve_hdr_field
+         ::= VNI
+           | TYPE
+gre_hdr_expr
+         ::= GRE ( gre_hdr_field close_scope_gre | close_scope_gre inner_inet_expr )
+gre_hdr_field
+         ::= HDRVERSION
+           | FLAGS
+           | PROTOCOL
+gretap_hdr_expr
+         ::= GRETAP close_scope_gre inner_expr
 optstrip_stmt
          ::= RESET TCP OPTION tcp_hdr_option_type close_scope_tcp
 tcp_hdr_field
@@ -1150,7 +1267,7 @@ tcpopt_field_maxseg
 tcpopt_field_mptcp
          ::= SUBTYPE
 dccp_hdr_expr
-         ::= DCCP dccp_hdr_field close_scope_dccp
+         ::= DCCP ( dccp_hdr_field | OPTION NUM ) close_scope_dccp
 dccp_hdr_field
          ::= SPORT
            | DPORT
