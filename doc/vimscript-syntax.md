@@ -7,12 +7,33 @@ If I could made the same tool that generates vimscript files from its EBNF
 spec, then the massive work for two becomes a single point of work and 
 quickly extensible to many other file formats for this Vim/Neovim editor family:
 
-In short, my mission:
+In layman terms, my mission:
 
-* read a EBNF, write this transformer, and generate vimscript syntax files.
+* read a EBNF, write this transformer, and generate syntax files (here, vimscript, later textMate/Intelli).
 
-Subset of Vimscript
+Chomskey-speaking, my mission:
+
+* read a CSL file of a CFG, translate CSL into a new (but meta) CFG, 
+  generate CST, read a DSL using this new CST, transform DSL.
+
+
+We cover this article's topics in the following semantic:
+
+1.  Everything about Vim syntax
+2.  Desired End-Result
+3.  End-Stage Engine Required for End-Result
+4.  Front-Stage Engine Required for that End-Stage Engine
+5.  Conclusion
+
+
+Vimscript
 =========
+Jumping to the end-result of my desired transformer tool, Vimscript 
+`syntax` commands is used to conduct syntax highlighting of the 
+text content found in its editor buffer.
+
+Vimscript `syntax` command is part of the Vim/NeoVim scripting language set.
+
 Scripting language within family of Vi editors is actually two families of 
 Vi scripting: Vimscript and NeoVim script language.  Many things are found
 in both set of languages.  
@@ -26,14 +47,54 @@ Vi/Vim and NeoVim).
 
 Note: There is a language war going on around terminology surrounding Vim 
 scripting language but thankfully `syntax` remains largely untouched: 
-I shall try and remain agnostic here.
+I shall try and remain agnostic in here.
 
-Syntax keyword
+Vimscript Syntax concept
+================
+Topically, vimscript `syntax` command is the building block of an editor's
+syntax highlighter.
+
+Building up of multiple vimscript syntax statements and its building 
+blocks are restricted to on a context-free grammar (CFG) constraint, comprising:
+
+     group-name (identifier, node),
+     literal (constant, identifier, regex, set-of-characters)
+     nextgroup (jump, edge)
+
+DSL experts: vimscript `syntax` is definitely not a CNF (Chomsky Normal Form).
+
+Since there is no support for mathematical expression in vimscript syntax, 
+PEG approach would not be generally required for our need and yet a specific 
+Packrat PEG mechanism would be called back to support the required CST of
+vimscript syntax.
+
+CST is a Concrete Syntax Tree consists of an ordered, rooted tree that
+represents the syntactic structure of a string according to some 
+context-free grammar (CFG).
+
+Also, vimscript syntax cannot handle a circular/acyclic pathway, as 
+in a graph form of the context-sensitive (CSG) is not supported: 
+Vimscript syntax only supports a tree-form of context syntax tree (CST).  
+
+One glaring but hidden limitation of vimscript syntax:
+
+    Any reuse of a destination groupname (node) that are NOT explicitly
+    `contained` after the `syntax` command WILL CAUSE a CFG edge 
+    breakage due to reuse of other edge(s); vimscript syntax 
+    must be strictly a CST, and not CSG.  This means that using 
+    vimscript syntax, there must be support for duplicative but
+    identical (yet `contained`) syntax subtrees throughout its CST
+    of vimscript syntax statements.
+
+In short, no subtree optimization, for our needed transformation here.
+
+
+vimscript Syntax command
 ==============
-`syntax` keyword can be entered at the editor command line or executed
-from a vimscript file.  
+`syntax` command are entered at the editor command line prompt or executed
+from the vimscript file.  
 
-`syntax` does the following:
+`syntax` command does the following:
 
 * enable/disable (`syntax on`)
 * match an identifier and groupname (label) it (`syntax keyword`)
@@ -47,37 +108,108 @@ around a concrete syntax graph, using the concept of
 a (node, edge \[, node(s)\]) declaration statement as its primary 
 form of inter-nodal aspect of syntax building block in vimscript.
 
-Building up of multiple vimscript syntax statements and its building 
-blocks are restricted to on a context-free grammar (CFG), comprising:
+Declaration
+------------
+The simplistic declaration of CSL is the empty set:
 
-     group-name (identifier, node),
-     literal (constant, identifier, regex, set-of-characters)
-     nextgroup (jump, edge)
+    A -> empty
 
-For DSL experts: vimscript `syntax` is definitely not a CNF (Chomsky Normal Form).
+and is declared by vimscript syntax statement of:
 
-Since there is no support for mathematical expression in vimscript syntax, 
-PEG approach would not be generally required for our need and yet a specific 
-Packrat PEG mechanism would be called back to support the required CST of
-VimL syntax.
+    syntax cluster A contains=
 
-CST is a Concrete Syntax Tree consists of an ordered, rooted tree that
-represents the syntactic structure of a string according to some 
-context-free grammar (CFG).
+`contains=` without a parameter value is almost never used 
+but written here as a guide for subsequential CSL building blocks:
 
-Also, vimscript syntax cannot handle a circular/acyclic pathway, as 
-in a graph form of the context-sensitive (CSG) is not supported: 
-Vimscript syntax only supports a tree-form of context syntax tree (CST).  
+Static
+----
+Next is the non-terminal to terminal declaration:
 
-One glaring limitation of vimscript syntax:
+    A -> 'a'
 
-    Reuse of a destination groupname causes edge breakages 
-    due to reuse of other edge(s); vimscript syntax must be strictly 
-    a CST, and not CSG.  This means that using vimscript syntax, 
-    there must be support for duplicative subtrees throughout its CST.
+and is declared by
 
-In short, no subtree optimization, for our needs here.
+    syntax match 'a' skipwhite contained nextgroup=
 
+Symbolic Linking
+----
+Next is the linking of non-terminal to non-terminal.
+
+    A -> B
+    B -> 'b'
+
+and is declared by
+
+    syntax cluster A contains=B
+    syntax match B 'b' 
+
+Concatentation
+----
+Most of the time, concatentation of terminal nodes is optimized out 
+into a larger terminal node by smarter parsers.  
+
+    A -> B C
+    B -> 'b'
+    C -> 'c'
+
+and is denoted as:
+
+    syntax cluster A nextgroup=B
+    syntax match B 'b' nextgroup=C
+    syntax match C 'c'
+
+Notice that this linearization is occurring by the daisy-chaining `syntax`
+commands together to form a symbolic concatentation (hereby known 
+as catentation).
+
+Choices
+----
+Then we start having choices, its DSL content could be a having 'b' 
+content or a 'c' content, but one must appear:
+
+    A -> B | C
+    B -> 'b'
+    C -> 'c'
+
+written for an 'A' being a non-terminal (symbolically-linked):
+
+    syntax cluster A contains=B,C
+    syntax match B 'b'
+    syntax match C 'c'
+
+or written for an 'A' being a terminal (constructor):
+
+    syntax match A 'something-something' nextgroup=B,C
+    syntax match B 'b'
+    syntax match C 'c'
+
+This above logic depends on whether the previous parent node has a pattern 
+being matched or not.
+
+My vision cloud of joy is started to get cloudy but this first-stage parser 
+will assist with this transformation complexity rather neatly.
+
+
+Optional
+-----
+Starting with repetition class of syntax, we have optional; either it has 
+it or it doesn't.
+
+    A -> D?
+    D -> 'd'
+
+also in vimscript command:
+
+    syntax cluster A contains=D
+    syntax match D 'd'
+
+Keep in mind, optional '?' (along with not '~') operator is discourage here 
+due to CSL constraint; sometimes the (EBNF) grammar file needs to 
+refactorized by removing this optional '?' operation and introducing 'choices' 
+approach in its place.
+
+XXXX
+====
 
 nftables may require a recursive descent parser or at
 least an LL(2) parser.
@@ -85,55 +217,77 @@ least an LL(2) parser.
 Bind9 named.conf may require a recursive descent parser or at
 least an LL(1) parser.
 
-But VimL syntax must be written with root groupname/node at the end of the vimscript file 
-as each production appears during parsing and the smallest groupname/node at the beginning 
-all by using the LR(0).
+But vimscript syntax must be written with root groupname/node at the end 
+of the vimscript file as each production appears during parsing and the 
+smallest groupname/node at the beginning all by using the LR(0).
 
-Coupling these two disparate yet disjoint transformations together is the key here.
+Coupling these two disparate yet disjoint CST together for our desired
+transformation is the key here.
 
-Recursive descent parser makes reuses of subtrees in a CST.   Two variants of recursive descent parsers are:
+Recursive descent parser makes reuses of subtrees in a CST.   
 
-1.  Predictive parser which does not require backtracking and only works with context-free grammar (CFG). Most 
-evident when CST has all their symbols (both terminal and non-terminal) on the right side of each node.
-2. Works with LL(k) but not guaranteed to terminate as exponential production occurs.
+Two variants of recursive descent parsers are:
 
-Hence, to ensure no clobbering of CST pathways required by VimL syntax, 
+1.  Predictive parser which does not require backtracking and only works 
+with context-free grammar (CFG). Most evident when CST has all their 
+symbols (both terminal and non-terminal) on the right side of each node.
+2. Works with LL(k) but not guaranteed to terminate as exponential 
+production occurs.
+
+Hence, to ensure no clobbering of CST pathways required by vimscript syntax, 
 memoization of all pathway invocations of mutual recursion for a
-VimL-supported CST would require this Packrat PEG approach.
+vimscript supported CST would require this Packrat PEG approach.
 
-That said, most PEG parsers require PEG-format file for its needed grammar.
+That said, most PEG parsers require PEG-format file for its needed 
+grammar breakdown.
 
-Very few PEG parsers can accept any BNF-variant grammar file; however, DHParser shines
-in taking a wide variety of EBNF variants, including PEG.
+Very few PEG parsers can accept any EBNF-variant grammar file; 
+however, DHParser shines in taking a wide variety of EBNF variants, 
+including PEG.  We go with DHParser here.
 
 DHParser is a top-down parser type.
 
 Domain Structure Language
 ===
-Domain Structure Language (DSL) is essentially the act of using two different parsers:
+Domain Structure Language (DSL) is essentially the act of using two (or more) 
+different parsers, one applied after another.
 
-1. To translate the EBNF syntax of EBNF into an AST
-2. To translate a domain-specific (in EBNF format) language file into an AST of domain-specific content.
+1. To translate the context-sensitive language (EBNF) of a parser-specific 
+context-sensitive (DHparse-supported) language so that its CSL can 
+construct a CST for use with another parsing/transformation/compiling.
+2. To translate a domain-specific (also a CSL; ie., EBNF of C/Python/nftables) 
+language file into an AST for use with compiling the final domain-specific 
+content for easiest analytical work.
 
-This way, we can leverage the use of EBNF as a standard transformer template for all domain-specific things, 
-start compiling any and all domain-specific content (DSL) as dictated by its specific domain 
-structure (also in EBNF format).
+This way, we can leverage the use of EBNF as a standard transformer template 
+for all domain-specific (ie., nftables, C, ISC Bind9 named.conf, Python, textMate) 
+things, start compiling any and all domain-specific content as dictated 
+by its domain-specific structure (written in EBNF format).
 
-One prime example of DSL would be to breakdown an English sentence into parts of the sentences (verb, subject, predicate, noun)
+A perfect example of DSL would be to breakdown an English sentence into 
+parts of the sentences (verb, subject, predicate, noun) then compile
+a novel into those identified components of the English grammar.
 
+Instead of parts of the English sentence, computer programming languages and 
+network protocols need their structure broken down (1st parser) and made 
+directly referencable by other programs via a 2nd parser.
 
-Instead of parts of the English sentence, computer programming languages and network protocols need their
-structure broken down (1st parser) and made directly referencable by other programs.
+This second parser becomes useful when certain actions needs be codified 
+across multiple languages: A snippet of malicious code can be found before its 
+execution through a well-known pattern detection of an unlinked object file or 
+an un-interpreted (Davlok, Java, JS, Python) bytecode, so that its badness can be 
+detected before it could be made harmful for computers to execute.  
 
-Second parser becomes useful when certain actions needs be codified across multiple languages: A well-known malicious
-code can be found before its execution through pattern detection of unlinked object file or un-interpreted bytecode,
-before it could be made harmful for computers to execute.
+First parser would deal with the format of bytecode or unlinked object of 
+intermediate representation (IR) code.  A second parser is would tease out the
+NOPs and unharmful codes.
 
-Many DSL-based (double) parsers have their own 1st and 2nd but different syntax files.
+DSL File Format
+===============
+Many DSL-based (2 or more) parsers have 2 or more CSL files and each use 
+their own but different CSL (ie., EBNF, Python, XML) specification.
 
-I wrote one tool to help identify the [DSL grammar file](https://github.com/egberts/filetype-ebnf-grammars).
-
-Such DSL grammar files have been identified but not exclusively as:
+DSL grammar files have been identified but not exclusively as:
 
 * BNF
 * PEG
@@ -142,18 +296,22 @@ Such DSL grammar files have been identified but not exclusively as:
 * PEG, Ford \[2004\] 
 * Marpa:R2 SLIF-DSL
 * JANET
-* Pointlander GO Peg
+* Pointlander GO PEG
 * Python PEG
 * Arepeggio PEG
 * textX
 * DHParser DSL
 * bncf
+* textMate (e.g., JetBrain platform, macos editor)
 
-So far, nobody uses ABNF, but there are lots of EBNF variants out there.
+I wrote one tool to help the identification of a [DSL grammar file](https://github.com/egberts/filetype-ebnf-grammars).
 
-SCOPING
+There are lots of EBNF variants out there, but ABNF remains not a practical constructor.
+
+
+Vimscript SCOPING
 =======
-Through the use of VimL `contains=` attribute of its `syntax` declarator, scoping of grammars can be enforced.
+Through the use of vimscript `contains=` attribute of its `syntax` declarator, scoping of grammars can be enforced.
 
 APPROACHES
 ====
