@@ -5,6 +5,12 @@ Our Vimscript syntax shall tackle this by doing known patterns firstly, then $va
 
 stmt has the following first word patterns:
 
+Working on
+===========
+ICMP , icmp_hdr_expr -> payload_expr
+
+TODO
+====
 <identifier>, concat_expr, verdict_map_stmt -> verdict_stmt -> stmt (everything you see here)
 <$var>
 <NUM>
@@ -53,7 +59,6 @@ HOUR, meta_key_unqualified -> primary_expr -> basic_expr -> concat_expr -> expr 
 IBRIDGENAME, meta_key_unqualified -> primary_expr -> basic_expr -> concat_expr -> expr -> relational_expr -> match_stmt
 IBRIPORT, meta_key_unqualified -> primary_expr -> basic_expr -> concat_expr -> expr -> relational_expr -> match_stmt
 ICMP6 , icmp6_hdr_expr -> payload_expr
-ICMP , icmp_hdr_expr -> payload_expr
 IGMP , igmp_hdr_expr -> payload_expr
 IIFGROUP, meta_key_unqualified
 IIFGROUP, meta_key_unqualified -> primary_expr -> basic_expr -> concat_expr -> expr -> relational_expr -> match_stmt
