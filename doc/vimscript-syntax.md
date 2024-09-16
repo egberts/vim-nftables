@@ -3,31 +3,85 @@ I needed to systemically create syntax highlighters files based off of
 GNU Bison (Linux [nftables for Vim/NeoVim](https://github.com/egberts/vim-nftables))
 and from EBNF specifications ([ISC Bind9 for Vim/NeoVim](https://github.com/egberts/vim-syntax-bind-named)).
 
-If I could made the same tool that generates vimscript files from its EBNF 
-spec, then the massive work for two becomes a single point of work and 
-quickly extensible to many other file formats for this Vim/Neovim editor family:
+If I could make a transducer tool that generates vimscript files 
+from a EBNF spec for my choice of any file format, then the massive 
+manual work that I have done for both massive syntax highlighter 
+in that particularl file format/grammar becomes a single point of 
+work would also becomes easier to maintain, and quickly extensible to 
+many other file formats for this Vim/Neovim editor family:
+
+Ideally, I would think that a Moore-Machine-type transducer tool 
+that does syntax-highlight generative output for as many editors 
+having such functional attributes like syntax-directed, 
+language-based, language-sensitive.  This transducer 
+would leverages topological sorting of CST by a partial ordering using 
+poset, pattern matching, generic function instantiation, and 
+multimethod dispatch using subsumption and a standard topsort algorithm.
 
 In layman terms, my mission:
 
-* read a EBNF, write this transformer, and generate syntax files (here, vimscript, later textMate/Intelli).
+* read a spec on about many EBNF variants, read a DSL grammar in EBNF spec,
+for a C/Python/nftables written in EBNF, write this transformer, 
+and generate syntax files for a specific editor.
 
 Chomskey-speakingly, my mission:
 
 * read a CSL file of a CFG, translate CSL into a new (but meta) CFG, 
   generate CST, read a DSL using this new CST, transform DSL.
 
+In short, this is my continuing education forum for DSL, CSL, CFG, CST, PEG, CST, to 
+complement my large AST, compiling and parsing skillset.
 
 We cover this article's topics in the following semantic:
 
 1.  Everything about Vim syntax
-2.  Desired End-Result
+2.  Desired End-Result, Vimscript, pluggable for other structured editor or projectional editor.
 3.  End-Stage Engine Required for End-Result
 4.  Front-Stage Engine Required for that End-Stage Engine
 5.  Conclusion
 
+How To Read Notations
+===========
+
+No language grammar notation is used here, ie., `L(G)`.
+No DFA/NFA notation are used here, thereby no state diagram.
+No model grammar is used here, unless your external railroad diagrams display our EBNF files here.
+Only regular grammar (not Regex) used here.
+
+Transducer?
+====================
+For our first-stage parser, a domain-specific notation for Most-Flexible 
+EBNF (from DHParser) shall be its grammar engine.  This means that 
+the input parser is ready to take other domain-specific grammar using any 
+of 11-variants of EBNF notations.  This will hopefully prove to be 
+most useful for data scientists and other folks who desire a 
+rapid prototype of their many file formats not found nor supported by other 
+syntax-sensitive editors.
+
+For our final-stage domain-specific notation, the template shall be inherited
+from the first domain-specific notation: this means final-stage CST shall be     
+constructed for the Python/C/nftables grammar language (no code nor command yet).
+
+No need to be parsing nor compiling here.  We work ONLY with the final-stage CST.
+
+With the CST from the second domain-specific notation, we can then navigate
+the tree of concreate syntax and make production outputs based on its
+symbol, keywords, delimiters, block notation, protocol field, and network 
+protocols.
+
 
 Vimscript
 =========
+In DSL parlance, vimscript syntax is a extended right-regular grammar 
+(Type-3 Chomskey): there are no support for left-regular grammar.
+
+Vimscript syntax is also a Pushdown Automata (PDA) with finite stack (aka 
+a subset of Finite Automata).
+
+With the help of this program design, it will take us into Linear Bounded
+Automata (LBA) with the help of two parser engines and a poset generator
+from syntactic parse tree by semantic analysis.
+
 Jumping to the end-result of my desired transformer tool, Vimscript 
 `syntax` commands is used to conduct syntax highlighting of the 
 text content found in its editor buffer.
@@ -69,11 +123,26 @@ following sets of 4 tuples (S, V, T, P):
     T: A set of terminals.
     P: A set of production rules.
 
+We won't be using the Formal Definition of Finite Automata which is 
+a { Q, Σ, q, F, δ } 5-tuple approach.
+
+    Q: Finite set of states
+    Σ: Set of input symbols
+    q: Initial state
+    F: Set of final states
+    δ: Transition function
+
+
 Yet, the concept of Vimscript syntax constructors appears to have 
 merged `S` and `T` for their set of terminals.
 
 The production '`P`' rule is even more elusive to map between CFG and vimscript 
 syntax statement, which shall (hopefully) be intensively documented hereafter.
+
+Vimscript syntax is definitely a Deterministic Finite Automaton (DFA) for
+as its exical analysis because it provides a more structured and efficient way 
+to process input symbols, making it ideal for scanning and recognizing 
+patterns in source code.
 
 Fortunately, there is no support requirement for mathematical expression here,
 thus PEG approach would not be generally required for our needs,  yet a specific 
@@ -130,7 +199,9 @@ consistently and concisely into the DSL notations of string handling.
 
 Terminal Node
 -------------
-The starting CSL declaration is a terminal node.
+The basic CSL declaration is a terminal node.   
+
+We use CSG notation to describe the CSL side.
 
 A terminal node may be a static symbol or empty:
 
@@ -159,6 +230,9 @@ Yet it shall be written here as a guide for subsequential CSL building blocks.
 
 This means, for use in vimscript syntax, the CSL language specification 
 shall be condensed to having all empty statements optimized out.
+
+Furthermore, one can reconstruct the optimized-out empty by examining
+the terminal node for symbolic and no further jump out.
 
 Static
 ----
@@ -573,7 +647,7 @@ Additional steps is required to recondition the `nftables.ebnf` output file into
 #### Ambiguous into Unambiguous
 A grammar contains rules that can generate more than one tree for the same CSG.
 Expansion of rules is often required to minimize permutation of 
-duplicative grammar subtrees.  An example of duplicative subtrees:
+duplicative grammar subtrees.  An working example of duplicative subtrees here is:
 
     E -> E + E | E * E | Num
 
@@ -582,6 +656,8 @@ would be rewritten as:
     E -> E + T | T
     T -> T * F | F
     F = Num
+
+See [Removal of Ambiguity Converting An Ambiguous Grammar into Unambiguous Grammar](https://www.geeksforgeeks.org/removal-of-ambiguity-converting-an-ambiguos-grammar-into-unambiguos-grammar/?ref=oin_asr4) for additional details.
 
 #### Nondeterministics into Deterministics
 
@@ -613,20 +689,50 @@ E rule would be subdivided into E and E', samething for T rule and would be rewr
     T' -> *FT' | None
     F -> Num
 
+How to convert CFG to CNF?
+--------------------------
+
+Step 1. Eliminate start symbol from RHS.
+If start symbol S is at the RHS of any production in the grammar, create a new production as:
+
+    S0->S
+
+where S0 is the new start symbol.
+
+Step 2. Eliminate null, unit and useless productions.
+If CFG contains null, unit or useless production rules, eliminate them. You can refer the this article to eliminate these types of production rules.
+
+Step 3. Eliminate terminals from RHS if they exist with other terminals or non-terminals. e.g,; production rule `X -> xY` can be decomposed as:
+
+    X -> ZY
+    Z -> x
+
+Step 4. Eliminate RHS with more than two non-terminals.
+e.g,; production rule `X -> XYZ` can be decomposed as:
+
+    X -> PZ
+    P -> XY 
+
 
 CONCLUSION
 =====
 
-DSL experts: I am asserting (now) that vimscript `syntax` constructor is definitely not a 
-CNF (Chomsky Normal Form).
+DSL experts: I am asserting (now) that vimscript `syntax` constructor is 100%
+CNF (Chomsky Normal Form) due to its production rules being forced not to have 
+any terminal followed by a non-terminal. (TODO: rewrite)
+
+When making a CST for use with navigating vimscript syntax tree, gotta 
+refactor any input CSG to exclude this terminal\*non-terminal concatenation 
+production rule format or no syntax highlighting will be supported.
+
 
 Such transformation of production rules required of our design entails mostly of:
 
-* backtracking by 1 node,
-* predictive lookahead by 1 node,
+* backtracking by 1 node (needed by `syntax cluster`)
+* predictive lookahead by 1 node (needed by `syntax cluster`)
 * little bit of multiline coalesence, and
-* upward node traversal,
-* crosslinkage of nodes.
+* upward node traversal, (needed by `vimscript ordering of syntax statements`)
+* crosslinkage of nodes?
 
 REFERENCE
 =====
@@ -635,3 +741,6 @@ REFERENCE
 * [Parsing Expression Grammar](https://en.wikipedia.org/wiki/Parsing_expression_grammar)
 * [Chomsky Normal Form](https://en.wikipedia.org/wiki/Chomsky_normal_form)
 * [Context-Sensitive Grammar (CSG) and Language (CSL)](https://www.geeksforgeeks.org/context-sensitive-grammar-csg-and-language-csl/)
+* [Relationship between Grammar and Language](https://www.geeksforgeeks.org/relationship-between-grammar-and-language/?ref=oin_asr12)
+* [Removal of Ambiguity Converting An Ambiguous Grammar into Unambiguous Grammar](https://www.geeksforgeeks.org/removal-of-ambiguity-converting-an-ambiguos-grammar-into-unambiguos-grammar/?ref=oin_asr4)
+* [Applications of Various Automata](https://www.geeksforgeeks.org/applications-of-various-automata/)
