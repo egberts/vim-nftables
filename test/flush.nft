@@ -1,0 +1,82 @@
+#!/usr/sbin/nft -f
+# File: flush.nft
+# Description: A test NFT file to exercise 'flush' command's Vim syntax highlightings.
+#
+# base_cmd  flush_cmd
+#
+
+table ip6 MyIptable  ### sanity test
+
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+flush table MyTable
+flush table ip MyTable
+flush table ip6 MyTable
+flush table inet MyTable
+flush table netdev MyTable
+flush table bridge MyTable
+flush table arp MyTable
+flush chain MyTable MyChain
+flush chain ip MyTable MyChain
+flush chain ip6 MyTable MyChain
+flush chain inet MyTable MyChain
+flush chain netdev MyTable MyChain
+flush chain bridge MyTable MyChain
+flush chain arp MyTable MyChain
+flush set MySet MyChain
+flush set ip MySet MyChain
+flush set ip6 MySet MyChain
+flush set inet MySet MyChain
+flush set netdev MySet MyChain
+flush set bridge MySet MyChain
+flush set arp MySet MyChain
+flush map MyMap
+flush map ip MyMap
+flush map ip6 MyMap
+flush map inet MyMap
+flush map netdev MyMap
+flush map bridge MyMap
+flush map arp MyMap
+flush flow table MyFlow
+flush flow table ip MyFlow
+flush flow table ip6 MyFlow
+flush flow table inet MyFlow
+flush flow table arp MyFlow
+flush meter MyMap
+flush meter ip MyMap
+flush meter ip6 MyMap
+flush meter inet MyMap
+flush meter netdev MyMap
+flush meter bridge MyMap
+flush meter arp MyMap
+flush ruleset ip 
+flush ruleset ip6
+flush ruleset inet
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+flush table MyTable InvalidChain  # intentional invalid
+flush table ip MyTable InvalidChain  # intentional invalid
+flush table arp MyTable InvalidChain  # intentional invalid
+flush chain arp MyTable MyChain ExtraIdentifier  # intentional invalid
+flush chain wrong_family_spec ip MyTable MyChain  # intentional invalid
+flush set arp MyTable MyChain ExtraIdentifier  # intentional invalid
+flush map arp MyTable MyChain ExtraIdentifier  # intentional invalid
+flush flow table MyFlow MyChain ExtraIdentifier  # intentional invalid
+flush meter arp MyTable MyChain ExtraIdentifier  # intentional invalid
+flush ruleset netdev  # intentional invalid; netdev is not a flushable
+flush ruleset bridge  # intentional invalid; bridge is not a flushable
+flush ruleset arp  # intentional invalid; arp is not a flushable
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+

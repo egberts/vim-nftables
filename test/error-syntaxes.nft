@@ -1,45 +1,52 @@
 #!/usr/sbin/nft -f
-# File: all-syntaxes.nft
-# Description: A test NFT file to exercise all Vim syntax highlightings.
+# File: error-syntax.nft
+# Description: A test NFT file to exercise 'list' command Vim syntax highlightings.
 #
-# This is the part where you can add your own esoteric setting(s) if it breaks
-# the vim syntax highlighter for NFTABLES (yet `nft` takes it in just normally).
-# TODO: More todo, FIXME, FIXME: TODO: xxx XXX ARGH!
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+list set myIpTable MySet
+list set inet myIpTable MySet
+list flowtable myIpTable MySet
+list flowtable inet myIpTable MySet
 
 
-#  ERROR SYNTAX (intentional)
-#  They should not be highlighted
-# SYNTAX ERRORS GOES PAST HERE
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
 
-include Filespec  # intentional syntax error
-include 'Filespec'  # intentional syntax error
-include 'Fil"espec'  # intentional syntax error
-include "Filespec" bad stuff oppsie  # intentional syntax error
-include "Filespec"  oopsie  # intentional syntax error
-include "Filespec"  oopsie  ;  # intentional syntax error
-
-list oopsie  # invalid syntax
-list oopsie ;  # invalid syntax
+list oopsie  # intentional invalid syntax
+list oopsie ;  # intentional invalid syntax
 list set myIpTable handle 123 # intentional syntax error
 list set inet myInetTable handle 123  # Intentional Syntax ERROR
-list flow tables arp  # flowtables do not support ARP
-list flow tables bridge  # flowtables do not support BRIDGE
-list flow tables netdev  # flowtables do not support NETDEV
-list flow table arp table_name identifier  # flowtables do not support ARP
-list flow table bridge table_name identifier  # flowtables do not support BRIDGE
-list flow table netdev table_name identifier  # flowtables do not support NETDEV
+list flow tables arp  # intentional invalid; flowtables do not support ARP
+list flow tables bridge  # intentional invalid; flowtables do not support BRIDGE
+list flow tables netdev  # intentional invalid; flowtables do not support NETDEV
+list flow table arp table_name identifier  # intentional invalid; flowtables do not support ARP
+list flow table bridge table_name identifier  # intentional invalid; flowtables do not support BRIDGE
+list flow table netdev table_name identifier  # intentional invalid; flowtables do not support NETDEV
 flush chain myIpTable myIpChain ; flush chain netdev myNetDev X; oopsie
-flush flow table arp table_name identifier  # flowtable do not support ARP
-flush flow table bridge table_name identifier  # flowtable do not support BRIDGE
+flush flow table arp table_name identifier  # intentional invalid; flowtable do not support ARP
+flush flow table bridge table_name identifier  # intentional invalid; flowtable do not support BRIDGE
 flush flow table netdev table_name identifier  # flowtable do not support NETDEV
-list flowtable arp table_name identifier  # flowtable do not support ARP
-list flowtable bridge table_name identifier  # flowtable do not support BRIDGE
-list flowtable netdev table_name identifier  # flowtable do not support NETDEV
-list flowtables arp  # flowtable do not support ARP
-list flowtables bridge  # flowtable do not support BRIDGE
-list flowtables netdev  # flowtable do not support NETDEV
+list flowtable arp table_name identifier  # intentional invalid; flowtable do not support ARP
+list flowtable bridge table_name identifier  # intentional invalid; flowtable do not support BRIDGE
+list flowtable netdev table_name identifier  # intentional invalid; flowtable do not support NETDEV
+list flowtables arp  # intentional invalid; flowtable do not support ARP
+list flowtables bridge  # intentional invalid; flowtable do not support BRIDGE
+list flowtables netdev  # intentional invalid; flowtable do not support NETDEV
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
 
 # list ct <ct_obj_type> <obj_spec>
 list ct timeout 15
 
-export ruleset vm json   # no export for singular 'ruleset'
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+

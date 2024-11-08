@@ -60,6 +60,8 @@ table xxxx { chain last {
 table xxxx { chain last ;};
 table xxxx { 
     chain last; };
+table xxxx { chain last { chain }; };
+table xxxx { chain MyIpNet { chain }; };
 table xxxx { chain 'MyIpNet' { chain }; };
 table xxxx { chain "MyIpNet" { chain }; };
 table xxxx { chain MyIpNet {

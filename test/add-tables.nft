@@ -12,12 +12,6 @@
 # base_cmd add_cmd 'table' table_spec family_spec family_spec_explicit
 add table filter
 
-table ip  # that one creates an empty table
-table ip6  # that one creates an emtpy table
-table inet  # that one creates an empty table
-table bridge  # that one creates an empty table
-table netdev  # that one creates an empty table
-table arp  # that one creates an empty table
 table T  # that one creates an empty table
 # base_cmd add_cmd 'table' table_spec identifier <STRING>
 table xxxx
@@ -30,6 +24,17 @@ table inet xxxx { };
 table bridge xxxx { };
 table netdev xxxx { };
 table arp xxxx { };
+
+table my.IpTable
+table my/IpTable
+add table my/IpTable
+add table my\IpTable    # defaults to 'ip' family
+table my./_IpTable
+add table my./_IpTable
+table my.IpTable
+add table my.IpTable
+add table my_./\IpTable    # defaults to 'ip' family
+
 # base_cmd add_cmd 'table' table_spec table_block common_block 'include'
 table T {
     include "file"
@@ -104,7 +109,8 @@ table T { chain C { }; };
 
 
 # nft_line/nft_c_base_cmd/nft_base_cmd_add/nft_add_table_spec
-add table ip T { ip chain C { type ; }; };   # supposed to be highlighted (incomplete type)
+add table ip T { ip chain C { type ; }; } # comment ;   # supposed to be highlighted (incomplete type)
+add table ip T { ip chain C { type ; }; } ;   # supposed to be highlighted (incomplete type)
 table T { chain C { type filter hook ingress device $MY_DEVICE ; }; };
 table T { chain C { type filter hook ingress device $MY_DEVICE ; }; };
 table T { chain C { type filter hook ingress devices = $MY_DEVICE ; }; };
@@ -125,10 +131,8 @@ table T { chain C { rule define = 1; comment "asdf" ;  }; };
 table T { chain C { devices=$MYDEVICE;  }; };
 table T { chain C { devices =$MYDEVICE;  }; };
 table T { chain C { devices= $MYDEVICE;  }; };
-table T { chain C { devices = eth0;  } }
 table T { chain C { devices =    $eth0;  }; };
 table T { chain C { xxx devices = $MYDEVICE;  }; };
-table T { chain C { devices = { eth0 } }; };
 
 table myIpTable { flags dormant; }
 table netdev myNetdev { flags dormant; }
@@ -172,6 +176,23 @@ table arp A0b_._/RP_TABLE {
         counter log drop
     }
 }
+table netdev A {
+    chain a { 
+        type filter hook ingress device lo priority -100; policy accept
+        chain a { type };
+        udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    }
+    chain b { }
+}
+table netdev A {
+    chain a { };
+    chain b { };
+    chain c { };
+}
+table netdev A {
+    chain a { }; chain b { }; chain c { };
+}
+
 table netdev NETDEV_TABLE {
     # mind the NIC, it must exists
     chain ingress_filter_netdev_lo { 
@@ -805,36 +826,51 @@ table ip6 firewall {
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
+
+table ip
+table ip6   
+table inet  #
+table bridge ;  
+table netdev  # intentionally invalid; invalid table identifier
+table arp  # intentionally invalid; invalid table identifier
 table ip {  };
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
-table my.IpTable
-table my/IpTable
-add table my/IpTable
-add table my\IpTable    # defaults to 'ip' family
-table my./_IpTable
-add table my./_IpTable
-table my.IpTable
-add table my.IpTable
-add table my_./\IpTable    # defaults to 'ip' family
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-table xxxx { chain 'MyIpNet' { chain }; };
-table xxxx { chain "MyIpNet" { chain }; };
-( describe 1; );
-table xxxx { flags ,, b, c };  " oopsie
-table xxxx { flags a, b,  };  " oopsie
-table ip6 xxxx { flags , a, b };  " oopsie
-table xxxx { undefine abc; chain last { chain last; undefine abc; }; };  # oopsie
 table T { chain C { type filter ; }; };  # incomplete
 table T { chain C { type filter hook ingress ; }; };  # incomplete
 table T { chain C { type filter hook ingress devices ; }; };  # incomplete
 table T { chain C { type filter hook ingress devices = ; }; };  # incomplete
+
 table T { chain C { type filter hook ingress device eth0 priority ; }; };  # incomplete
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+table xxxx { undefine abc; chain last { chain last; undefine abc; }; };  # oopsie
+table xxxx { flags ,, b, c };  " oopsie
+table xxxx { flags a, b,  };  " oopsie
+table ip6 xxxx { flags , a, b };  " oopsie
+table xxxx { chain 'MyIpNet' { chain }; };
+table xxxx { chain "MyIpNet" { chain }; };
+
+table T { chain C { devices = eth0  } }
+table T { chain C { devices = eth0;  } }
+
+table T { chain C { devices = { eth0 } # comment
+    }  # comment
+}  # comment
+table T { chain C { devices = { eth0 } ; # comment
+    }; # comment
+}; # comment
+table T { chain C { devices = { eth0 } }; };
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+( describe 1; );
+
 table xxxx { chain MyIpNet {
     chain last;  # oopsie
     };

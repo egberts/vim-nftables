@@ -1,10 +1,14 @@
 #!/usr/sbin/nft -f
-# File: all-syntaxes.nft
+# File: passing-syntaxes.nft
 # Description: A test NFT file to exercise all Vim syntax highlightings.
 #
-# This is the part where you can add your own esoteric setting(s) if it breaks
-# the vim syntax highlighter for NFTABLES (yet `nft` takes it in just normally).
-# TODO: More todo, FIXME, FIXME: TODO: xxx XXX ARGH!
+# base_cmd *
+# nft_line/*
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
 
 reset map
 # <common_block>

@@ -72,6 +72,9 @@ protocols.
 
 Vimscript
 =========
+
+
+
 In DSL parlance, vimscript syntax is a extended right-regular grammar 
 (Type-3 Chomskey): there are no support for left-regular grammar.
 
@@ -197,6 +200,37 @@ Desired End-Result
 In order to understand how to use the vimscript syntax, we need to map it
 consistently and concisely into the DSL notations of string handling.
 
+Mapping Vimscript to CSG
+========================
+We forge ahead and pre-fill the mapping table, then followed by
+its detail:
+
+```
+CSG notation	RHS	LHS	vimscript command(s)
+			
+S → ε	terminal	empty	syntax match S “”
+A → ‘a’	terminal	literal	syntax match A “a”
+B → ‘b’	terminal	literal	syntax match B “b”
+A → B	terminal	terminal	syntax match A “a” nextgroup=B
+A → c_C	terminal	Non-terminal	syntax match A “a” nextgroup=\@c_C
+c_C → X	Non-terminal	terminal	syntax cluster c_C contains=X
+c_C → c_F	Non-terminal	Non-terminal	syntax cluster c_C contains=\@F
+			
+c_C → AB	Non-terminal	catenation	syn cluster c_C contains=A; syn match A /a/ nextgroup=B; syn match B /b/
+D → AB	terminal	catenation	syn match D /d/ nextgroup=A; syn match A /a/ nextgroup=B; syn match B /b/
+			
+c_C → A | B	Non-terminal	union/choices	syn cluster c_C contains=A,B
+D → A | B	terminal	union/choices	syn match D /d/ nextgroup=A,B
+			
+c_C → A|B|C 	Non-terminal	union	syn cluster c_C contains=A,B,C
+D → A | B | C	terminal	union/choices	syn match D /d/ nextgroup=A,B,C
+			
+L → E(E S)*		a list/set/dict	syn cluster c_L contains=E syn match E /e/ nextgroup=S syn match S /,/ nextgroup=E
+ → F*		ZeroOrMore	syn match F // nextgroup=F
+ → F+		OneOrMore	syn match F // nextgroup=F1; syn match F1 /f/ nextgroup=F
+
+```
+
 Terminal Node
 -------------
 The basic CSL declaration is a terminal node.   
@@ -205,34 +239,35 @@ We use CSG notation to describe the CSL side.
 
 A terminal node may be a static symbol or empty:
 
-    A -> empty
+    A -> ε
     B -> 'b'
 
 The detail of their corresponding vimscript syntax is next.
 
-Note: In DSL parlance, we use a unique identifier (e.g., `A`, `B`) 
-if its usage is not the same as mentioned throughout this article.
+Note: In CSG parlance, we use the next available but unique 
+identifier (e.g., `A`, `B`) if its RHS production is not 
+the same as initially mentioned throughout this article: 
+resuse of identifier is essential to explain the 
+ever-expansive CSG notations.
 
 Empty
 -----
-The simplistic CSL declaration of a terminal node is an empty set:
+The simplistic CSG declaration of a terminal node is an empty set:
 
-    A -> empty
+    A -> ε
 
 and is declared by vimscript syntax statement of:
 
     syntax cluster A contains=
 
-But the `contains=` attribute without any parameter value is 
-a vimscript interpreter error.
+The `contains=` attribute without any parameter value is 
+a vimscript interpreter error. 
 
-Yet it shall be written here as a guide for subsequential CSL building blocks.
+Yet it shall be written here merely as a guide for 
+subsequential CSG building blocks.
 
-This means, for use in vimscript syntax, the CSL language specification 
-shall be condensed to having all empty statements optimized out.
-
-Furthermore, one can reconstruct the optimized-out empty by examining
-the terminal node for symbolic and no further jump out.
+This means, for proper use in vimscript syntax, CSG language specification 
+shall be condensed to having all empty statements optimized and removed out.
 
 Static
 ----
@@ -240,9 +275,9 @@ Next is the static terminal declaration:
 
     B -> 'b'
 
-Above LHS is an label.
+LHS `B` is a label.
 
-Above RHS is a static pattern (e.g., a single character, a literal).
+RHS `'b'` is a pattern (e.g., a single character, literal, variable name, keyword, or command).
 
 and is declared by its following vimscript statement:
 
@@ -744,3 +779,5 @@ REFERENCE
 * [Relationship between Grammar and Language](https://www.geeksforgeeks.org/relationship-between-grammar-and-language/?ref=oin_asr12)
 * [Removal of Ambiguity Converting An Ambiguous Grammar into Unambiguous Grammar](https://www.geeksforgeeks.org/removal-of-ambiguity-converting-an-ambiguos-grammar-into-unambiguos-grammar/?ref=oin_asr4)
 * [Applications of Various Automata](https://www.geeksforgeeks.org/applications-of-various-automata/)
+* [Automatic syntax highlighter generation](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/autohighlight/final-paper.pdf), Allen, S. T.; Williams, S. R., December 9, 2005
+

@@ -1,0 +1,82 @@
+#!/usr/sbin/nft -f
+# File: list.nft
+# Description: A test NFT file to exercise 'list' command's Vim syntax highlightings.
+#
+# base_cmd list_cmd
+#
+
+table ip6 MyIptable  ### sanity test
+
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+list table MyTable
+list table ip MyTable
+list table ip6 MyTable
+list table inet MyTable
+list table netdev MyTable
+list table bridge MyTable
+list table arp MyTable
+list chain MyTable MyChain
+list chain ip MyTable MyChain
+list chain ip6 MyTable MyChain
+list chain inet MyTable MyChain
+list chain netdev MyTable MyChain
+list chain bridge MyTable MyChain
+list chain arp MyTable MyChain
+list set MySet MyChain
+list set ip MySet MyChain
+list set ip6 MySet MyChain
+list set inet MySet MyChain
+list set netdev MySet MyChain
+list set bridge MySet MyChain
+list set arp MySet MyChain
+list map MyMap
+list map ip MyMap
+list map ip6 MyMap
+list map inet MyMap
+list map netdev MyMap
+list map bridge MyMap
+list map arp MyMap
+list flow table MyFlow
+list flow table ip MyFlow
+list flow table ip6 MyFlow
+list flow table inet MyFlow
+list flow table arp MyFlow
+list meter MyMap
+list meter ip MyMap
+list meter ip6 MyMap
+list meter inet MyMap
+list meter netdev MyMap
+list meter bridge MyMap
+list meter arp MyMap
+list ruleset ip 
+list ruleset ip6
+list ruleset inet
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+list table MyTable InvalidChain
+list table ip MyTable InvalidChain
+list table arp MyTable InvalidChain
+list chain arp MyTable MyChain ExtraIdentifier
+list chain wrong_family_spec ip MyTable MyChain
+list set arp MyTable MyChain ExtraIdentifier
+list map arp MyTable MyChain ExtraIdentifier
+list flow table MyFlow MyChain ExtraIdentifier
+list meter arp MyTable MyChain ExtraIdentifier
+list ruleset netdev
+list ruleset bridge
+list ruleset arp
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+

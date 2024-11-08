@@ -1,11 +1,21 @@
-#!/usr/sbin/nft
+#!/usr/sbin/nft -f
+# File: checked-add-tables.nft
+# Description: A test NFT file to exercise '[add] table' Vim syntax highlightings.
 #
-# Title: `add table` validator that passes `nft -c` checks.
+# base_cmd add_cmd 'table'
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_table
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
 
 add table inet INET_TABLE
-add chain inet INET_TABLE workstation_inet_filter_input;
-add chain inet INET_TABLE workstation_arp_filter_input ;
 
+add table inet INET_TABLE { }
+
+add table inet INET_TABLE {
+    define interface_name2 = "br0";
+}
 table inet INET_TABLE {
     define interface_name2 = "br0";
     chain prerouting {
@@ -158,3 +168,20 @@ table inet INET_TABLE {
         counter log reject
     }
 }
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+add chain inet INET_TABLE workstation_inet_filter_input;
+add chain inet INET_TABLE workstation_arp_filter_input ;
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+
