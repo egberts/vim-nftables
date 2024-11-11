@@ -2191,8 +2191,8 @@ syn match nft_base_cmd_reset_rules_ruleset_spec_id_table "\v[a-zA-Z0-9\_]{1,64}"
 \ nextgroup=nft_base_cmd_reset_rules_ruleset_spec_id_chain
 
 " base_cmd 'reset' 'rules' family_spec_explicit
-hi link   nft_base_cmd_reset_rules_family_spec_explicit nftHL_Family
-syn match nft_base_cmd_reset_rules_family_spec_explicit "\v(ip6|ip|inet|arp|bridge|netdev)" skipwhite contained
+hi link   nft_base_cmd_reset_rules_ruleset_spec_family_spec_explicit nftHL_Family
+syn match nft_base_cmd_reset_rules_ruleset_spec_family_spec_explicit "\v(ip6|ip|inet|arp|bridge|netdev)" skipwhite contained
 \ nextgroup=
 \    nft_base_cmd_reset_rules_ruleset_spec_id_table
 
@@ -2200,22 +2200,23 @@ syn match nft_base_cmd_reset_rules_family_spec_explicit "\v(ip6|ip|inet|arp|brid
 " base_cmd 'reset' 'rules' ruleset_spec
 syn cluster nft_c_base_cmd_reset_rules_ruleset_spec
 \ contains=
-\    nft_base_cmd_reset_rules_ruleset_spec_family_spec_explicit
+\    nft_base_cmd_reset_rules_ruleset_spec_family_spec_explicit,
+\    nft_base_cmd_reset_rules_ruleset_spec_id_table
 
 " base_cmd 'reset' 'rules' 'chain'/'table' ruleset_spec
-syn cluster @nft_c_base_cmd_reset_rules_ruleset_spec_id_table
+syn cluster @nft_c_base_cmd_reset_rules_ruleset_spec
 \ contains=
 \    nft_base_cmd_reset_rule_ruleset_spec_family_spec,
 \    nft_base_cmd_reset_rule_ruleset_spec_id_table
 
 " base_cmd 'reset' 'rules' 'chain'
-hi link nft_base_cmd_reset_rules_chain_keyword nftHL_Chain
+hi link nft_base_cmd_reset_rules_chain_keyword nftHL_Action
 syn match nft_base_cmd_reset_rules_chain_keyword "chain" skipwhite contained
 \ nextgroup=
 \    @nft_c_base_cmd_reset_rule_ruleset_spec
 
 " base_cmd 'reset' 'rules' 'table'
-hi link nft_base_cmd_reset_rules_table_keyword nftHL_Table
+hi link nft_base_cmd_reset_rules_table_keyword nftHL_Action
 syn match nft_base_cmd_reset_rules_table_keyword "table" skipwhite contained
 \ nextgroup=
 \    @nft_c_base_cmd_reset_rule_ruleset_spec
@@ -2224,10 +2225,10 @@ syn match nft_base_cmd_reset_rules_table_keyword "table" skipwhite contained
 hi link nft_base_cmd_reset_rules nftHL_Action
 syn match nft_base_cmd_reset_rules "rules" skipwhite contained
 \ nextgroup=
-\    nft_base_cmd_reset_rules_family_spec_explicit,
 \    nft_base_cmd_reset_rules_table_keyword,
 \    nft_base_cmd_reset_rules_chain_keyword,
 \    @nft_c_base_cmd_reset_rules_ruleset_spec
+"\    nft_base_cmd_reset_rules_family_spec_explicit,
 
 " base_cmd 'reset' 'quota'
 hi link nft_base_cmd_reset_quota nftHL_Action
@@ -2235,11 +2236,11 @@ syn match nft_base_cmd_reset_quota "quota" skipwhite contained
 
 " base_cmd 'reset' 'counter' obj_spec
 " base_cmd 'reset' 'counter'/'quota' table_id chain_id
-hi link   nft_base_cmd_reset_counter_quota_obj_spec_id_chain nftHL_Identifier
+hi link   nft_base_cmd_reset_counter_quota_obj_spec_id_chain nftHL_Chain
 syn match nft_base_cmd_reset_counter_quota_obj_spec_id_chain "\v[a-zA-Z0-9]{1,64}" skipwhite contained
 
 " base_cmd 'reset' 'counter'/'quota' 'table' identifier
-hi link   nft_base_cmd_reset_counter_quota_obj_spec_id_table nftHL_Identifier
+hi link   nft_base_cmd_reset_counter_quota_obj_spec_id_table nftHL_Table
 syn match nft_base_cmd_reset_counter_quota_obj_spec_id_table "\v[a-zA-Z0-9]{1,64}" skipwhite contained
 \ nextgroup=nft_base_cmd_reset_counter_quota_obj_spec_id_chain
 
