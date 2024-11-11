@@ -166,14 +166,17 @@ set filter blackhole { type ipv4_addr ; }
 set filter set1 { type ipv4_addr ; policy memory ; }
 set filter set1 { type ipv4_addr ; policy performance ; }
 set ip myIpTable mySet {   # comment
-    type inet_proto;   # comment
-    flags interval;   # comment
+    type inet.proto;   # comment
+    typeof inet.proto;   # comment
+    flags constant,dynamic,timeout,interval;   # comment
     timeout 30s;   # comment
     gc-interval 2h;   # comment
     elements = {ip};   # comment
+    auto-merge;   # comment
+    size 1200   # comment
     size 1200;   # comment
     policy memory;   # comment
-    auto-merge;   # comment
+    policy performance;   # comment
     };  # comment
 #####set netdev myNetdevTable myNetdevSet { type ether_addr; flags interval; timeout 15m; gc-interval 2d; elements = {mark}; size 1200; policy performance; auto-merge; }
 set netdev myNetdevTable myNetdevSet { type ether_addr; flags interval; timeout 15m; gc-interval 2d; size 1200; policy performance; auto-merge; }

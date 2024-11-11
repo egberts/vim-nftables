@@ -1,0 +1,110 @@
+#!/usr/sbin/nft -f
+# File: reset.nft
+# Description: A test NFT file to exercise 'reset' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'reset' 
+# nft_line/nft_base_cmd/nft_base_cmd_reset
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# 'reset counters' <ruleset_spec>
+reset counters 
+# 'reset counters' <table_spec>
+reset counters MyIpTable MyChain
+reset counters ip MyIpTable MyChain
+reset counters ip6 MyIpTable MyChain
+reset counters inet MyIpTable MyChain
+reset counters netdev MyIpTable MyChain
+reset counters bridge MyIpTable MyChain
+reset counters arp MyIpTable MyChain
+# 'reset counters table' <table_spec>
+reset counters table MyIpTable MyChain
+reset counters table ip MyIpTable MyChain
+reset counters table ip6 MyIpTable MyChain
+reset counters table inet MyIpTable MyChain
+reset counters table netdev MyIpTable MyChain
+reset counters table bridge MyIpTable MyChain
+reset counters table arp MyIpTable MyChain
+
+# 'reset quotas' <ruleset_spec>
+reset quotas 
+# 'reset counters' <table_spec>
+reset quotas MyIpTable MyChain
+reset quotas ip MyIpTable MyChain
+reset quotas ip6 MyIpTable MyChain
+reset quotas inet MyIpTable MyChain
+reset quotas netdev MyIpTable MyChain
+reset quotas bridge MyIpTable MyChain
+reset quotas arp MyIpTable MyChain
+# 'reset quotas table' <table_spec>
+reset quotas table MyIpTable MyChain
+reset quotas table ip MyIpTable MyChain
+reset quotas table ip6 MyIpTable MyChain
+reset quotas table inet MyIpTable MyChain
+reset quotas table netdev MyIpTable MyChain
+reset quotas table bridge MyIpTable MyChain
+reset quotas table arp MyIpTable MyChain
+
+reset counter tablename chainname
+reset counter ip tablename chainname
+reset counter ip6 tablename chainname
+reset counter inet tablename chainname
+reset counter netdev tablename chainname
+reset counter bridge tablename chainname
+reset counter arp tablename chainname
+
+reset quota tablename chainame
+reset quota ip tablename chainname
+reset quota ip6 tablename chainname
+reset quota inet tablename chainname
+reset quota netdev tablename chainname
+reset quota bridge tablename chainname
+reset quota arp tablename chainname
+
+# 'reset' 'rules' ruleset_spec
+reset rules 
+reset rules ip
+reset rules ip6
+reset rules inet
+reset rules netdev
+reset rules bridge
+reset rules arp
+
+# 'reset' 'rules' table_spec
+reset rules ip
+reset rules ip myTable myChain
+reset rules myTable
+reset rules table myTable
+
+# 'reset' 'rules' chain_spec
+reset rules myTable myChain
+reset rules chain myTable myChain
+
+# 'reset' 'rule' ruleid_spec
+reset rule 
+reset rule ip
+reset rule ip6
+reset rule inet
+reset rule netdev
+reset rule bridge
+reset rule arp
+
+reset element <set_spec> <set_block_expr>
+
+reset set <set_or_id_spec>
+
+reset map <set_or_id_spec>
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
