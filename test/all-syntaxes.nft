@@ -2344,13 +2344,13 @@ reset counter ip6 myIp6Table
 reset counter inet myInetTable
 
 # reset counter <objid_spec>
-reset counter myIpTable handle 5
-reset counter netdev myNetdevTable handle 5
-reset counter bridge myBridgeTable handle 5
-reset counter arp myArpTable handle 5
-reset counter ip myIpTable handle 5
-reset counter ip6 myIp6Table handle 5
-reset counter inet myInetTable handle 5
+reset counter myIpTable objId handle 5
+reset counter netdev myNetdevTable objId handle 5
+reset counter bridge myBridgeTable objId handle 5
+reset counter arp myArpTable objId handle 5
+reset counter ip myIpTable objId handle 5
+reset counter ip6 myIp6Table objId handle 5
+reset counter inet myInetTable objId handle 5
 
 
 # delete chain <chain_spec>

@@ -91,19 +91,80 @@ reset rule netdev
 reset rule bridge
 reset rule arp
 
-reset element <set_spec> <set_block_expr>
-
-reset set <set_or_id_spec>
-
-reset map <set_or_id_spec>
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
+# 'reset' 'element' set_spec set_block_expr
+# 'reset' 'element' table_spec set_id set_block_expr
+# 'reset' 'element' family_spec table_id set_id set_block_expr
+# 'reset' 'element' [ ('ip'|'ip6'|'inet'|'netdev'|'bridge'|'arp') ] table_id set_id set_block_expr
+# 'reset' 'element' [ ('ip'|'ip6'|'inet'|'netdev'|'bridge'|'arp') ] table_id set_id [ set_expr | variable_expr ]
+reset element table_id set_id $variable
+reset element table_id set_id { eth0 }  ;  
+
+reset element ip table_id set_id { eth0 }    
+reset element ip6 table_id set_id { eth0 }
+reset element inet table_id set_id { eth0 }
+reset element netdev table_id set_id { eth0 }
+reset element bridge table_id set_id { eth0 }
+reset element arp table_id set_id { eth0 }
+
+# 'reset' 'set' set_or_id_spec set_block_expr
+# 'reset' 'set' ( set_spec | setid_spec ) set_block_expr
+# 'reset' 'set' set_spec set_block_expr
+# 'reset' 'set' table_spec set_id set_block_expr
+# 'reset' 'set' family_spec table_id set_id set_block_expr
+# 'reset' 'set' [ ('ip'|'ip6'|'inet'|'netdev'|'bridge'|'arp') ] table_id set_id set_block_expr
+# 'reset' 'set' [ ('ip'|'ip6'|'inet'|'netdev'|'bridge'|'arp') ] table_id set_id [ set_expr | variable_expr ]
+# 'reset' 'set' setid_spec set_block_expr
+# 'reset' 'set' table_spec 'handle' handle_identifier set_block_expr
+# 'reset' 'set' table_spec 'handle' handle_identifier '$'identifier
+# 'reset' 'set' table_spec 'handle' handle_identifier { string [ ; string ] }
+reset set table_id set_id $variable
+reset set table_id set_id { eth0 }
+reset set ip table_id set_id { eth0 }    
+reset set ip6 table_id set_id { eth0 }
+reset set inet table_id set_id { eth0 }
+reset set netdev table_id set_id { eth0 }
+reset set bridge table_id set_id { eth0 }
+reset set arp table_id set_id { eth0 }
+
+# 'reset' 'map' set_or_id_spec set_block_expr
+# 'reset' 'map' ( set_spec | setid_spec ) set_block_expr
+# 'reset' 'map' set_spec set_block_expr
+# 'reset' 'map' table_spec set_id set_block_expr
+# 'reset' 'map' family_spec table_id set_id set_block_expr
+# 'reset' 'map' [ ('ip'|'ip6'|'inet'|'netdev'|'bridge'|'arp') ] table_id set_id set_block_expr
+# 'reset' 'map' [ ('ip'|'ip6'|'inet'|'netdev'|'bridge'|'arp') ] table_id set_id [ set_expr | variable_expr ]
+# 'reset' 'map' setid_spec set_block_expr
+# 'reset' 'map' table_spec 'handle' handle_identifier set_block_expr
+reset map table_id set_id $variable
+reset map table_id set_id { eth0 }
+reset map ip table_id set_id { eth0 }
+reset map ip6 table_id set_id { eth0 }
+reset map inet table_id set_id { eth0 }
+reset map netdev table_id set_id { eth0 }
+reset map bridge table_id set_id { eth0 }
+reset map arp table_id set_id { eth0 }
+reset map table_id set_id handle 123
+reset map ip table_id set_id handle 123
+reset map ip6 table_id set_id handle 123
+reset map inet table_id set_id handle 123
+reset map netdev table_id set_id handle 123
+reset map bridge table_id set_id handle 123
+reset map arp table_id set_id handle 123
+
 
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
 
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)

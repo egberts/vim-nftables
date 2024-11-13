@@ -2185,17 +2185,91 @@ syn match nft_base_cmd_replace "\vreplace\s{1,64}rule" skipwhite contained
 \ nextgroup=
 \    @nft_c_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_family_spec
 
-" base_cmd 'reset' 'map'
-hi link nft_base_cmd_reset_map nftHL_Action
-syn match nft_base_cmd_reset_map "map" skipwhite contained
+" base_cmd 'reset' [ 'set' | 'map' ] table_id spec_id '{' ... '}'
+hi link nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_set nftHL_Normal
+syn region nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_set start=/{/ end=/}/ skipwhite skipnl contained
+\ nextgroup=
+\    nft_EOL
 
-" base_cmd 'reset' 'set'
-hi link nft_base_cmd_reset_set nftHL_Action
-syn match nft_base_cmd_reset_set "set" skipwhite contained
+" base_cmd 'reset' [ 'set' | 'map' ] table_id spec_id '$'identifier
+hi link nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_variable nftHL_Variable
+syn match nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_variable "\$\v[a-zA-Z0-9\-_]{1,64}" skipwhite contained
+
+" base_cmd 'reset' [ 'set' | 'map' ] table_id spec_id 'handle' handle_identifier
+hi link nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_handle_id nftHL_Number
+syn match nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_handle_id "\v[0-9]{1,7}" skipwhite contained
+
+" base_cmd 'reset' [ 'set' | 'map' ] table_id spec_id 'handle'
+hi link nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_handle_spec nftHL_Handle
+syn match nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_handle_spec "handle" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_handle_id
+
+" base_cmd 'reset' [ 'set' | 'map' ] table_id spec_id
+hi link nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id nftHL_Set
+syn match nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id "\v[a-zA-Z0-9\-_]{1,64}" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_handle_spec,
+\    nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_variable,
+\    nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id_set
+
+" base_cmd 'reset' [ 'set' | 'map' ] table_id
+hi link nft_base_cmd_reset_set_or_map_family_spec_table_id nftHL_Table
+syn match nft_base_cmd_reset_set_or_map_family_spec_table_id "\v[a-zA-Z0-9\-_]{1,64}" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_set_or_map_family_spec_table_id_spec_id
+
+" base_cmd 'reset' [ 'set' | 'map' ] family_spec table_id
+hi link nft_base_cmd_reset_set_or_map_family_spec nftHL_Family
+syn match nft_base_cmd_reset_set_or_map_family_spec "\v(ip6|ip|inet|netdev|bridge|arp)" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_set_or_map_family_spec_table_id
+
+" base_cmd 'reset' [ 'set' | 'map' ]
+hi link nft_base_cmd_reset_set_or_map nftHL_Action
+syn match nft_base_cmd_reset_set_or_map "\v(set|map)" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_set_or_map_family_spec,
+\    nft_base_cmd_reset_set_or_map_family_spec_table_id
+
+
+" base_cmd 'reset' 'element' table_id spec_id '{' ... '}'
+hi link nft_base_cmd_reset_element_family_spec_table_id_spec_id_set nftHL_Normal
+syn region nft_base_cmd_reset_element_family_spec_table_id_spec_id_set start=/{/ end=/}/ skipwhite skipnl contained
+\ nextgroup=
+\    nft_Semicolon,
+\    nft_EOL
+
+" base_cmd 'reset' 'element' table_id spec_id $variable
+hi link nft_base_cmd_reset_element_family_spec_table_id_spec_id_variable nftHL_Variable
+syn match nft_base_cmd_reset_element_family_spec_table_id_spec_id_variable "\v\$[a-zA-Z0-9\-_]{1,64}" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_element_family_spec_table_id_spec_id
+
+" base_cmd 'reset' 'element' table_id spec_id
+hi link nft_base_cmd_reset_element_family_spec_table_id_spec_id nftHL_Set
+syn match nft_base_cmd_reset_element_family_spec_table_id_spec_id "\v[a-zA-Z0-9\-_]{1,64}" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_element_family_spec_table_id_spec_id_variable,
+\    nft_base_cmd_reset_element_family_spec_table_id_spec_id_set
+
+" base_cmd 'reset' 'element' table_id
+hi link nft_base_cmd_reset_element_family_spec_table_id nftHL_Table
+syn match nft_base_cmd_reset_element_family_spec_table_id "\v[a-zA-Z0-9\-_]{1,64}" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_element_family_spec_table_id_spec_id
+
+" base_cmd 'reset' 'element'
+hi link nft_base_cmd_reset_element_family_spec nftHL_Family
+syn match nft_base_cmd_reset_element_family_spec "\v(ip6|ip|inet|netdev|bridge|arp)" skipwhite contained
+\ nextgroup=nft_base_cmd_reset_element_family_spec_table_id
 
 " base_cmd 'reset' 'element'
 hi link nft_base_cmd_reset_element nftHL_Action
 syn match nft_base_cmd_reset_element "element" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_reset_element_family_spec,
+\    nft_base_cmd_reset_element_family_spec_table_id
 
 " base_cmd 'reset' 'rule' table_id chain_id
 hi link   nft_base_cmd_reset_rule_ruleset_spec_id_chain nftHL_Family
@@ -2355,8 +2429,7 @@ syn match nft_base_cmd_reset "reset" skipwhite contained
 \    nft_base_cmd_reset_rules,
 \    nft_base_cmd_reset_rule,
 \    nft_base_cmd_reset_element,
-\    nft_base_cmd_reset_set,
-\    nft_base_cmd_reset_map
+\    nft_base_cmd_reset_set_or_map,
 
 " base_cmd [ 'set' ]
 
