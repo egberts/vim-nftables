@@ -1,0 +1,101 @@
+#!/usr/sbin/nft -f
+# File: describe.nft
+# Description: A test NFT file to exercise 'describe' Vim syntax highlightings.
+#
+# base_cmd 'describe' 
+# nft_line/nft_base_cmd/nft_base_cmd_describe
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# base_cmd 'describe'
+describe 1;
+describe  1
+describe 1   # has inline comment
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_exthdr_exists_expr/nft_exthdr_key
+describe exthdr frag;
+describe exthdr dst
+describe exthdr mh
+describe exthdr ah
+describe exthdr rt
+describe exthdr hbh
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_rt_hdr_expr
+describe rt nexthdr
+describe  rt nexthdr
+describe   rt nexthdr
+describe rt  nexthdr
+describe rt   nexthdr
+describe rt hdrlength
+describe rt type
+describe rt seg-left
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_rt0_hdr_expr
+describe rt0 addr [1]
+describe rt0 addr [ 1 ]
+describe rt0 addr [ 12345691 ]
+describe  rt0 addr [1]
+describe rt0  addr [1]
+describe rt0 addr  [1]
+describe rt0 addr [ 1]
+describe rt0 addr [1 ]
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_rt2_hdr_expr
+describe rt2 addr
+describe  rt2 addr
+describe rt2  addr
+describe rt2 addr 
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_rt4_hdr_expr
+describe rt4 last-entry;
+describe rt4 flags     ;
+describe rt4 tag
+describe rt4 sid
+describe rt4 sid [ 1 ]
+describe rt4 sid[1]
+
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_hbh_hdr_expr
+describe hbh nexthdr
+describe hbh hdrlength
+
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_frag_hdr_expr
+describe frag nexthdr
+describe frag reserved
+describe frag frag-off
+describe frag reserved2
+describe frag more-fragments
+describe frag id
+
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_dst_hdr_expr
+describe dst nexthdr
+describe dst hdrlength
+
+# nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_mh_hdr_expr
+describe mh nexthdr
+describe mh hdrlength
+describe mh type
+describe mh reserved
+describe mh checksum
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+describe rt0 addr [   ]
+describe rt0 addr []
+describe rt0 addr [ abcdefghi ]  # oopsie
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+describe rt0 addr [1
+    ]  # 2-liner oopsie
+
+describe rt4 sid[a]  # oopsie
+describe exthdr flag # oopsie
+describe tcp flag # oopsie
+describe hbh # oopsie
+
+# nft_line/nft_base_cmd_describe/nft_c_integer_expr
+( describe 1; );

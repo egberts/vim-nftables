@@ -1,0 +1,51 @@
+#!/usr/sbin/nft -f
+# File: replace.nft
+# Description: A test NFT file to exercise 'replace' Vim syntax highlightings.
+#
+# base_cmd 'replace' 
+# nft_line/nft_base_cmd/nft_base_cmd_replace
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# base_cmd 'replace'
+
+replace rule table_id chain_id handle 777
+replace rule ip table_id chain_id handle 321
+replace rule ip6 table_id chain_id handle 4
+replace rule inet table_id chain_id handle 1
+replace rule netdev table_id chain_id handle 7654321
+replace rule bridge table_id chain_id handle 10
+replace rule arp table_id chain_id handle 777
+
+replace rule table_id chain_id handle 777 ;
+replace rule ip table_id chain_id handle 321;
+replace rule ip6 table_id chain_id handle 4     ;
+replace rule inet table_id chain_id handle 1     ;
+replace rule netdev table_id chain_id handle 7654321     ;
+replace rule bridge table_id chain_id handle 10     ;
+replace rule arp table_id chain_id handle 777     ;
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+replace rule invalid_family_spec
+replace rule invalid{table_id} table_id chain_id handle 777
+
+replace rule tableid chain-id missing_handle_keyword
+replace rule netdev table_id chain_id missing_handle_keyword
+
+replace rule ip table_id chain_id unexpected_string handle 123 
+
+replace rule tableid chain-id handle 777 invalid_rule
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################

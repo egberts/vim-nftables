@@ -76,7 +76,7 @@ reset rules arp
 reset rules ip
 reset rules ip myTable myChain
 reset rules myTable
-reset rules table myTable
+reset rules table myTable myChain
 
 # 'reset' 'rules' chain_spec
 reset rules myTable myChain

@@ -1,0 +1,35 @@
+#!/usr/sbin/nft -f
+# File: rename.nft
+# Description: A test NFT file to exercise 'rename' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'rename' 
+# nft_line/nft_base_cmd/nft_base_cmd_rename
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# 'rename chain' <chain_spec>
+rename chain myTable myChain identifier 
+rename chain ip myTable myChain identifier 
+rename chain ip6 myTable myChain identifier 
+rename chain inet myTable myChain identifier 
+rename chain netdev myTable myChain identifier 
+rename chain bridge myTable myChain identifier 
+rename chain arp myTable myChain identifier 
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+rename counters 
+rename chain ip6 myTable myChain new_identifier x
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################

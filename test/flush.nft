@@ -64,9 +64,14 @@ flush table ip MyTable InvalidChain  # intentional invalid
 flush table arp MyTable InvalidChain  # intentional invalid
 flush chain arp MyTable MyChain ExtraIdentifier  # intentional invalid
 flush chain wrong_family_spec ip MyTable MyChain  # intentional invalid
+flush set MyTable MyChain ExtraIdentifier  # intentional invalid
 flush set arp MyTable MyChain ExtraIdentifier  # intentional invalid
+flush map MyTable MyChain ExtraIdentifier  # intentional invalid
 flush map arp MyTable MyChain ExtraIdentifier  # intentional invalid
+flush flow MyFlow MyChain ExtraIdentifier  # intentional invalid
 flush flow table MyFlow MyChain ExtraIdentifier  # intentional invalid
+flush flow table ip MyFlow MyChain ExtraIdentifier  # intentional invalid
+flush meter MyTable MyChain ExtraIdentifier  # intentional invalid
 flush meter arp MyTable MyChain ExtraIdentifier  # intentional invalid
 flush ruleset netdev  # intentional invalid; netdev is not a flushable
 flush ruleset bridge  # intentional invalid; bridge is not a flushable

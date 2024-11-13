@@ -1,0 +1,248 @@
+#!/usr/sbin/nft -f
+# File: create.nft
+# Description: A test NFT file to exercise 'create' Vim syntax highlightings.
+#
+# Section: base_cmd/ADD/CREATE
+# CREATE (create_cmd)
+#  create is similar to the add command, but returns 
+#  an error if the chain already exists.
+#
+# base_cmd 'create' 
+# nft_line/nft_base_cmd/nft_base_cmd_create
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+create table myIpTable 
+create table my.IpTable
+create table my/IpTable
+create table my_IpTable
+create table my./_IpTable
+create table netdev myNetdev 
+create table bridge myBridge 
+create table arp myArpTable 
+create table ip myIpTable 
+create table ip6 myIp6Table 
+create table inet myInetTable 
+create table myIpTable { flags dormant; }
+create table netdev myNetdev { flags dormant; }
+create table bridge myBridge { flags dormant; }
+create table arp myArpTable { flags dormant; }
+create table ip myIpTable { flags dormant; }
+create table ip6 myIp6Table { flags dormant; }
+create table inet myInetTable { flags dormant; }
+
+
+# Two kinds of a base chain for syntax handling:
+#  1. Unidentified family chain
+#  2. Explictly-identified family chain
+
+# create chain <chain_spec>
+create chain myIpTable myIpChain
+create chain netdev myNetdevTable myNetdevTable 
+create chain bridge myBridgeTable myBridgeChain 
+create chain arp myArpTable myArpChain 
+create chain ip myIpTable myIpChain 
+create chain ip6 myIp6Table myIp6Chain 
+create chain inet myInetTable myInetChain 
+
+# create chain <chain_spec> { <chain_block> }
+create chain myIpTable myIpChain { type filter hook prerouting priority 0; policy drop; } ;
+create chain myIpTable myIpChain { type filter hook input priority 0; policy drop;};
+create chain myIpTable myIpChain { type filter hook forward priority 0; policy drop;}
+create chain myIpTable myIpChain { type filter hook output priority 0; policy drop;}
+create chain myIpTable myIpChain { type filter hook postrouting priority 0; policy drop;}
+create chain myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
+create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept; }
+create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept; }
+create chain arp myArpTable myArpChain { type filter hook output priority 0; policy accept; }
+create chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy accept; }
+create chain bridge myBridgeTable myBridgeChain { type filter hook input priority 0; policy accept; }
+create chain bridge myBridgeTable myBridgeChain { type filter hook output priority 0; policy accept; }
+create chain bridge myBridgeTable myBridgeChain { type filter hook input device eth0 priority 0; policy accept; }
+create chain netdev myNetdevTable myNetdevChain 
+create chain netdev myNetdevTable myNetdevChain { type filter hook ingress device vlan0 priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook prerouting priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook forward priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook output priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type filter hook postrouting priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type nat hook prerouting priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type nat hook input priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type nat hook output priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type nat hook postrouting priority 0; policy accept; }
+create chain ip myIpTable myIpChain { type route hook output priority 0; policy accept; }
+
+create chain ip myIpTable myIpChain { type filter hook input device eth0 priority 0; policy accept; }
+
+create chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook output priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook postrouting priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type nat hook prerouting priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type nat hook input priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept; }
+create chain ip6 myIp6Table myIp6Chain { type filter hook input device eth0 priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook output priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook postrouting priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type nat hook prerouting priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type nat hook input priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type nat hook output priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type nat hook postrouting priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type route hook output priority 0; policy accept; }
+create chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy accept; }
+
+create chain netdev myIpTable myIpChain { type filter hook ingress devices = { eth0, eth1, eth2 } priority 0; policy drop;}
+create chain bridge myBridgeTable myBridgeChain { type filter hook prerouting devices = { eth0, eth1, eth2 } priority 0; policy drop;}
+create chain arp myArpTable myArpChain { type filter hook input devices = { eth0, eth1, eth2 } priority 0; policy drop;}
+create chain ip myIpTable myIpChain { type nat hook postrouting devices = { eth0, eth1, eth2 } priority 0; policy drop;}
+create chain ip6 myIp6Table myIp6Chain { type filter hook input devices = { eth0, eth1, eth2 } priority 0; policy drop;}
+create chain inet myInetTable myInetChain { type route hook output devices = { eth0, eth1, eth2 } priority 0; policy drop;}
+
+# create set <set_spec> { <set_block> }
+create set my_filter_table my_ssh_meter { type ipv4_addr . inet_proto; flags dynamic ;}
+create set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout;}
+####create set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout . dynamic ;}
+
+# create map <set_spec> { <map_block> }
+create map myIpTable myIpMap { flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+####create map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map netdev myNetdevTable myNetdevMap { flags interval; elements = { ether_addr }; size 1200; policy performance; }
+####create map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+create map bridge myBridgeTable myBridgeMap { flags interval; elements = { ether_addr }; size 1200; policy performance; }
+####create map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+create map arp myArpTable myArpMap { flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+####create map arp myArpTable myArpMap { type mark; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+create map ip6 myIp6Table myIp6Map { flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
+####create map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
+create map inet myInetTable myInetMap { flags interval; elements = { inet_proto }; size 1200; policy performance; }
+####create map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
+
+# create element <set_spec> <set_block_expr>
+#create element myIpTable myIpSet { element, element }
+create element netdev myNetdevTable myNetdevSet { 10.20.255.48/29 : goto group_114, 10.20.255.88/29 : goto group_114, 10.20.255.128/29 : goto group_114 } 
+create element bridge myBridgeTable myBridgeSet { 8.8.8.8, 8.8.4.4 }
+create element arp myArpTable myArpSet { 10.20.255.50 : 1:ffd8, 10.20.255.90 : 1:ffd5, 10.20.255.130 : 1:ffd2 }
+create element ip myIpTable myIpSet { 10.20.255.88/29 : goto group_114 }
+create element ip6 myIp6Table myIp6Set { 10.20.255.128/29 : goto group_114 }
+create element inet myInetTable myInetSet { 10.20.255.50/32 : "1:0xffd9" }
+
+# create flowtable <flowtable_spec> { <flowtable_block> }
+create flowtable myIpTable myIpFT { hook input priority 0; devices = { br0, eth0, eth1} ; }
+create flowtable ip myIpTable myIpFT { hook input priority 0; devices = { eth0, eth1 } ; }
+create flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { br0, eth0 } ; }
+create flowtable inet myInetTable myInetFT { hook input priority 0; devices = { br0, eth1 } ; }
+
+# create counter <obj_spec> close_scope_counter 
+# create counter <obj_spec> counter_obj counter_config close_scope_counter  
+create counter myIpTable https-filter
+create counter netdev myNetdevTable https-filter  
+create counter bridge myBridgeTable https-filter  
+create counter arp myArpTable https-filter  
+create counter ip myIpTable https-filter  
+create counter ip6 myIp6Table https-filter  
+create counter inet myInetTable https-filter  
+
+# create quota <obj_spec> <quota_odj> <quota_config>
+create quota filter http-quota over 25 mbytes
+###create quota filter http-quota { over 25 mbytes };
+###create quota filter ssh-quota { 10 kbytes }
+create quota netdev myIpfilter http-quota over 25 mbytes;
+create quota bridge myIpfilter http-quota over 25 mbytes
+create quota arp myIpfilter http-quota over 25 mbytes
+create quota ip myIpfilter http-quota over 25 mbytes
+create quota ip6 myIpfilter http-quota until 525 kbytes
+create quota inet myIpfilter http-quota over 25 mbytes
+
+# create ct helper  obj_spec ct_obj_alloc { ct_helper_block } close_scope_ct
+create ct helper myIpTable myCTHchain { };
+create ct helper myIpTable myCTHchain { ; }
+create ct helper myIpTable myCTHchain { ; };
+create ct helper myIpTable myCTHchain { type "sip" protocol tcp; l3proto ip; }
+create ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
+
+# create ct timeout  obj_spec ct_obj_alloc { ct_timeout_block } 
+create ct timeout myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+create ct timeout netdev myNetdevTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+create ct timeout bridge myBridgeTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+create ct timeout arp myArpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+create ct timeout ip myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+create ct timeout ip6 myIp6Table ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+create ct timeout inet myInetTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+create ct timeout myTable agressive-tcp {
+        l3proto ip;
+        protocol tcp;
+        policy = {established: 100, close_wait: 4, close: 4}
+    }
+
+# create ct expectation  obj_spec ct_obj_alloc { ct_expect_block } close_scope_ct
+create ct expectation myTable myExpectation { ; }
+create ct expectation myTable myExpectation { ; } 
+create ct expectation myTable e_pgsql {
+        protocol tcp
+        dport 5432
+        timeout 1h
+        size 12
+        l3proto ip
+    }
+
+
+# create limit <obj_spec> <limit_obj> <limit_config>
+create limit myIpTable myIpLimit rate 1/second
+create limit netdev myNetdevTable myNetdevLimit rate 1/minute
+create limit bridge myBridgeTable myBridgeLimit rate 1/hour
+create limit ip myIpTable myIpLimit rate 1/day
+create limit ip6 myIp6Table myIp6Limit rate 1/week
+create limit inet myInetTable myInetLimit rate 1/second
+create limit myIpTable myIpLimit rate 1/second burst 15 packets
+###create limit myIpTable myIpLimit rate 1/second burst 1514 bytes
+
+# create secmark obj_spec secmark_obj secmark_config close_scope_secmark
+# Bison: CREATE SECMARK obj_spec secmark_obj secmark_config { secmark_block } close_scope_secmark 
+create secmark myTable myTable mySecMark 
+# Bison: CREATE SECMARK obj_spec secmark_obj secmark_config { common_block } close_scope_secmark 
+####create secmark myTable sshtag { "system_u:object_r:ssh_server_packet_t:s0" }
+
+# create synproxy obj_spec synproxy_obj synproxy_config close_scope_synproxy
+#   Bison: ADD SYNPROXY obj_spec synproxy_obj synproxy_config { common_block } close_scope_synproxy 
+create synproxy myTable synproxy_obj mss 1500 wscale 7;
+create synproxy ip myTable synproxy_obj mss 1492 wscale 5;
+create synproxy ip6 myTable synproxy_obj mss 1498 wscale 6;
+create synproxy inet myTable synproxy_obj mss 1496 wscale 4;
+create synproxy arp myTable synproxy_obj mss 1512  wscale 2;
+create synproxy bridge myTable synproxy_obj mss 1518 wscale 3;
+create synproxy netdev myTable synproxy_obj mss 1593 wscale 1
+#   Bison: SYNPROXY obj_spec synproxy_obj synproxy_config { common_block } close_scope_synproxy (w/o 'add')
+###create synproxy myTable https-synproxy {
+###    mss 1460
+###    wscale 7
+###    timestamp sack-perm
+###}
+###create synproxy myTable other-synproxy {
+###    mss 1460
+###    wscale 5
+###}
+
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################

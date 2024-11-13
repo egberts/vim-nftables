@@ -2141,6 +2141,50 @@ syn cluster nft_c_base_cmd_add
 \    @nft_c_base_cmd_add_rule,
 " '', 'rule', 'add rule' forces nft_base_cmd_add_rule to be the last 'contains=' entry!!!
 
+" base_cmd 'replace' [ family_spec ] table_identifier chain_identifier handle_identifier rule
+
+" base_cmd 'replace' [ family_spec ] table_identifier chain_identifier handle_identifier
+hi link   nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_handle_id nftHL_Handle
+syn match nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_handle_id "\v[0-9]{1,9}" skipwhite contained
+\ nextgroup=
+\    nft_Semicolon
+
+" base_cmd 'replace' [ family_spec ] table_identifier chain_identifier handle_identifier
+hi link   nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_handle_spec nftHL_Action
+syn match nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_handle_spec "handle\s" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_handle_id
+
+" base_cmd 'replace' [ family_spec ] table_identifier chain_identifier
+hi link   nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_chain_id nftHL_Chain
+syn match nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_chain_id "\v[a-zA-Z0-9\-_]{1,64}\s+" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_handle_spec
+
+" base_cmd 'replace' [ family_spec ] table_identifier
+hi link   nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_table_id nftHL_Table
+syn match nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_table_id "\v[a-zA-Z0-9\-_]{1,64}\s+" contained
+\ nextgroup=
+\    nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_chain_id
+
+" base_cmd 'replace' family_spec
+hi link   nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_family_spec_family nftHL_Family
+syn match nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_family_spec_family "\v(ip6|ip|inet|bridge|netdev|arp)\s+" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_table_id
+
+" base_cmd 'replace' [ family_spec ]
+syn cluster nft_c_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_family_spec
+\ contains=
+\    nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_family_spec_family,
+\    nft_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_table_id
+
+" base_cmd 'replace' 'rule'
+hi link   nft_base_cmd_replace nftHL_Command
+syn match nft_base_cmd_replace "\vreplace\s{1,64}rule" skipwhite contained
+\ nextgroup=
+\    @nft_c_base_cmd_replace_rule_ruleid_spec_chain_spec_table_spec_family_spec
+
 " base_cmd 'reset' 'map'
 hi link nft_base_cmd_reset_map nftHL_Action
 syn match nft_base_cmd_reset_map "map" skipwhite contained
@@ -2315,6 +2359,52 @@ syn match nft_base_cmd_reset "reset" skipwhite contained
 \    nft_base_cmd_reset_map
 
 " base_cmd [ 'set' ]
+
+"""""""""""""""""" rename_cmd BEGIN """"""""""""""""""""""""""""""""""
+" base_cmd 'rename' 'chain' chain_spec identifier
+" base_cmd 'rename' 'chain' [ family_spec ] table_id chain_id [ 'last' | <string> ]
+
+hi link   nft_base_cmd_rename_chain_spec_table_spec_identifier nftHL_String
+syn match nft_base_cmd_rename_chain_spec_table_spec_identifier "\v[a-zA-Z_\-]{1,63}" skipempty skipnl skipwhite contained
+\ nextgroup=nft_EOL
+
+hi link   nft_base_cmd_rename_chain_spec_table_spec_chain_id nftHL_Identifier
+syn match nft_base_cmd_rename_chain_spec_table_spec_chain_id "\v[a-zA-Z_\-]{1,63}" skipwhite contained
+\ nextgroup=
+\     nft_base_cmd_rename_chain_spec_table_spec_identifier
+
+hi link   nft_base_cmd_rename_chain_spec_table_spec_table_id nftHL_Identifier
+syn match nft_base_cmd_rename_chain_spec_table_spec_table_id "\v[a-zA-Z_\-]{1,63}" skipwhite contained
+\ nextgroup=
+\     nft_base_cmd_rename_chain_spec_table_spec_chain_id "\v[a-zA-Z_\-]{1,63}" skipwhite contained
+
+hi link   nft_base_cmd_rename_chain_spec_table_spec_family_spec nftHL_Family
+syn match nft_base_cmd_rename_chain_spec_table_spec_family_spec "\v(ip6|ip|inet|netdev|bridge|arp)" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_rename_chain_spec_table_spec_table_id
+
+syn cluster nft_c_base_cmd_rename_chain_spec_table_spec
+\ contains=
+\    nft_base_cmd_rename_chain_spec_table_spec_family_spec,
+\    nft_base_cmd_rename_chain_spec_table_spec_table_id
+
+" base_cmd 'rename' 'chain' chain_spec
+syn cluster nft_c_base_cmd_rename_chain_spec
+\ contains=
+\    @nft_c_base_cmd_rename_chain_spec_table_spec
+
+" base_cmd 'rename' 'chain'
+hi link   nft_base_cmd_rename_chain_keyword nftHL_Action
+syn match nft_base_cmd_rename_chain_keyword "chain" skipwhite contained
+\ nextgroup=
+\    @nft_c_base_cmd_rename_chain_spec
+
+" base_cmd 'rename'
+hi link   nft_base_cmd_rename nftHL_Command
+syn match nft_base_cmd_rename "rename" skipwhite contained
+\ nextgroup=
+\    nft_base_cmd_rename_chain_keyword
+"""""""""""""""""" rename_cmd END """"""""""""""""""""""""""""""""""
 
 """""""""""""""""" list_cmd BEGIN """"""""""""""""""""""""""""""""""
 
@@ -2542,14 +2632,14 @@ syn cluster nft_c_base_cmd
 \    @nft_c_base_cmd_flush,
 \    @nft_c_base_cmd_list,
 \    nft_base_cmd_reset,
+\    nft_base_cmd_rename,
+\    nft_base_cmd_replace,
 \    @nft_c_base_cmd_add
 
-"\    nft_base_cmd_replace,
 "\    nft_base_cmd_create,
 "\    nft_base_cmd_insert,
 "\    nft_base_cmd_delete,
 "\    nft_base_cmd_get,
-"\    nft_base_cmd_rename,
 "\    nft_base_cmd_destroy,
 
 hi link nft_comment_whole_line nftHL_Comment
