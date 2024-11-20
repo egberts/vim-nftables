@@ -27,7 +27,9 @@ import ruleset vm
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
 
+
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
+
 

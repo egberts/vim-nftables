@@ -169,6 +169,7 @@ table inet INET_TABLE {
     }
 }
 
+
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
@@ -176,9 +177,11 @@ table inet INET_TABLE {
 add chain inet INET_TABLE workstation_inet_filter_input;
 add chain inet INET_TABLE workstation_arp_filter_input ;
 
+
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
+
 
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)

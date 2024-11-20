@@ -1393,8 +1393,8 @@ syn match nft_base_cmd_export "\vexport" skipwhite contained
 \ nextgroup=nft_export_cmd
 
 " base_cmd 'create' (via base_cmd0
-hi link   nft_base_cmd_create_cmd nftHL_Command
-syn match nft_base_cmd_create_cmd "\vcreate" skipwhite contained
+hi link   nft_base_cmd_create nftHL_Command
+syn match nft_base_cmd_create "\vcreate" skipwhite contained
 \ nextgroup=
 \    nft_base_cmd_create_cmd_table_keyword,
 \    nft_base_cmd_create_cmd_chain_keyword,
@@ -3210,9 +3210,9 @@ syn cluster nft_c_base_cmd
 \    @nft_c_base_cmd_list,
 \    nft_base_cmd_reset,
 \    nft_base_cmd_rename,
+\    nft_base_cmd_create,
 \    nft_base_cmd_replace,
 \    @nft_c_base_cmd_add
-"\    nft_base_cmd_create,
 "\    nft_base_cmd_insert,
 "\    nft_base_cmd_delete,
 "\    nft_base_cmd_get,

@@ -13,7 +13,12 @@
 
 add flowtable T C F
 add flowtable ip S F
-add flowtable T C F;
+add flowtable ip6 S F
+add flowtable inet S F
+add flowtable netdev S F
+add flowtable bridge S F
+add flowtable arp S F
+
 add flowtable ip T C F { hook b };
 add flowtable T C F { devices = eth0 };
 add flowtable T C F { flags offload; }
@@ -33,3 +38,5 @@ add flowtable T C F { counter }
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
+
+

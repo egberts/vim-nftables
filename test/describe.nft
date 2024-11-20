@@ -97,12 +97,14 @@ describe rt0 addr [   ]
 describe rt0 addr []
 describe rt0 addr [ abcdefghi ]  # oopsie
 
+
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
 describe 1   # has inline comment
 describe rt2 addr 
 describe rt4 flags     ;
+
 
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
@@ -117,4 +119,5 @@ describe rt4 sid[a]  # oopsie
 describe exthdr flag # oopsie
 describe tcp flag # oopsie
 describe hbh # oopsie
+
 

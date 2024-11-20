@@ -13,6 +13,12 @@
 
 map T C S
 map ip T C S
+map ip6 T C S
+map inet T C S
+map netdev T C S
+map bridge T C S
+map arp T C S
+
 map T C S;
 map T C S { timeout 15:00:01 }
 map T C S { gc-interval 1:00:1 }
@@ -104,6 +110,7 @@ add map T C {
     type time : interval classid
 };
 
+
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
@@ -119,3 +126,5 @@ map arp T
 map T C ;
 map T C { timeout 15:00:01 }
 map T C { typeof b.c.d.e.f : .k };
+
+

@@ -77,11 +77,14 @@ flush ruleset netdev  # intentional invalid; netdev is not a flushable
 flush ruleset bridge  # intentional invalid; bridge is not a flushable
 flush ruleset arp  # intentional invalid; arp is not a flushable
 
+
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
 
+
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
+
 

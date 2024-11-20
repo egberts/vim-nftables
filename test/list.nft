@@ -72,11 +72,15 @@ list ruleset netdev
 list ruleset bridge
 list ruleset arp
 
+
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
 
+
+
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
+
 

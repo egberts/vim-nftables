@@ -13,6 +13,12 @@
 
 set T C S
 set ip T C S
+set ip6 T C S
+set inet T C S
+set netdev T C S
+set bridge T C S
+set arp T C S
+
 set T C S ;
 set ip T C S { typeof b };
 set T C S { typeof a.b.c.d.e.f };
@@ -61,6 +67,7 @@ add set T C S { comment single-word }
 set T C S { automerge }
 add set T C S { automerge }
 
+
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
@@ -68,3 +75,5 @@ add set T C S { automerge }
 set T C
 set ip S
 set T C ;
+
+

@@ -52,3 +52,5 @@ replace rule tableid chain-id handle 777 invalid_rule
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
+
+
