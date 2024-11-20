@@ -1,7 +1,7 @@
 #
 # Detect file type by use of shebang
 function! s:DetectFiletype()
-    if getline(1) =~# '^#!\s*\%\(/\S\+\)\?/\%\(s\)\?bin/\%\(env\s\+\)\?nft\>'
+    if getline(1) =~ '^#!\s*\%\(/\S\+\)\?/\%\(s\)\?bin/\%\(env\s\+\)\?nft\>'
         setfiletype nftables
     endif
 endfunction

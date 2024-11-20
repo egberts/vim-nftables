@@ -1,0 +1,52 @@
+#!/usr/sbin/nft -f
+# File: all-counter.nft
+# Description: A test NFT file to exercise '[add] counter' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'counter' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_counter
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# base_cmd add_cmd 'counter'
+
+counter T O
+counter T O ;
+counter ip T O
+counter T last;
+counter T last packet 123 bytes 12345;
+counter T O { packet 123 bytes 12345 }
+counter T O { packet 123 bytes 12345 };
+counter T O ;
+counter ip T O { packet 123 bytes 123 };
+
+add counter T O
+add counter ip O
+add counter T O ;
+add counter T last;
+add counter T last packet 123 bytes 12345;
+add counter T O { packet 123 bytes 12345 };
+add counter T O { packet 123 bytes 12345 };
+add counter T O ;
+add counter ip T O { packet 123 bytes 123 };
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+counter T C { automerge }
+add counter T C { automerge }
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+
+

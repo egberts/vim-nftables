@@ -1807,11 +1807,16 @@ syn region nft_add_table_table_block_chain_chain_block start=/{/ end=/}/ skipnl 
 " \    nft_add_table_options_comment_spec,
 " \    nft_add_table_table_block_chain_keyword
 
+" add_cmd 'table' table_block 'chain' chain_spec chain_id
+hi link   nft_add_table_table_block_chain_chain_spec_chain_id  nftHL_Chain
+syn match nft_add_table_table_block_chain_chain_spec_chain_id  "\v[a-zA-Z0-9\_\-\/\\\[\]]{1,64}" skipwhite contained
+\ nextgroup=nft_add_table_table_block_chain_chain_block
 
-" add_cmd 'table' table_block 'chain' chain_block
+
+" add_cmd 'table' table_block 'chain' chain_spec table_id
 hi link   nft_add_table_table_block_chain_chain_identifier_string_unquoted nftHL_Chain
 syn match nft_add_table_table_block_chain_chain_identifier_string_unquoted "\v[a-zA-Z0-9\_\-\/\\\[\]]{1,64}" skipwhite contained
-\ nextgroup=nft_add_table_table_block_chain_chain_block
+\ nextgroup=nft_add_table_table_block_chain_chain_spec
 
 hi link   nft_add_table_table_block_chain_chain_identifier_string_sans_double_quote nftHL_Chain
 syn match nft_add_table_table_block_chain_chain_identifier_string_sans_double_quote "\v[a-zA-Z0-9\/\\\[\]\"]{1,64}" keepend skipwhite contained
@@ -1846,37 +1851,119 @@ syn match nft_add_table_table_block_chain_keyword "chain" skipwhite contained
 \    nft_add_table_table_block_chain_chain_identifier_string_unquoted
 """"" END OF table <identifier> { chain
 
-hi link   nft_keyword_last nftHL_Command
-syn match nft_keyword_last "last" skipwhite contained
+""""" BEGIN OF add_cmd_/'counter'/obj_spec """""
+" add_cmd 'counter' obj_spec '{' counter_block '}'
+hi link    nft_add_cmd_counter_counter_block nftHL_Normal
+syn region nft_add_cmd_counter_counter_block start=/{/ end=/}/ skipwhite contained
+\ nextgroup=
+\    nft_Semicolon,
+\    nft_EOL
+\ contains=
+\    nft_add_cmd_counter_counter_config,
+"\    @nft_comment_spec,
+"\    @nft_stmt_separator,
+"\    @nft_c_common_block
+
+" add_cmd 'counter' obj_spec counter_config 'packet' <packet_num> 'bytes' <integer>
+hi link   nft_add_cmd_counter_counter_config_bytes_num nftHL_Number
+syn match nft_add_cmd_counter_counter_config_bytes_num "\v[0-9]{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_Semicolon,
+\    nft_EOL
+
+" add_cmd 'counter' obj_spec counter_config 'packet' <packet_num> 'bytes'
+hi link   nft_add_cmd_counter_counter_config_bytes nftHL_Action
+syn match nft_add_cmd_counter_counter_config_bytes "bytes" skipwhite contained
+\ nextgroup=
+\    nft_add_cmd_counter_counter_config_bytes_num
+
+" add_cmd 'counter' obj_spec counter_config 'packet' <packet_num>
+hi link   nft_add_cmd_counter_counter_config_packet_num nftHL_Number
+syn match nft_add_cmd_counter_counter_config_packet_num "\v[0-9]{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_add_cmd_counter_counter_config_bytes
+
+" add_cmd 'counter' obj_spec counter_config 'packet'
+hi link   nft_add_cmd_counter_counter_config nftHL_Identifier
+syn match nft_add_cmd_counter_counter_config "packet" skipwhite contained
+\ nextgroup=
+\    nft_add_cmd_counter_counter_config_packet_num
+
+" add_cmd 'counter' table_identifier [ obj_identifier | 'last' ]
+hi link   nft_add_cmd_counter_obj_spec_obj_id nftHL_Identifier
+syn match nft_add_cmd_counter_obj_spec_obj_id "\v[a-zA-Z0-9\-\_]{1,64}" skipwhite contained
+\ nextgroup=
+\    nft_add_cmd_counter_counter_block,
+\    nft_add_cmd_counter_counter_config
+
+hi link   nft_add_cmd_counter_obj_spec_obj_last nftHL_Action
+syn match nft_add_cmd_counter_obj_spec_obj_last "last" skipwhite contained
+\ nextgroup=
+\    nft_add_cmd_counter_counter_config
+
+" add_cmd 'counter' obj_spec obj_id table_spec table_id
+hi link   nft_add_cmd_counter_obj_spec_table_spec_table_id nftHL_Identifier
+syn match nft_add_cmd_counter_obj_spec_table_spec_table_id "\v[a-zA-Z0-9\-\_]{1,64}" skipwhite contained
+\ nextgroup=
+\    nft_add_cmd_counter_obj_spec_obj_last,
+\    nft_add_cmd_counter_obj_spec_obj_id
+
+" _add_ to make 'chain_spec' pathway unique
+hi link   nft_add_cmd_counter_obj_spec_table_spec_family_spec_explicit nftHL_Family
+syn match nft_add_cmd_counter_obj_spec_table_spec_family_spec_explicit "\v(ip(6)?|inet|arp|bridge|netdev)" skipwhite contained
+\ nextgroup=nft_add_cmd_counter_obj_spec_table_spec_table_id
+
+" base_cmd add_cmd 'counter' obj_spec
+syn cluster nft_c_add_cmd_counter_obj_spec
+\ contains=
+\    nft_add_cmd_counter_obj_spec_table_spec_family_spec_explicit,
+\    nft_add_cmd_counter_obj_spec_table_spec_table_id
+
+" base_cmd add_cmd 'counter'
+hi link   nft_base_cmd_add_counter nftHL_Command
+syn match nft_base_cmd_add_counter "\v^\s*(counter|add\s*counter)" skipwhite contained
+\ nextgroup=@nft_c_add_cmd_counter_obj_spec
+""""" END OF add_cmd_/'counter'/obj_spec """""
 
 """"" BEGIN OF add_cmd_/'chain'/chain_spec """""
-" add_cmd 'chain' chain_spec identifier
-hi link   nft_add_chain_table_spec_identifier nftHL_Identifier
-syn match nft_add_chain_table_spec_identifier "\v[a-zA-Z0-9\-\_]{1,64}" skipwhite contained
+" add_cmd 'chain' table_identifier [ chain_identifier | 'last' ]
+hi link   nft_add_cmd_chain_spec_chain_id nftHL_Identifier
+syn match nft_add_cmd_chain_spec_chain_id "\v[a-zA-Z0-9\-\_]{1,64}" skipwhite contained
+\ nextgroup=nft_add_cmd_chain_chain_block
+
+hi link   nft_add_cmd_chain_spec_chain_last nftHL_Command
+syn match nft_add_cmd_chain_spec_chain_last "last" skipwhite contained
+\ nextgroup=nft_add_cmd_chain_chain_block
+
+" add_cmd 'chain' chain_spec table_identifier
+hi link   nft_add_cmd_chain_spec_table_spec_table_id nftHL_Identifier
+syn match nft_add_cmd_chain_spec_table_spec_table_id "\v[a-zA-Z0-9\-\_]{1,64}" skipwhite contained
 \ contains=nft_keyword_last
-\ nextgroup=nft_add_table_table_block_chain_chain_block  " TODO LET'S TRY THAT AND SEE WHERE IT GOES
+\ nextgroup=
+\    nft_add_cmd_chain_spec_chain_last,
+\    nft_add_cmd_chain_spec_chain_id
 " This is really interesting, reusing a chain_block may work after all TODO"
 
 " base_cmd 'add chain'/'chain' (via base_cmd)
 " add_cmd 'chain' chain_spec family_spec family_spec_explicit
 hi link   nft_add_chain_spec_family_spec_explicit_valid nftHL_Family
 syn match nft_add_chain_spec_family_spec_explicit_valid "\v(ip(6)?|inet|arp|bridge|netdev)" skipwhite contained
+
 " _add_ to make 'chain_spec' pathway unique
-hi link   nft_add_chain_spec_family_spec_explicit nftHL_Family
-syn match nft_add_chain_spec_family_spec_explicit "\v(ip(6)?|inet|arp|bridge|netdev)" skipwhite contained
-\ contains=nft_add_chain_spec_family_spec_explicit_valid
-\ nextgroup=nft_add_chain_table_spec_identifier
+hi link   nft_add_cmd_chain_spec_table_spec_family_spec_explicit nftHL_Family
+syn match nft_add_cmd_chain_spec_table_spec_family_spec_explicit "\v(ip(6)?|inet|arp|bridge|netdev)" skipwhite contained
+\ nextgroup=nft_add_cmd_chain_spec_table_spec_table_id
 
 " base_cmd add_cmd 'chain' chain_spec
-syn cluster nft_c_add_cmd_add_chain_chain_spec
+syn cluster nft_c_add_cmd_chain_spec
 \ contains=
-\    nft_add_chain_spec_family_spec_explicit,
-\    nft_add_chain_table_spec_identifier
+\    nft_add_cmd_chain_spec_table_spec_family_spec_explicit,
+\    nft_add_cmd_chain_spec_table_spec_table_id
 
 " base_cmd add_cmd 'chain'
 hi link   nft_base_cmd_add_chain nftHL_Command
 syn match nft_base_cmd_add_chain "\v^\s*(chain|add\s*chain)" skipwhite contained
-\ nextgroup=@nft_c_add_cmd_add_chain_chain_spec
+\ nextgroup=@nft_c_add_cmd_chain_spec
 """"" END OF add_cmd_/'chain'/chain_spec """""
 
 
@@ -2592,9 +2679,9 @@ syn cluster nft_c_base_cmd_add
 \    nft_base_cmd_add_flowtable,
 \    nft_base_cmd_add_table,
 \    nft_base_cmd_add_chain,
+\    nft_base_cmd_add_counter,
 \    @nft_c_base_cmd_add_rule
 "\    nft_base_cmd_add_element,
-"\    nft_base_cmd_add_count,
 "\    nft_base_cmd_add_quota,
 "\    nft_base_cmd_add_ct,
 "\    nft_base_cmd_add_limit,
