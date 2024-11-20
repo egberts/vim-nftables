@@ -272,6 +272,8 @@ define workstation1_ipv6 = fe00:2::2
 define my_public_wan = eth2
 define int_if1 = eth0
 define int_if2 = $my_public_wan
+define int_ifs = {}
+define int_ifs = { }
 define int_ifs = { virbr0, $int_if2, virbr1 }
 
 # Implicit 'add' (add_cmd) (no 'add' keyword)

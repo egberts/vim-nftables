@@ -27,6 +27,9 @@ replace rule netdev table_id chain_id handle 7654321     ;
 replace rule bridge table_id chain_id handle 10     ;
 replace rule arp table_id chain_id handle 777     ;
 
+replace rule ip table_id chain_id position 321 
+replace rule ip table_id chain_id index 321  ;
+
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)

@@ -1,0 +1,35 @@
+#!/usr/sbin/nft -f
+# File: all-flowtable.nft
+# Description: A test NFT file to exercise '[add] flowtable' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'flowtable' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_flowtable
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# base_cmd add_cmd 'flowtable'
+
+add flowtable T C F
+add flowtable ip S F
+add flowtable T C F;
+add flowtable ip T C F { hook b };
+add flowtable T C F { devices = eth0 };
+add flowtable T C F { flags offload; }
+add flowtable T C F { flags offload ;}
+add flowtable T C F { flags offload ; };
+add flowtable T C F { counter }
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################

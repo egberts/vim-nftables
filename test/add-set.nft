@@ -11,25 +11,43 @@
 
 # base_cmd add_cmd 'set'
 
-set T C
-set ip S
-set T C ;
-set ip T C { typeof b };
-set T C { typeof a.b.c.d.e.f };
-set T C { flags constant }
-set T C { flags interval; }
-set T C { flags timeout };
-set T C { flags dynamic ; } ;
-set T C { flags constant, interval, timeout, dynamic };
-set T C { flags constant; flags interval; flags timeout; flags dynamic };
-set T C { timeout 15:00:01 }
-set T C { gc-interval 1:00:1 }
-set T C { elements = 1:00:1 }
-set T C { automerge }
-set T C { comment *A comment string* }
-set T C { comment "A comment string" }
-set T C { comment 'A comment string' }
-set T C { comment single-word }
+set T C S
+set ip T C S
+set T C S ;
+set ip T C S { typeof b };
+set T C S { typeof a.b.c.d.e.f };
+set T C S { flags constant }
+set T C S { flags interval; }
+set T C S { flags timeout };
+set T C S { flags dynamic ; } ;
+set T C S { flags constant, interval, timeout, dynamic };
+set T C S { flags constant; flags interval; flags timeout; flags dynamic };
+set T C S { timeout 15:00:01 }
+set T C S { gc-interval 1:00:1 }
+set T C S { elements = 1:00:1 }
+set T C S { comment *A comment string* }
+set T C S { comment "A comment string" }
+set T C S { comment 'A comment string' }
+set T C S { comment single-word }
+
+add set T C
+add set ip S
+add set T C S ;
+add set ip T C S { typeof b };
+add set T C S { typeof a.b.c.d.e.f };
+add set T C S { flags constant }
+add set T C S { flags interval; }
+add set T C S { flags timeout };
+add set T C S { flags dynamic ; } ;
+add set T C S { flags constant, interval, timeout, dynamic };
+add set T C S { flags constant; flags interval; flags timeout; flags dynamic };
+add set T C S { timeout 15:00:01 }
+add set T C S { gc-interval 1:00:1 }
+add set T C S { elements = 1:00:1 }
+add set T C S { comment *A comment string* }
+add set T C S { comment "A comment string" }
+add set T C S { comment 'A comment string' }
+add set T C S { comment single-word }
 
 
 ##################################################################################
@@ -40,6 +58,13 @@ set T C { comment single-word }
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
 
+set T C S { automerge }
+add set T C S { automerge }
+
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
+
+set T C
+set ip S
+set T C ;

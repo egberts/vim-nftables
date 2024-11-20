@@ -1,0 +1,50 @@
+#!/usr/sbin/nft -f
+# File: define.nft
+# Description: A test NFT file to exercise 'define' Vim syntax highlightings.
+#
+# base_cmd define_cmd
+# nft_line/nft_base_cmd/nft_base_cmd_define
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+define int_ifs = {}
+define int_if2 = { }
+define MYPOLICY= -1
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+define int_if3 = { virbr0, $int_if2, virbr1 }
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+# TODO: Needs work
+##################################################################################
+define nic_inet = bond0
+define nic_dmz = bond1
+define nic_lan = bond2
+# network ranks
+define net_ipv4_dmz = 10.0.1.0/24
+define net_ipv6_dmz = fe00:1::/64
+define net_ipv4_lan = 10.0.2.0/24
+define net_ipv6_lan = fe00:2::/64
+# some machines
+define server1_ipv4 = 10.0.1.2
+define server1_ipv6 = fe00:1::2
+define workstation1_ipv4 = 10.0.2.2
+define workstation1_ipv6 = fe00:2::2
+
+define my_public_wan = eth2
+define int_if1 = eth0
+define int_if4 = $my_public_wan
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+

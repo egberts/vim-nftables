@@ -1,0 +1,121 @@
+#!/usr/sbin/nft -f
+# File: all-map
+# Description: A test NFT file to exercise '[add] map' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'map' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_map
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# base_cmd add_cmd 'map'
+
+map T C S
+map ip T C S
+map T C S;
+map T C S { timeout 15:00:01 }
+map T C S { gc-interval 1:00:1 }
+map T C S { flags constant }
+map T C S { flags interval; }
+map T C S { flags timeout };
+map T C S { flags dynamic ; } ;
+map T C S { flags constant, interval, timeout, dynamic };
+map T C S { flags constant; flags interval; flags timeout; flags dynamic };
+map T C S { comment *A comment string* }
+map T C S { comment "A comment string" }
+map T C S { comment 'A comment string' }
+map T C S { comment single-word }
+map T C S { policy performance };
+map T C S { policy memory };
+map T C S { size 123 };
+map T C S { elements = 1:00:1 }
+map T C S { policy performance; elements = 1:00:1; size 123; flags timeout,constant; };
+map T C S { 
+    policy performance; 
+include "Secret-map-policy"
+    elements = 1:00:1; 
+    size 123; 
+    flags timeout,constant; 
+};
+
+add map T C S 
+add map ip T C S 
+add map ip6 T C S 
+add map inet T C S 
+add map netdev T C S 
+add map bridge T C S 
+add map arp T C S 
+add map T C S ;
+add map T C S { timeout 15:00:01 }
+add map T C S { gc-interval 1:00:1 }
+add map T C S { flags constant }
+add map T C S { flags interval; }
+add map T C S { flags timeout };
+add map T C S { flags dynamic ; } ;
+add map T C S { flags constant, interval, timeout, dynamic };
+add map T C S { flags constant; flags interval; flags timeout; flags dynamic };
+add map T C S { comment *A comment string* }
+add map T C S { comment "A comment string" }
+add map T C S { comment 'A comment string' }
+add map T C S { comment single-word }
+add map T C S { policy performance };
+add map T C S { policy memory };
+add map T C S { size 123 };
+add map T C S { elements = 1:00:1 }
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+map ip T C { typeof b };
+map T C { typeof a.b.c.d.e.f };
+
+add map T C { typeof a : interval g.h };
+add map T C { typeof a : interval .i };
+add map T C { typeof b.c.d.e.f : i.j };
+add map T C { typeof b.c.d.e.f : counter  };
+add map T C { typeof b.c.d.e.f : quota  };
+add map T C { typeof b.c.d.e.f : limit  };
+add map T C { typeof b.c.d.e.f : secmark  };
+add map T C { typeof b.c.d.e.f : synproxy  };
+add map T C { typeof b.c.d.e.f : ct timeout };
+add map T C { typeof b.c.d.e.f : ct expectation };
+add map T C { type time : };
+add map T C { type string : };
+add map T C { type mark : };
+add map T C { type dscp : };
+add map T C { type ecn : };
+add map T C { type classid : };
+add map T C { type mark.classid : };
+add map T C { type time : interval };
+add map T C { type time : interval time };
+add map T C { type time : interval string; };
+add map T C { type time : interval mark ; };
+add map T C { type time : interval dscp   ;  }
+add map T C { type time : interval ecn };
+add map T C { type time : interval classid };
+add map T C { 
+    define A = -15 ;
+    type time : interval classid
+};
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+map 
+map ip
+map ip T
+map ip6 T
+map inet T
+map netdev T
+map bridge T
+map arp T
+map T C ;
+map T C { timeout 15:00:01 }
+map T C { typeof b.c.d.e.f : .k };
