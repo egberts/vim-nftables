@@ -1,0 +1,65 @@
+#!/usr/sbin/nft -f
+# File: get.nft
+# Description: A test NFT file to exercise 'get' Vim syntax highlightings.
+#
+# nft_line/nft_base_cmd/nft_c_base_cmd_get
+# base_cmd 'get' get_cmd
+# base_cmd 'get' 'element' set_spec set_block_expr
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+
+get element table_id set_id
+get element ip T S
+get element ip6 T S
+get element inet T S
+get element netdev T S
+get element bridge T S
+get element arp T S
+
+get element T S ;
+get element T S $variable_id
+get element T S $a;
+get element T S { ~ ~ typeof b };
+get element T S { * ~ typeof b };
+get element T S { ~typeof b };
+get element ip T S { typeof b };
+get element T S { typeof a.b.c.d.e.f };
+get element T S { flags constant }
+get element T S { flags interval; }
+get element T S { flags timeout };
+get element T S { flags dynamic ; } ;
+get element T S { flags constant, interval, timeout, dynamic };
+get element T S { flags constant; flags interval; flags timeout; flags dynamic };
+get element T S { timeout 15:00:01 }
+get element T S { gc-interval 1:00:1 }
+get element T S { elements = 1:00:1 }
+get element T S { comment *A comment string* }
+get element T S { comment "A comment string" }
+get element T S { comment 'A comment string' }
+get element T S { comment single-word }
+
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+get element T S { automerge }
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+get element T C
+get element ip S
+get element T C ;
+
+

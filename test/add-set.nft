@@ -11,15 +11,6 @@
 
 # base_cmd add_cmd 'set'
 
-set T C S
-set ip T C S
-set ip6 T C S
-set inet T C S
-set netdev T C S
-set bridge T C S
-set arp T C S
-
-set T C S ;
 set ip T C S { typeof b };
 set T C S { typeof a.b.c.d.e.f };
 set T C S { flags constant }
@@ -37,8 +28,19 @@ set T C S { comment 'A comment string' }
 set T C S { comment single-word }
 
 add set T C
-add set ip S
-add set T C S ;
+
+add set T C  
+
+
+
+add set ip S    
+
+
+add set T C S;
+
+
+add set T C S $variable_name
+add set T C S $a
 add set ip T C S { typeof b };
 add set T C S { typeof a.b.c.d.e.f };
 add set T C S { flags constant }
@@ -60,20 +62,91 @@ add set T C S { comment single-word }
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
 
+
+set ip T C S  
+
+
+
+set ip6 T C S   
+
+
+
+set inet T C S
+set netdev T C S
+set bridge T C S
+set arp T C S
+
+set T 
+ 
+set T     
+ 
+set T # comment
+set T;
+set T     ;
+# comment
+set T ; # comment
+# comment
+set T;
+# comment
+
+set T C
+set T C 
+set T     C
+set T     C   
+set T C # comment
+set T C;
+set T  C   ;
+# comment
+set T C ; # comment
+# comment
+set TC ;
+# comment
+
+set T C S
+set T C S 
+set T      C S
+set T C S  # comment
+set T C S;
+set T C S ;
+
+
+set T   C S   ;
+# comment
+set T  C S; # comment
+# comment
+set T C S;
+# comment
+
+set T C
+set T C 
+
+set T C S
+set T C S 
+
+set T C S $a  ;  z
+# comment
+
+set T C S { };
+
+
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
-
-set T C S { automerge }
-add set T C S { automerge }
 
 
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
 
-set T C
+set T
+
 set ip S
+set T C;
 set T C ;
+set T C ;
+
+add set 
+
+
 
 

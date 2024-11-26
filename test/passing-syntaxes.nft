@@ -375,8 +375,14 @@ add table myIpTable    # defaults to 'ip' family
 add table my_.IpTable    # defaults to 'ip' family
 
 # add table <table_spec> { <table_block> }
-add table myIpTable { flags dormant; }
-add table netdev myNetdev { flags dormant; }
+add table myIpTable { flags dormant } ;
+add table myIpTable { flags dormant; } ;
+add table myIpTable { flags dormant ; } ;
+add table myIpTable { flags dormant ;};
+add table myIpTable { flags dormant,idle } ; 
+add table myIpTable { flags dormant,idle; } ;
+add table netdev myNetdev { flags dormant ; }
+add table myIpTable { flags dormant,idle;} 
 add table bridge myBridge { flags dormant; }
 add table arp myArpTable { flags dormant; }
 add table ip myIpTable { flags dormant; }

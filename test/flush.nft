@@ -5,8 +5,6 @@
 # base_cmd  flush_cmd
 #
 
-table ip6 MyIptable  ### sanity test
-
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################

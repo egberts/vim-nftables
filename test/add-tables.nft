@@ -56,13 +56,21 @@ table T {
     redefine A = 1 ;
 }
 # base_cmd add_cmd 'table' table_spec table_block common_block 'undefine'
-table T { undefine A }
+table T {
+    undefine A
+    undefine B 
+}
 table xxxx { undefine abc ; }
 table xxxx { undefine abc ; } ; 
 
 # base_cmd add_cmd 'table' table_spec table_block table_options 'comment'
 # base_cmd add_cmd 'table' table_spec table_block 'comment' string
-table T { comment Hello } 
+table T { 
+    comment Hello
+    comment Hello
+    comment Hello
+    comment Hello 
+} 
 table bridge T { comment 'Hello world!' }
 table T { comment "Hello world!" }
 table T { comment *Hello world!* }
@@ -74,8 +82,22 @@ table arp xxxx { comment test;  };
 # base_cmd add_cmd 'table' table_spec table_block 'policy' 'offload'
 # base_cmd add_cmd 'table' table_spec table_block hook_spec 'type' 
 # base_cmd add_cmd 'table' table_spec table_block 'flags' flag_spec
+table T {flags member_1}
+table T {flags member_1;}
+table T {flags member_1;};
+table T {flags member_1 ;}
+table T {flags member_1; }
+table T {flags member_1 ; }
+table T {flags member_1 ;};
+table T {flags member_1; };
+table T {flags member_1 ; };
 table T { flags member_1 }
+table T { flags member_1; }
+table T {flags member_2,member_3}
 table T { flags member_2, member_3 }
+table T { flags member_1; } ;
+table T { flags member_2,member_3} ; 
+table T { flags member_2, member_3 } ; 
 # base_cmd add_cmd 'table' table_spec table_block { table_options ';' }
 table T { flags member_1 } ;
 table ip xxxx { flags a, b, c};
@@ -106,6 +128,13 @@ table T { chain C };
 table T { chain C ; } ;
 table T { chain C ; } ;
 table T { chain C { }; };
+table T { chain C { }; chain D { }; };
+add table T { 
+    chain C {
+        comment asdf 
+    }; 
+    chain D { }; 
+};
 
 
 # nft_line/nft_c_base_cmd/nft_base_cmd_add/nft_add_table_spec
@@ -154,6 +183,10 @@ table inet MyIpNet {
     flags a, b, c
     comment "unique"
 };
+
+
+
+
 table xxxx { chain last {
     undefine abc;
     include "file";
@@ -161,14 +194,15 @@ table xxxx { chain last {
 }; };
 table arp A0b_._/RP_TABLE {
     chain ARP_INPUT_FILTER {
-       type filter hook input priority 0;
-       policy drop;
-       counter log drop
+        define a = 123;
+        type filter hook input priority 0;
+        policy drop;
+        counter log drop
     }
     chain ARP_INPUT_FILTER {
-       type filter hook prerouting priority 0;
-       policy drop;
-       counter log return
+        type filter hook prerouting priority 0;
+        policy drop;
+        counter log return
     }
     chain workstation_arp_filter_output {
         type filter hook output priority 0;
@@ -181,7 +215,12 @@ table netdev A {
         type filter hook ingress device lo priority -100; policy accept
         chain a { type };
         udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
-    }
+    };
+
+
+
+
+
     chain b { }
 }
 table netdev A {
