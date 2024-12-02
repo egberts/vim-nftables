@@ -12,12 +12,43 @@
 # base_cmd 'describe'
 
 # TODO:  base_cmd 'describe' symbol_expr
+describe $abcde
+describe "string"
+describe 'string'
+describe *string*
 
 # base_cmd 'describe' integer_expr
 describe 1;
 describe  1
 
-# TODO:  base_cmd 'describe' payload_expr
+# base_cmd 'describe' payload_expr
+# base_cmd 'describe' payload_expr 'at'
+describe at 
+# base_cmd 'describe' payload_expr 'ethhdr'
+describe ethhdr
+# base_cmd 'describe' payload_expr 'vlan'
+describe vlan
+# base_cmd 'describe' payload_expr 'arp'
+describe arp
+# base_cmd 'describe' payload_expr 'ip'
+describe ip
+describe icmp
+describe igmp
+describe ip6
+describe auth
+describe esp
+describe comp
+describe udp
+describe udplite
+describe tcp
+describe dccp
+describe sctp
+describe th
+describe vxlan
+describe geneve
+describe gre
+describe gretap
+
 # nft_line/nft_base_cmd_describe/nft_c_primary_expr/nft_c_exthdr_expr/nft_hbh_hdr_expr
 describe hbh nexthdr
 describe hbh hdrlength
@@ -81,7 +112,8 @@ describe rt4 sid
 describe rt4 sid [ 1 ]
 describe rt4 sid[1]
 
-# TODO:  base_cmd 'describe' ct_expr
+# base_cmd 'describe' ct_expr
+
 # TODO:  base_cmd 'describe' numgen_expr
 # TODO:  base_cmd 'describe' hash_expr
 # TODO:  base_cmd 'describe' fib_expr
