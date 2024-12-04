@@ -28,6 +28,47 @@ add rule bridge T C position 55555
 add rule netdev T C position 6
 add rule netdev Tabcdef Charger position 6
 
+# ct_key_dir_optional->ct_key->ct_stmt
+add rule ip6 myTable myChain position 1 ct l3proto set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct proto set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct mark set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct state set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct direction set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct status set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct expiration set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct helper set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct saddr set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct daddr set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct proto-src set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct proto-dst set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct label set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct event set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct secmark set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct id set ip6 myIpTable myCTHchain { };
+
+# ct_key_dir_optional->ct_key->ct_stmt
+add rule ip6 myTable myChain position 1 ct bytes set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct packets set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct avgpkt set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct zone set ip6 myIpTable myCTHchain { };
+
+# ct_key_dir_optional->ct_stmt
+add rule ip6 myTable myChain position 1 ct bytes set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct packets set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct avgpkt set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct zone set ip6 myIpTable myCTHchain { };
+
+# ct_dir>ct_stmt
+add rule ip6 myTable myChain position 1 ct original bytes set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct original packets set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct original avgpkt set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct original zone set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct reply bytes set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct reply packets set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct reply avgpkt set ip6 myIpTable myCTHchain { };
+add rule ip6 myTable myChain position 1 ct reply zone set ip6 myIpTable myCTHchain { };
+
+
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
