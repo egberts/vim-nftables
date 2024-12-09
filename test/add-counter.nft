@@ -11,19 +11,44 @@
 
 # base_cmd add_cmd 'counter'
 
+c
+
 counter T O
+counter T0 O
+counter T_ O
+counter T\ O
+counter T/T O
+
+counter T O0
+counter T O_
+counter T O\
+counter T O/O
+
 counter T O ;
+
 counter ip T O
-counter ip6 T O
+counter ip6 T O 
 counter inet T O
 counter netdev T O
 counter bridge T O
 counter arp T O
+
+counter ip T O ;
+counter ip6 T O ;
+counter inet T O ; 
+counter netdev T O;
+counter bridge T O; 
+counter arp T O  ;  
+counter T last xxx
+counter T last 123 
 counter T last;
+
 counter T last packet 123 bytes 12345;
+
+# Prototyping error highlighting here
 counter T O { packet 123 bytes 12345 }
-counter T O { packet 123 bytes 12345 };
-counter T O ;
+counter T O { packet 123 bytes 12345 }
+counter T last { packet 123 bytes 12345 };
 counter ip T O { packet 123 bytes 123 };
 
 add counter T O
@@ -41,6 +66,17 @@ add counter ip T O { packet 123 bytes 123 };
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
 
+counter T& O
+counter T+ O
+counter T= O
+counter T) O
+
+counter T O* x
+counter T O%
+counter T O
+counter T O
+
+
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
@@ -49,8 +85,18 @@ add counter ip T O { packet 123 bytes 123 };
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
+counter T O packet !xxx
+counter T O packet 123 xxx xxx; 
+counter T last packet !xxx
+counter T last packet 123 xxx xxx; 
 
 counter T C { automerge }
 add counter T C { automerge }
+
+counter T O& # invalid character
+counter T O+ # invalid character
+counter T O= # invalid character
+counter T O) # invalid character
+
 
 

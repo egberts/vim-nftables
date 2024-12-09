@@ -2,12 +2,31 @@
 # File: all-syntaxes.nft
 # Description: A test NFT file to exercise 'add table' Vim syntax highlightings.
 #
+# Identifiers begin with an alphabetic character (a-z,A-Z), 
+# followed by zero or more alphanumeric characters (a-z,A-Z,0-9) 
+# and the characters slash (/), backslash (\), underscore (_) 
+# and dot (.). 
+#
+# Identifiers using different characters or clashing with a 
+# keyword need to be enclosed in double quotes (").  
+#
 # base_cmd add_cmd 'table' 
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_table/nft_add_table_chain_block policy_spec
 #
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
+
+table A
+table Z
+table a
+table z
+table a0
+table z0
+table A/
+table A\
+table A_
+table A.
 
 # base_cmd add_cmd 'table' table_spec family_spec family_spec_explicit
 add table filter
@@ -17,6 +36,7 @@ table T  # that one creates an empty table
 table xxxx
 # base_cmd add_cmd 'table' table_spec identifier 'last'
 table last
+
 # base_cmd add_cmd 'table' table_spec table_block
 table T { }
 table T { } ; #
@@ -862,10 +882,12 @@ table ip6 firewall {
   }
 }
 
+table xxxx { undefine abc; chain last { chain last; undefine abc; }; };  # oopsie
+
+
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
-
 table ip
 table ip6   
 table inet  #
@@ -874,19 +896,30 @@ table netdev  # intentionally invalid; invalid table identifier
 table arp  # intentionally invalid; invalid table identifier
 table ip {  };
 
-table T { chain C { type filter ; }; };  # incomplete
+table 0   # invalid identifier (started with non-letter)
+table 0abc   # invalid identifier (started with non-letter)
+table /abc   # invalid identifier (started with non-letter)
+table \abc   # invalid identifier (started with non-letter)
+table _abc   # invalid identifier (started with non-letter)
+table .abc   # invalid identifier (started with non-letter)
+
 table T { chain C { type filter hook ingress ; }; };  # incomplete
 table T { chain C { type filter hook ingress devices ; }; };  # incomplete
 table T { chain C { type filter hook ingress devices = ; }; };  # incomplete
 
 table T { chain C { type filter hook ingress device eth0 priority ; }; };  # incomplete
 
+table A!error
+
 
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
 
-table xxxx { undefine abc; chain last { chain last; undefine abc; }; };  # oopsie
+table "*weirdname"  # allowable '*' but only inside double quote???
+table "$weirdname"  # allowable '$' but only inside double quote???
+table "#weirdname"  # allowable '#' but only inside double quote???
+
 table xxxx { flags ,, b, c };  " oopsie
 table xxxx { flags a, b,  };  " oopsie
 table ip6 xxxx { flags , a, b };  " oopsie
@@ -908,9 +941,32 @@ table T { chain C { devices = { eth0 } }; };
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
-( describe 1; );
+
+table T { chain C { type filter ; }; };  # incomplete
 
 table xxxx { chain MyIpNet {
     chain last;  # oopsie
     };
 };
+
+table A@   # invalid character
+table A# { };   # invalid character
+table A$ { };   # invalid character
+table A%   # invalid character
+table A^   # invalid character
+table A&   # invalid character
+table A*   # invalid character
+table A(   # invalid character
+table A)   # invalid character
+table A-   # invalid character
+table A+   # invalid character
+table A=   # invalid character
+table A[   # invalid character
+table A]   # invalid character
+table A<   # invalid character
+table A>   # invalid character
+table A,   # invalid character
+table A?   # invalid character
+table A|   # invalid character
+table A:   # invalid character
+

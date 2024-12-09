@@ -1,0 +1,110 @@
+#!/usr/sbin/nft -f
+# File: limit.nft
+# Description: A test NFT file to exercise '[add] limit' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'limit' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_limit
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+add limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
+add limit inet myInetTable myInetLimit rate 1/second
+add limit ip6 myIp6Table myIp6Limit rate 1 / week
+add limit ip myIpTable myIpLimit rate 1/ day
+add limit myIpTable myIpLimit rate 1/second 
+add limit myIpTable myIpLimit rate 1/second burst 1514 bytes
+add limit myIpTable myIpLimit rate 1/second burst 15 packets
+add limit netdev myNetdevTable myNetdevLimit rate 1/minute 
+add rule myTable myChain limit rate 1023000 mbytes/second
+add rule myTable myChain limit rate 1025000 mbytes/second burst 1023 mbytes
+add rule myTable myChain limit rate 1025 bytes/second burst 512 bytes
+add rule myTable myChain limit rate 1025 kbytes/second
+add rule myTable myChain limit rate 1025 kbytes/second burst 1023 kbytes
+add rule myTable myChain limit rate 1025 mbytes/second burst 1025 kbytes
+add rule myTable myChain limit rate 400/hour
+add rule myTable myChain limit rate 400/minute
+add rule myTable myChain limit rate over 1023/second burst 10 packets
+add rule myTable myChain limit rate over 400/week
+add rule myTable myChain limit rate over 40/day
+create limit bridge myBridgeTable myBridgeLimit rate 1/hour
+create limit inet myInetTable myInetLimit rate 1/second
+create limit ip6 myIp6Table myIp6Limit rate 1/week
+create limit ip myIpTable myIpLimit rate 1/day
+create limit myIpTable myIpLimit rate 1/second
+create limit myIpTable myIpLimit rate 1/second burst 1514 bytes
+create limit myIpTable myIpLimit rate 1/second burst 15 packets
+create limit netdev myNetdevTable myNetdevLimit rate 1/minute
+create limit <obj_spec> <limit_obj> <limit_config>
+delete limit arp table_name handle 15
+delete limit arp table_name limit_name
+delete limit bridge table_name handle 15
+delete limit bridge table_name limit_name
+delete limit inet table_name handle 15
+delete limit inet table_name limit_name
+delete limit ip6 table_name handle 15
+delete limit ip6 table_name limit_name
+delete limit ip table_name handle 15
+delete limit ip table_name limit_name
+delete limit netdev table_name handle 15
+delete limit netdev table_name limit_name
+delete limit table_name handle 15
+delete limit table_name limit_name 
+limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
+limit inet myInetTable myInetLimit rate 1/second
+limit ip6 myIp6Table myIp6Limit rate 1 / week
+limit ip myIpTable myIpLimit rate 1/ day
+limit myIpTable myIpLimit rate 1/second 
+limit myIpTable myIpLimit rate 1/second burst 1514 bytes
+limit myIpTable myIpLimit rate 1/second burst 15 packets
+limit myTable lim_1kbps  { rate over 1024 bytes/second burst 512 bytes ; comment "use to limit incoming smtp" ; }
+limit myTable lim_400ppm { rate 400/minute ; comment "use to limit incoming icmp" ; }
+limit netdev myNetdevTable myNetdevLimit rate 1/minute 
+limit obj_spec limit_obj { limit_block } close_scope_limit
+list limit arp myTable limit_name
+list limit bridge myTable limit_name
+list limit inet myTable limit_name
+list limit ip6 myTable limit_name
+list limit ip myArpTable myArpChain
+list limit ip myBridgeTable myBridgeChain
+list limit ip myInetTable myInetChain
+list limit ip myIp6Table myIp6Chain
+list limit ip myIpTable myIpChain
+list limit ip myTable limit_name
+list limit limit_name
+list limit myIpTable myIpChain
+list limit myTable limit_name
+list limit netdev myNetdevTable myNetdevChain
+list limit netdev myTable limit_name
+list limits
+list limits arp
+list limits bridge
+list limits inet
+list limits ip
+list limits ip6
+list limits netdev
+list limits table arp table_name
+list limits table bridge table_name
+list limits table inet table_name
+list limits table ip6 table_name
+list limits table ip table_name
+list limits table netdev table_name
+list limits table ruleset_spec
+list limits table table_name
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
