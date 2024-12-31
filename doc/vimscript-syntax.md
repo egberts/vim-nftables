@@ -21,7 +21,7 @@ multimethod dispatch using subsumption and a standard topsort algorithm.
 In layman terms, my mission:
 
 * read a spec on about many EBNF variants, read a DSL grammar in EBNF spec,
-for a C/Python/nftables written in EBNF, write this transformer, 
+for a C/Python/nftables written in EBNF, write this multi-stage transformer, 
 and generate syntax files for a specific editor.
 
 Chomskey-speakingly, my mission:
@@ -32,7 +32,7 @@ Chomskey-speakingly, my mission:
 In short, this is my continuing education forum for DSL, CSL, CFG, CST, PEG, CST, to 
 complement my large AST, compiling and parsing skillset.
 
-We cover this article's topics in the following semantic:
+We cover this article's topics in the following outline:
 
 1.  Everything about Vim syntax
 2.  Desired End-Result, Vimscript, pluggable for other structured editor or projectional editor.
@@ -73,8 +73,6 @@ protocols.
 Vimscript
 =========
 
-
-
 In DSL parlance, vimscript syntax is a extended right-regular grammar 
 (Type-3 Chomskey): there are no support for left-regular grammar.
 
@@ -112,7 +110,7 @@ Topically, vimscript `syntax` command is the building block of an editor's
 syntax highlighter.
 
 Building up of multiple vimscript syntax statements and its building 
-blocks are restricted to on a context-free grammar (CFG) constraint, comprising:
+blocks are restricted to within a context-free grammar (CFG) constraint, comprising:
 
      group-name (identifier, node),
      literal (constant, identifier, regex, set-of-characters)
@@ -147,10 +145,11 @@ as its exical analysis because it provides a more structured and efficient way
 to process input symbols, making it ideal for scanning and recognizing 
 patterns in source code.
 
-Fortunately, there is no support requirement for mathematical expression here,
+Fortunately, there is no support requirement for stack or mathematical expression here,
 thus PEG approach would not be generally required for our needs,  yet a specific 
 Packrat PEG mechanism would be called back to support the required backtracking
-and traversal of a CST: some PEG capabilities, some parser techniques, not all.
+and traversal of a CST: some PEG capabilities, some parser techniques, not all for
+this needed transformation.
 
 CST is a Concrete Syntax Tree consists of an ordered, rooted tree that
 represents the syntactic structure of a string according to some 
@@ -190,15 +189,19 @@ from the vimscript file.
 * starts syntaxing effort at certain types of places within the editor.
 
 For CFG purpose, we only need `match`, `region`, `cluster`, and `keyword`
-attrbutes of the `syntax` command to build around a desired form of 
+attrbutes of the `syntax` commands to build around a desired form of 
 concrete syntax tree, using the concept of 
 a (node, edge \[, node(s)\]) declaration statement as its primary 
 form of inter-nodal aspect of syntax building block in vimscript.
 
+Vim syntax cannot distinguish between string pattern from CSG symbol 
+identifier, literal, nor regex.
+
 Desired End-Result
 ==================
-In order to understand how to use the vimscript syntax, we need to map it
-consistently and concisely into the DSL notations of string handling.
+In order to output the vimscript syntax, we need to map it
+consistently and concisely from a set of CSG notations of string handling
+that most parser can be able to understand.
 
 Mapping Vimscript to CSG
 ========================
@@ -233,18 +236,18 @@ L → E(E S)*		a list/set/dict	syn cluster c_L contains=E syn match E /e/ nextgr
 
 Terminal Node
 -------------
-The basic CSL declaration is a terminal node.   
+The basic CSG declaration is a terminal node.   
 
 We use CSG notation to describe the CSL side.
 
 A terminal node may be a static symbol or empty:
 
-    A -> ε
-    B -> 'b'
+    A -> ε        # empty
+    B -> 'b'      # static
 
 The detail of their corresponding vimscript syntax is next.
 
-Note: In CSG parlance, we use the next available but unique 
+Note: In CSG parlance, we introduce a new but unique 
 identifier (e.g., `A`, `B`) if its RHS production is not 
 the same as initially mentioned throughout this article: 
 resuse of identifier is essential to explain the 
@@ -252,7 +255,7 @@ ever-expansive CSG notations.
 
 Empty
 -----
-The simplistic CSG declaration of a terminal node is an empty set:
+The most basic CSG declaration of a terminal node is an empty set:
 
     A -> ε
 
@@ -269,7 +272,7 @@ subsequential CSG building blocks.
 This means, for proper use in vimscript syntax, CSG language specification 
 shall be condensed to having all empty statements optimized and removed out.
 
-Static
+Literal, Static Pattern
 ----
 Next is the static terminal declaration:
 
@@ -284,9 +287,9 @@ and is declared by its following vimscript statement:
     syntax match B 'b'
 
 In the language of vimscript syntax, `B` is the groupname, 
-and  `'b'` is the literal.
+and  `'b'` is the pattern.
 
-groupname is a the primary form of node mechanism during the syntax construction.
+`groupname` is this primary form of node mechanism during the syntax construction.
 
 
 EDGE (Linking)
@@ -305,7 +308,7 @@ Two nodes makes possible one (or more) link (edge).
 Symbolic Node
 ---------
 
-In CSL, symbolic node has no static content.
+In CSL, symbolic node has no static content, especially in `Vimscript` language.
 
 In DSL, symbolic node is non-terminal, shown as `C` below:
 
@@ -314,16 +317,16 @@ In DSL, symbolic node is non-terminal, shown as `C` below:
 It may point next to a `N` node, terminal or non-terminal,  but 
 `C` remains a non-terminal that has no static pattern.
 
-If the `C` node is a terminal, `syntax match/region` statement is used.
+If the `N` node is a terminal, then `C` shall use a `syntax match/region` statement.
 
-If the `C` node is an non-terminal, `syntax cluster` statement is used.
+If the `N` node is an non-terminal, then `C` shall use a `syntax cluster` statement.
 
-We will not be using `syntax keyword` here due to its inability to 
+We will not be using any `syntax keyword` here due to its inability to 
 let `syntax match/region`  statement override the `syntax keyword` statement.
 
 Symbolic Linking
 ----
-Next is the linking of non-terminal to specifically a non-terminal 
+The linking of non-terminal to specifically a non-terminal 
 destination node/groupname.
 
     A -> B
@@ -342,7 +345,7 @@ clustername (cluster-defined groupname) from thereon.
 
 After a symbolic node, its destination node that is a terminal is represented below as:
 
-    c_C -> B
+    C -> B
 
 and coded as:
 
@@ -356,17 +359,17 @@ Symbolic Node to Non-Terminal
 -----
 A destination node that is non-terminal is written as:
 
-    D -> c_E
+    D -> E
 
     ;;;;
 
-    syntax cluster D contains=@c_E
-    syntax cluster c_E contains=
+    syntax cluster D contains=@E
+    syntax cluster E contains=
 
 A Long Rant on `@` Weirdness
 ----------------------
 Notice the weirdness of vimscript's special handling of groupname made 
-by `syntax cluster` command?  Vim manual authors still called this, a `groupname`.
+by only the `syntax cluster` command?  Vim manual authors still called this, a `groupname`.
 I assert they'd be called 'clustername', but alas, no.
 
 All attempts to reference the cluster-form of 
@@ -400,8 +403,8 @@ to (and not by a `groupname`).
 
 Concatentation
 ----
-Most parsers do the concatentation of terminal nodes is optimized out 
-into a larger terminal node by smarter parsers.  But for this design
+Most parsers encountering the concatentation of terminal nodes will optimize out 
+into a single but larger terminal node by smarter parsers.  But for this design
 need, we keep the original CFG constructs in an unoptimized, original manner.
 
     H -> F G
@@ -431,7 +434,7 @@ Choices
 Then we start having choices, its DSL content could be a having 'f' 
 content or a 'b' content, but one must appear.
 
-Written for destination node 'F' being a terminal (string constructor):
+Written for destination node '`B`' and '`F`' being a terminal (string constructor):
 
     J -> B | F
 
@@ -442,10 +445,10 @@ Written for destination node 'F' being a terminal (string constructor):
 
 Written for destination node 'F' being an non-terminal (symbolically-linked):
 
-    J -> B | c_F
+    J -> B | F
 
-    syntax cluster J contains=B,@c_F
-    syntax cluster c_F  ...
+    syntax cluster J contains=B,@F
+    syntax cluster F  ...
     syntax match B 'b' ...
 
 My vision of joy is started to get cloudy but later realization will
@@ -469,7 +472,7 @@ also in vimscript command:
 an optional '`?`' operator.
 
 Keep in mind, use of this optional '?' (along with not '~') operator is 
-discouraged on any LHS of an expression here due to CSL constraint; 
+discouraged on any complete LHS of an expression here due to CSL constraint; 
 sometimes the (EBNF) grammar file needs to further refactorized by removing 
 this optional '?' operation and introducing a more static 'choices' 
 approach in its place.
@@ -526,7 +529,7 @@ context-sensitive (DHparse-supported) language so that its CSL can
 construct a CST for use with another parsing/transformation/compiling.
 2. To translate a domain-specific (also a CSL; ie., EBNF of C/Python/nftables) 
 language file into an AST for use with compiling the final domain-specific 
-content for easiest analytical work.
+content for easiest analytical work of multi-stage transformation.
 
 This way, we can leverage the use of EBNF as a standard transformer template 
 for all domain-specific (ie., nftables, C, ISC Bind9 named.conf, Python, textMate) 
@@ -549,7 +552,7 @@ detected before it could be made harmful for computers to execute.
 
 First parser would deal with the format of bytecode or unlinked object of 
 intermediate representation (IR) code.  A second parser is would tease out the
-NOPs and unharmful codes.
+NOPs and unharmful code logics.
 
 DSL File Format
 ===============
@@ -559,7 +562,6 @@ their own but different CSL (ie., EBNF, Python, XML) specification.
 DSL grammar files have been identified but not exclusively as:
 
 * BNF
-* PEG
 * EBNF
 * Bison 
 * PEG, Ford \[2004\] 
@@ -600,7 +602,7 @@ Should the CST tree be EBNF-based, or nftables-based?  The answer depends on the
 
 Grammar/Symbol Preparation
 =====
-For DHParser, we need two files; a symbol table file and an EBNF grammar file.
+For DHParser, we need two files; a lexical symbol table file containing lexical keywords, and an EBNF grammar file.
 
 When taking in the `parser_bison.y` created by Unix Yacc (Yet Another Compiler Compiler) for GNU Bison
 to process and create a parser in C language, parser_bison.y contains the symbol definitions.
@@ -677,7 +679,8 @@ Additional steps is required to recondition the `nftables.ebnf` output file into
 1.  Ambiguous into Unambiguous
 2.  Nondeterministic into Deterministic
 3.  Left recursion into No Left Recursion
-4.  Longest-length pattern as first alternative; shortest-length pattern as last alternative
+4.  Longest-length pattern as first alternative; shortest-length pattern as last alternative.
+5.   Wildcard must be lstly and broken apart from any grammar construct.
 
 #### Ambiguous into Unambiguous
 A grammar contains rules that can generate more than one tree for the same CSG.
