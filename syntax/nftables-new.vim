@@ -3111,7 +3111,7 @@ syn match nft_add_table_table_block_chain_chain_block_flags_spec_offload "\voffl
 
 " add_cmd 'table' table_block 'chain' chain_block flags_spec 'flags'
 hi link   nft_add_table_table_block_chain_chain_block_flags_spec_flags nftHL_Statement
-syn match nft_add_table_table_block_chain_chain_block_flags_spec_flags "\v^\s{0,64}flags" skipwhite contained
+syn match nft_add_table_table_block_chain_chain_block_flags_spec_flags "\vflags" skipwhite contained
 \ nextgroup=
 \    nft_add_table_table_block_chain_chain_block_flags_spec_offload,
 \    nft_Error
@@ -4142,23 +4142,11 @@ syn cluster nft_c_add_cmd_rule_rule_position
 \    nft_add_cmd_rule_rule_position_family_spec_explicit,
 \    nft_add_cmd_rule_rule_position_table_spec
 
-
-" base_cmd add_cmd [[ 'add' ] 'rule' ]
-syn cluster nft_c_add_cmd_rule
-\ contains=@nft_c_add_cmd_rule_rule_position
-
 " base_cmd [[ 'add' ] 'rule' ] keywords
 hi link   nft_base_cmd_add_cmd_add_rule_keyword nftHL_Command
-syn match nft_base_cmd_add_cmd_add_rule_keyword "\v(add\s{1,15}rule|rule)\s{1,31}" contained
-\ nextgroup=@nft_c_add_cmd_rule
+syn match nft_base_cmd_add_cmd_add_rule_keyword "\v(add\s{1,15}rule|rule)\s{1,31}" skipwhite contained
+\ nextgroup=@nft_c_add_cmd_rule_rule_position
 
-" base_cmd [[ 'add' ] 'rule' ]
-syn cluster nft_c_base_cmd_add_rule
-\ contains=
-\    nft_base_cmd_add_cmd_add_rule_keyword,
-\    @nft_c_add_cmd_rule
-" nft_c_add_cmd_rule must be the last one in 'contains='
-" because <identifier> can also start the command line via nft_c_add_cmd_rule_rule_position
 
 " base_cmd 'ct' 'expectation' obj_spec table_spec
 hi link   nft_base_cmd_add_ct_expectation_obj_spec_table_spec nftHL_Command
@@ -4175,7 +4163,7 @@ syn match nft_base_cmd_add_ct_keyword_expectation "expectation" skipwhite contai
 \    @nft_c_base_cmd_ct_expectation_obj_spec
 
 " base_cmd 'ct' 'timeout' obj_spec table_spec
-hi link   nft_base_cmd_add_ct_timeout_obj_spec_table_spec nftHL_Command
+hi link   nft_base_cmd_add_ct_timeout_obj_spec_table_spec nftHL_Family
 syn match nft_base_cmd_add_ct_timeout_obj_spec_table_spec "\v(ip[6]|inet|netdev|bridge|arp)" skipwhite contained
 
 " base_cmd 'ct' 'timeout' obj_spec
@@ -4189,7 +4177,7 @@ syn match nft_base_cmd_add_ct_keyword_timeout "timeout" skipwhite contained
 \ nextgroup=nft_base_cmd_add_ct_timeout_obj_spec
 
 " base_cmd 'ct' 'helper' obj_spec table_spec
-hi link   nft_base_cmd_add_ct_helper_obj_spec_table_spec nftHL_Command
+hi link   nft_base_cmd_add_ct_helper_obj_spec_table_spec nftHL_Family
 syn match nft_base_cmd_add_ct_helper_obj_spec_table_spec "\v(ip6|ip|inet|netdev|bridge|arp)" skipwhite contained
 
 " base_cmd 'ct' 'helper' obj_spec
@@ -4209,7 +4197,7 @@ syn cluster nft_c_cmd_add_ct_keywords
 
 " base_cmd [ 'ct' ]
 hi link   nft_base_cmd_add_ct nftHL_Command
-syn match nft_base_cmd_add_ct "\v^\s{0,32}ct\s{0,16}" contained
+syn match nft_base_cmd_add_ct "ct" skipwhite contained
 \ nextgroup=@nft_c_cmd_add_ct_keywords
 
 " base_cmd [ 'add' ]
@@ -4223,7 +4211,9 @@ syn cluster nft_c_base_cmd_add
 \    nft_base_cmd_add_counter,
 \    nft_base_cmd_add_ct,
 \    nft_base_cmd_add_limit,
-\    @nft_c_base_cmd_add_rule
+\    nft_base_cmd_add_cmd_add_rule_keyword,
+\    nft_add_cmd_rule_rule_position_family_spec_explicit,
+\    @nft_c_add_cmd_rule_rule_position
 "\    nft_base_cmd_add_element,
 "\    nft_base_cmd_add_quota,
 "\    nft_base_cmd_add_synproxy,
@@ -5017,11 +5007,11 @@ syn match nft_comment_whole_line "#.*$" keepend contained
 
 """""""""""""""" TOP-LEVEL SYNTAXES """"""""""""""""""""""""""""
 " `line` main top-level syntax, do not add 'contained' here.
-syn match nft_line '^\v\s{0,16}'
+syn match nft_line "^\v\s{0,16}"
 \ nextgroup=
 \    nft_comment_whole_line,
-\    @nft_c_base_cmd,
 \    @nft_c_common_block,
+\    @nft_c_base_cmd
 
 " opt_newline (via flowtable_expr, set_expr, set_list_member_expr, verdict_map_expr,
 "                  verdict_map_list_member_exp)

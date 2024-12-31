@@ -18,7 +18,7 @@ rule arp T C index 3
 rule inet T C position 4
 rule bridge T C position 55555
 rule netdev T C position 6
-rule netdev Tabcdef Charger position 6
+ rule netdev Tabcdef Charger position 6
 
 add rule ip  T      C     position  1
 add rule ip6 filter input handle 2
