@@ -1,0 +1,69 @@
+# starts with <line>
+
+common_block 'include' quoted_string
+common_block 'define' identifier '=' initializer_expr
+common_block 'redefine' identifier '=' initializer_expr
+common_block 'undefine' identifier
+common_block 'error'
+stmt_separator ';'
+stmt_separator '\n'
+base_cmd stmt_separator
+base_cmd 'replace' 'rule' ruleid_spec rule
+base_cmd 'create' 'table'
+base_cmd 'create' 'chain'
+base_cmd 'create' 'set'
+base_cmd 'create' 'map'
+base_cmd 'create' 'flowtable'
+base_cmd 'create' 'element'
+base_cmd 'create' 'counter'
+base_cmd 'create' 'ct helper'
+base_cmd 'create' 'ct timeout'
+base_cmd 'create' 'ct expectation'
+base_cmd 'create' 'limit'
+base_cmd 'create' 'secmark'
+base_cmd 'create' 'synproxy'
+base_cmd 'insert' insert_cmd
+base_cmd 'delete' delete_cmd
+base_cmd 'get' get_cmd
+base_cmd 'list' list_cmd
+base_cmd 'reset' reset_cmd
+base_cmd 'flush' flush_cmd
+base_cmd 'rename' rename_cmd
+base_cmd 'import' import_cmd
+base_cmd 'export' export_cmd
+base_cmd 'monitor' monitor_cmd
+base_cmd 'describe' describe_cmd
+base_cmd 'destroy' destroy_cmd
+base_cmd 'add' add_cmd
+base_cmd add_cmd
+base_cmd 'add' 'table' table_spec
+base_cmd 'add' 'chain' chain_spec
+base_cmd 'add' 'set' set_spec
+base_cmd 'add' 'map' set_spec
+base_cmd 'add' 'flowttable' flowtable_spec
+base_cmd 'add' 'element' set_spec
+base_cmd 'add' 'counter' obj_spec
+base_cmd 'add' 'quota' obj_spec
+base_cmd 'add' 'ct helper' obj_spec
+base_cmd 'add' 'ct timeout' obj_spec
+base_cmd 'add' 'ct expectation' obj_spec
+base_cmd 'add' 'limit' obj_spec
+base_cmd 'add' 'secmark' obj_spec
+base_cmd 'add' 'synproxy' obj_spec
+base_cmd 'add' 'rule'
+base_cmd 'table' table_spec
+base_cmd 'chain' chain_spec
+base_cmd 'set' set_spec
+base_cmd 'map'set_spec
+base_cmd 'flowttable' flowtable_spec
+base_cmd 'element' set_spec
+base_cmd 'counter' obj_spec
+base_cmd 'quota' obj_spec
+base_cmd 'ct helper' obj_spec
+base_cmd 'ct timeout' obj_spec
+base_cmd 'ct expectation' obj_spec
+base_cmd 'limit' obj_spec
+base_cmd 'secmark' obj_spec
+base_cmd 'synproxy' obj_spec
+base_cmd 'rule' rule_position rule
+base_cmd rule_position rule

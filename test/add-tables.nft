@@ -949,7 +949,8 @@ table xxxx { chain MyIpNet {
     };
 };
 
-table A@   # invalid character
+table @TX
+table A @# @   # invalid character
 table A# { };   # invalid character
 table A$ { };   # invalid character
 table A%   # invalid character

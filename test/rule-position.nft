@@ -1,0 +1,64 @@
+#!/usr/sbin/nft -f
+# File: rule-position
+# Description: A test NFT file to exercise wildcard/identifier Vim syntax highlightings.
+#
+# base_cmd add_cmd ['rule'] rule_position
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_c_add_cmd_rule
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+identifier_table chain_identifier stmt
+
+identifier_table chain_identifier drop
+identifier_table chain_identifier accept
+identifier_table chain_identifier continue
+identifier_table chain_identifier jump chain_identifier
+identifier_table chain_identifier goto chain_identifier
+identifier_table chain_identifier return
+
+identifier_table chain_identifier position 15
+
+identifier_table chain_identifier handle 7
+
+identifier_table chain_identifier index 1
+
+ip table_identifier chain_identifier
+ip6 table_identifier chain_identifier
+inet table_identifier chain_identifier
+netdev table_identifier chain_identifier
+bridge table_identifier chain_identifier
+arp table_identifier chain_identifier
+
+ip table_identifier chain_identifier
+ip6 table_identifier chain_identifier
+inet table_identifier chain_identifier
+netdev table_identifier chain_identifier
+bridge table_identifier chain_identifier
+arp table_identifier chain_identifier
+
+table_id
+chain_id
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+ip table_identifier
+ip6 table_identifier
+inet table_identifier
+netdev table_identifier
+bridge table_identifier
+arp table_identifier
+

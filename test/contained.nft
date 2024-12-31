@@ -1,0 +1,733 @@
+#!/usr/sbin/nft -f
+# File: contained.nft
+# Description: A test NFT file to exercise 'contained' of reserved keywords in Vim syntax highlightings.
+#
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# table identifier
+table_identifier
+identifier_table
+
+# common_block
+include
+define
+redefine
+undefine
+
+# base_cmd
+add rule 
+ replace
+create
+insert
+delete
+get
+list
+reset
+flush
+rename
+import
+export
+monitor
+describe
+destroy
+
+
+# base_cmd add_cmd
+table table\id
+table table/id
+table table_id
+table table.id
+table table.id
+chain table/id
+rule <stmt>
+set table_id chain_id set_id $v_\/.ariable
+map table_id
+flowtable table_id
+element table_id
+counter table_id
+quota table_id
+ct table_id
+limit table_id
+secmark table_id
+synproxy table_id
+
+add table table\id
+add table table/id
+add table table_id
+add table table.id
+add table table.id
+add chain table/id
+add rule <stmt>
+add set table_id chain_id set_id $v_\/.ariable
+add map table_id
+add flowtable table_id
+add element table_id
+add counter table_id
+add quota table_id
+add ct table_id
+add limit table_id
+add secmark table_id
+add synproxy table_id
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+# other 'contained' that are supposed to be contained
+abort
+accept
+ackseq
+addr
+ah
+all
+&
+arp
+a-rwnd
+asconf
+asconf-ack
+*
+at
+automerge
+avgpkt
+bridge
+burst
+bypass
+bytes
+~
+cfi
+cgroup
+2cgroupv2
+chains
+checksum
+chunk
+classid
+code
+:
+,
+comment
+comp
+constant
+continue
+cookie-ack
+cookie-echo
+count
+counters
+cpi
+cpu
+csumcov
+cum-tsn-ack
+cwr
+daddr
+-
+data
+day
+dccp
+dei
+device
+devices
+direction
+dnat
+doff
+.
+dport
+drop
+dscp
+dst
+dup
+dynamic
+echo
+ecne
+ecn
+elements
+= /$/
+=
+error
+esp
+ether
+event
+exists
+expectation
+expiration
+expires
+exthdr
+fanout
+fastopen
+fib
+flags
+flow
+flowlabel
+flowtables
+forward-tsn
+frag
+frag-off
+fully-random
+fwd
+gateway
+gc-interval
+goto
+group
+>
+>=
+handle
+hbh
+hdrlength
+hdrversion
+heartbeat
+heartbeat-ack
+helper
+helpers
+hlen
+hook
+hooks
+hoplimit
+hour
+htype
+ibridgename
+ibriport
+icmp
+6icmp6
+icmpx
+id
+igmp
+iif
+iifgroup
+iifname
+iiftype
+in
+inc
+index
+inet
+init-ack
+init-tag
+init-tsn
+init
+interval
+ip
+6ip6
+ipsec
+jhash
+json
+jump
+3l3protocol
+label
+last
+last-ent
+left
+length
+level
+limits
+ll-hdr
+log
+lowest-tsn
+lshift
+lsrr
+<
+<=
+maps
+mark
+masquerade
+maxdelay
+5md5sig
+memory
+meta
+meter
+meters
+mh
+minute
+missing
+mod
+more-fragments
+mptcp
+mrt
+mss
+mtu
+name
+<>
+netdev
+network-hdr
+never
+new-cum-tsn
+nexthdr
+nexthop
+nftrace
+nop
+!
+notrack
+num-dup-tsns
+num-gack-blocks
+numgen
+num-istreams
+num-ostreams
+obridgename
+obriport
+offload
+offset
+oif
+oifgroup
+oifname
+oiftype
+operation
+option
+options
+original
+osf
+out
+over
+packets
+pcp
+performance
+persistent
+pkttype
+plen
+plus
+policy
+port
+position
+ppid
+pptr
+prefix
+priority
+protocol
+proto-dst
+proto-src
+ptr
+ptype
+queue
+queuenum
+queue-threshold
+quotas
+ra
+random
+rate
+redirect
+reject
+reply
+reqid
+reserved
+2reserved2
+return
+right
+rr
+rshift
+rt
+0rt0
+2rt2
+4rt4
+rtclassid
+rules
+ruleset
+sack
+0sack0
+1sack1
+2sack2
+3sack3
+sack-perm
+saddr
+sctp
+secmarks
+second
+seed
+seg-left
+seqno
+sequence
+sets
+shutdown
+shutdown-ack
+shutdown-complete
+sid
+size
+skgid
+skuid
+/
+snaplen
+snat
+socket
+spi
+spnum
+sport
+ssn
+ssrr
+state
+status
+stream
+string
+subtype
+symhash
+synproxys
+tables
+tag
+tcp
+time
+timeout
+timestamp
+to
+tproxy
+trace
+transparent
+transport-hdr
+tsecr
+tsn
+tsval
+ttl
+type
+typeof
+udp
+udplite
+until
+update
+urgptr
+used
+value
+vlan
+vm
+vmap
+vtag
+week
+wildcard
+window
+with
+wscale
+xml
+xt
+zone
+;
+
+# reserved words as the 2nd word
+xxx abort
+xxx accept
+xxx ackseq
+xxx addr
+xxx ah
+xxx all
+xxx &
+xxx arp
+xxx a-rwnd
+xxx asconf
+xxx asconf-ack
+xxx *
+xxx at
+xxx automerge
+xxx avgpkt
+xxx bridge
+xxx burst
+xxx bypass
+xxx bytes
+xxx ~
+xxx cfi
+xxx cgroup
+xxx 2cgroupv2
+xxx chains
+xxx checksum
+xxx chunk
+xxx classid
+xxx code
+xxx :
+xxx ,
+xxx comment
+xxx comp
+xxx constant
+xxx continue
+xxx cookie-ack
+xxx cookie-echo
+xxx count
+xxx counters
+xxx cpi
+xxx cpu
+xxx csumcov
+xxx cum-tsn-ack
+xxx cwr
+xxx daddr
+xxx -
+xxx data
+xxx day
+xxx dccp
+xxx dei
+xxx device
+xxx devices
+xxx direction
+xxx dnat
+xxx doff
+xxx .
+xxx dport
+xxx drop
+xxx dscp
+xxx dst
+xxx dup
+xxx dynamic
+xxx echo
+xxx ecne
+xxx ecn
+xxx elements
+xxx  = /$/
+xxx =
+xxx error
+xxx esp
+xxx ether
+xxx event
+xxx exists
+xxx expectation
+xxx expiration
+xxx expires
+xxx exthdr
+xxx fanout
+xxx fastopen
+xxx fib
+xxx flags
+xxx flow
+xxx flowlabel
+xxx flowtables
+xxx forward-tsn
+xxx frag
+xxx frag-off
+xxx fully-random
+xxx fwd
+xxx gateway
+xxx gc-interval
+xxx goto
+xxx group
+xxx >
+xxx >=
+xxx handle
+xxx hbh
+xxx hdrlength
+xxx hdrversion
+xxx heartbeat
+xxx heartbeat-ack
+xxx helper
+xxx helpers
+xxx hlen
+xxx hook
+xxx hooks
+xxx hoplimit
+xxx hour
+xxx htype
+xxx ibridgename
+xxx ibriport
+xxx icmp
+xxx 6icmp6
+xxx icmpx
+xxx id
+xxx igmp
+xxx iif
+xxx iifgroup
+xxx iifname
+xxx iiftype
+xxx in
+xxx inc
+xxx index
+xxx inet
+xxx init-ack
+xxx init-tag
+xxx init-tsn
+xxx init
+xxx interval
+xxx ip
+xxx 6ip6
+xxx ipsec
+xxx jhash
+xxx json
+xxx jump
+xxx 3l3protocol
+xxx label
+xxx last
+xxx last-ent
+xxx left
+xxx length
+xxx level
+xxx limits
+xxx ll-hdr
+xxx log
+xxx lowest-tsn
+xxx lshift
+xxx lsrr
+xxx <
+xxx <=
+xxx maps
+xxx mark
+xxx masquerade
+xxx maxdelay
+xxx 5md5sig
+xxx memory
+xxx meta
+xxx meter
+xxx meters
+xxx mh
+xxx minute
+xxx missing
+xxx mod
+xxx more-fragments
+xxx mptcp
+xxx mrt
+xxx mss
+xxx mtu
+xxx name
+xxx <>
+xxx netdev
+xxx network-hdr
+xxx never
+xxx new-cum-tsn
+xxx nexthdr
+xxx nexthop
+xxx nftrace
+xxx nop
+xxx !
+xxx notrack
+xxx num-dup-tsns
+xxx num-gack-blocks
+xxx numgen
+xxx num-istreams
+xxx num-ostreams
+xxx obridgename
+xxx obriport
+xxx offload
+xxx offset
+xxx oif
+xxx oifgroup
+xxx oifname
+xxx oiftype
+xxx operation
+xxx option
+xxx options
+xxx original
+xxx osf
+xxx out
+xxx over
+xxx packets
+xxx pcp
+xxx performance
+xxx persistent
+xxx pkttype
+xxx plen
+xxx plus
+xxx policy
+xxx port
+xxx position
+xxx ppid
+xxx pptr
+xxx prefix
+xxx priority
+xxx protocol
+xxx proto-dst
+xxx proto-src
+xxx ptr
+xxx ptype
+xxx queue
+xxx queuenum
+xxx queue-threshold
+xxx quotas
+xxx ra
+xxx random
+xxx rate
+xxx redirect
+xxx reject
+xxx reply
+xxx reqid
+xxx reserved
+xxx 2reserved2
+xxx return
+xxx right
+xxx rr
+xxx rshift
+xxx rt
+xxx 0rt0
+xxx 2rt2
+xxx 4rt4
+xxx rtclassid
+xxx rules
+xxx ruleset
+xxx sack
+xxx 0sack0
+xxx 1sack1
+xxx 2sack2
+xxx 3sack3
+xxx sack-perm
+xxx saddr
+xxx sctp
+xxx secmarks
+xxx second
+xxx seed
+xxx seg-left
+xxx seqno
+xxx sequence
+xxx sets
+xxx shutdown
+xxx shutdown-ack
+xxx shutdown-complete
+xxx sid
+xxx size
+xxx skgid
+xxx skuid
+xxx /
+xxx snaplen
+xxx snat
+xxx socket
+xxx spi
+xxx spnum
+xxx sport
+xxx ssn
+xxx ssrr
+xxx state
+xxx status
+xxx stream
+xxx string
+xxx subtype
+xxx symhash
+xxx synproxys
+xxx tables
+xxx tag
+xxx tcp
+xxx time
+xxx timeout
+xxx timestamp
+xxx to
+xxx tproxy
+xxx trace
+xxx transparent
+xxx transport-hdr
+xxx tsecr
+xxx tsn
+xxx tsval
+xxx ttl
+xxx type
+xxx typeof
+xxx udp
+xxx udplite
+xxx until
+xxx update
+xxx urgptr
+xxx used
+xxx value
+xxx vlan
+xxx vm
+xxx vmap
+xxx vtag
+xxx week
+xxx wildcard
+xxx window
+xxx with
+xxx wscale
+xxx xml
+xxx xt
+xxx zone
+xxx ;
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+

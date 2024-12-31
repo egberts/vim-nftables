@@ -22,8 +22,10 @@ rename chain arp myTable myChain identifier
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
-rename counters 
 rename chain ip6 myTable myChain new_identifier x
+
+# TODO rename counters (nft_base_cmd_rename extension)
+rename counters 
 
 
 ##################################################################################

@@ -14,6 +14,8 @@
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 
+# TODO : Finish nft_base_cmd_create_cmd_table_keyword
+
 create table myIpTable 
 create table my.IpTable
 create table my/IpTable

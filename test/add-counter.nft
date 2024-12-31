@@ -11,9 +11,8 @@
 
 # base_cmd add_cmd 'counter'
 
-c
-
 counter T O
+ counter T O
 counter T0 O
 counter T_ O
 counter T\ O

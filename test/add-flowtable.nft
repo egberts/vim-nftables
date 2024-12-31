@@ -18,6 +18,7 @@ add flowtable inet S F
 add flowtable netdev S F
 add flowtable bridge S F
 add flowtable arp S F
+ add flowtable arp S F
 
 add flowtable ip T C F { hook b };
 add flowtable T C F { devices = eth0 };

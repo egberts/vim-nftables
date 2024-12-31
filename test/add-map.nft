@@ -18,6 +18,7 @@ map inet T C S
 map netdev T C S
 map bridge T C S
 map arp T C S
+ map arp T C S
 
 map T C S;
 map T C S { timeout 15:00:01 }

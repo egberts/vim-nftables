@@ -119,8 +119,10 @@ table arp myArpTable { flags dormant; }
 table ip myIpTable { flags dormant; }
 table ip6 myIp6Table { flags dormant; }
 table inet myInetTable { flags dormant; }
+ table inet myInetTable { flags dormant; }
 
 add chain inet T C { type filter hook input priority 0 }
+ add chain inet T C { type filter hook input priority 0 }
 
 table inet base_table {
         chain input_filter {

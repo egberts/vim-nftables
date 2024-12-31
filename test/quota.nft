@@ -1,0 +1,169 @@
+#!/usr/sbin/nft -f
+# File: quota.nft
+# Description: A test NFT file to exercise '[add] quota' Vim syntax highlightings.
+#
+# base_cmd add_cmd 'quota' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_quota
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+add quota arp myIpfilter http-quota over 25 mbytes
+add quota bridge myIpfilter http-quota over 25 mbytes
+add quota filter http-quota { over 25 mbytes };
+add quota filter http-quota over 25 mbytes
+add quota filter ssh-quota { 10 kbytes }
+add quota inet myIpfilter http-quota over 25 mbytes
+add quota ip6 myIpfilter http-quota until 525 kbytes
+add quota ip myIpfilter http-quota over 25 mbytes
+add quota netdev myIpfilter http-quota over 25 mbytes;
+create quota arp myIpfilter http-quota over 25 mbytes
+create quota bridge myIpfilter http-quota over 25 mbytes
+create quota filter http-quota { over 25 mbytes };
+create quota filter http-quota over 25 mbytes
+create quota filter ssh-quota { 10 kbytes }
+create quota inet myIpfilter http-quota over 25 mbytes
+create quota ip6 myIpfilter http-quota until 525 kbytes
+create quota ip myIpfilter http-quota over 25 mbytes
+create quota netdev myIpfilter http-quota over 25 mbytes;
+delete ct expectation arp table_name quota_name
+delete ct expectation bridge table_name quota_name
+delete ct expectation inet table_name quota_name
+delete ct expectation ip6 table_name quota_name
+delete ct expectation ip table_name quota_name
+delete ct expectation netdev table_name quota_name
+delete ct expectation table_name quota_name 
+delete quota arp table_name handle 15
+delete quota arp table_name quota_name
+delete quota bridge table_name handle 15
+delete quota bridge table_name quota_name
+delete quota inet myInetFilter handle 123
+delete quota inet myInetFilter index 345
+delete quota inet myInetFilter position 234
+delete quota inet table_name quota_name
+delete quota ip6 table_name handle 15
+delete quota ip6 table_name quota_name
+delete quota ip table_name handle 15
+delete quota ip table_name quota_name
+delete quota netdev table_name handle 15
+delete quota netdev table_name quota_name
+delete quota table_name handle 15
+delete quota table_name quota_name 
+element filter ports { 22 : "ssh-quota" }
+element filter ports { 80 : "http-quota" }
+filter http-quota { over 25 mbytes };
+filter http-quota over 25 mbytes
+filter ssh-quota { 10 kbytes }
+inet myIpfilter http-quota over 25 mbytes
+ip6 myIpfilter http-quota until 525 kbytes
+ip myIpfilter http-quota over 25 mbytes
+list quota
+list quota arp myArpTable myArpChain
+list quota arp myTable quota_name
+list quota bridge myBridgeTable myBridgeChain
+list quota bridge myTable quota_name
+list quota inet myInetTable myInetChain
+list quota inet myTable quota_name
+list quota ip6 myIp6Table myIp6Chain
+list quota ip6 myTable quota_name
+list quota ip myIpTable myIpChain
+list quota ip myTable quota_name
+list quota myInetTable myInetChain
+list quota myTable quota_name
+list quota netdev myNetdevTable myNetdevChain
+list quota netdev myTable quota_name
+list quota quota_name 
+list quotas table arp myArpTable
+list quotas table arp table_name
+list quotas table bridge myBridgeTable
+list quotas table bridge table_name
+list quotas table inet myInetTable
+list quotas table inet table_name
+list quotas table ip6 myIp6Table
+list quotas table ip6 table_name
+list quotas table ip myIpTable
+list quotas table ip table_name
+list quotas table myIpTable
+list quotas table netdev myNetdevTable
+list quotas table netdev table_name
+list quotas table ruleset_spec
+list quotas table table_name
+netdev myIpfilter http-quota over 25 mbytes;
+quota and drop all packets once the quota hits 
+quota arp myIpfilter http-quota over 25 mbytes
+quota bridge myIpfilter http-quota over 25 mbytes
+quota example { over 100 mbytes used 0 bytes }
+quota filter http-quota { over 25 mbytes };
+quota filter http-quota over 25 mbytes
+quota filter ssh-quota { 10 kbytes }
+quota inet myIpfilter http-quota over 25 mbytes
+quota ip6 myIpfilter http-quota until 525 kbytes
+quota ip myIpfilter http-quota over 25 mbytes
+quota netdev myIpfilter http-quota over 25 mbytes;
+reset quota;
+reset quota arp
+reset quota arp myArpFilter https-quota
+reset quota arp tablename chainname
+reset quota bridge
+reset quota bridge myBridgeFilter https-quota
+reset quota bridge tablename chainname
+reset quota inet
+reset quota inet myInetFilter https-quota
+reset quota inet tablename chainname
+reset quota ip
+reset quota ip6
+reset quota ip6 myIp6Filter https-quota
+reset quota ip6 tablename chainname
+reset quota ip myIpFilter https-quota
+reset quota ip tablename chainname
+reset quota myIpTable myFilter ;
+reset quota myIpTable myIpFilter
+reset quota netdev
+reset quota netdev myBridgeFilter https-quota
+reset quota netdev tablename chainname
+reset quotas 
+reset quotas arp
+reset quotas arp MyIpTable MyChain
+reset quotas bridge
+reset quotas bridge MyIpTable MyChain
+reset quotas inet
+reset quotas inet MyIpTable MyChain
+reset quotas ip
+reset quotas ip6
+reset quotas ip6 MyIpTable MyChain
+reset quotas ip MyIpTable MyChain
+reset quotas MyIpTable MyChain
+reset quotas netdev
+reset quotas netdev MyIpTable MyChain
+reset quotas table arp myIpFilter
+reset quotas table arp MyIpTable MyChain
+reset quotas table bridge myIpFilter
+reset quotas table bridge MyIpTable MyChain
+reset quotas table inet myIpFilter
+reset quotas table inet MyIpTable MyChain
+reset quotas table ip6 myIpFilter
+reset quotas table ip6 MyIpTable MyChain
+reset quotas table ip myIpFilter
+reset quotas table ip MyIpTable MyChain
+reset quotas table myIpFilter
+reset quotas table MyIpTable MyChain
+reset quotas table netdev myIpFilter
+reset quotas table netdev MyIpTable MyChain
+reset quota tablename chainame
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
