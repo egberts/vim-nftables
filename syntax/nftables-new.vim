@@ -2777,7 +2777,7 @@ syn match nft_meter_stmt_alloc "meter" skipwhite contained
 \    nft_meter_stmt_alloc_identifier
 
 " meter_stmt->stmt
-syn cluster nft_meter_stmt
+syn cluster nft_c_meter_stmt
 \ contains=
 \    nft_meter_stmt_alloc
 
@@ -3033,6 +3033,7 @@ syn match nft_c_queue_stmt_keyword_flags "flags" skipwhite contained
 
 " 'queue'
 " 'queue'->queue_stmt->stmt
+hi link nft_queue_stmt nftHL_Command
 syn match nft_queue_stmt "queue" skipwhite contained
 \ nextgroup=
 \    @nft_c_queue_stmt_compat_flags,
@@ -3040,8 +3041,105 @@ syn match nft_queue_stmt "queue" skipwhite contained
 \    nft_c_queue_stmt_keyword_to,
 \    nft_c_queue_stmt_keyword_flags
 
-" SLE marker "
+syn cluster nft_c_queue_stmt
+\ contains=nft_queue_stmt
 
+" ('random'|'fully-random'|'persistent') ','
+" ','->nf_nat_flags->(masq_stmt_args|nat_stmt|redir|stmt_arg)
+hi link nft_nf_nat_flags_comma nftHL_Action
+syn match nft_nf_nat_flags_comma "," skipwhite contained
+\ contains=
+\    nft_nf_nat_flag
+
+" nf_nat_flag
+" ('random'|'fully-random'|'persistent')
+" ('random'|'fully-random'|'persistent')->nf_nat_flags->(masq_stmt_args|nat_stmt|redir|stmt_arg)
+hi link nft_nf_nat_flag nftHL_Action
+syn match nft_nf_nat_flag "\v(random|fully\-random|persistent)" skipwhite contained
+\ nextgroup=
+\    nft_nf_nat_flags_comma
+
+" nf_nat_flags
+" nf_nat_flags->(masq_stmt_args|nat_stmt|redir|stmt_arg)
+" nf_key_proto->(fwd_stmt|nat_stmt|rt_expr|tproxy_stmt)
+syn cluster nft_c_nf_nat_flags
+\ contains=
+\    nft_nf_nat_flag
+
+" 'fwd' ('ip'|'ip6') 'to'
+" 'to'->fwd_stmt
+hi link nft_fwd_stmt_nf_key_proto_keyword_to nftHL_Command
+syn match nft_fwd_stmt_nf_key_proto_keyword_to "to" skipwhite contained
+\ nextgroup=@nft_c_stmt_expr
+
+" 'fwd' ('ip'|'ip6')
+" nf_key_proto->fwd_stmt
+hi link nft_fwd_stmt_nf_key_proto nftHL_Command
+syn match nft_fwd_stmt_nf_key_proto "\vip[6]?" skipwhite contained
+\ nextgroup=
+\    nft_fwd_stmt_nf_key_proto_keyword_to
+
+" 'fwd' 'to'
+hi link nft_fwd_stmt_keyword_to nftHL_Command
+syn match nft_fwd_stmt_keyword_to "to" skipwhite contained
+\ nextgroup=@nft_c_stmt_expr
+
+" 'fwd'
+" fwd_stmt
+hi link nft_fwd_stmt nftHL_Command
+syn match nft_fwd_stmt "fwd" skipwhite contained
+\ nextgroup=
+\    nft_fwd_stmt_keyword_to,
+\    nft_fwd_stmt_nf_key_proto
+
+" TODO 'dup 'to' stmt_expr 'device' stmt_expr
+
+" 'dup' 'to'
+" 'to'->dup_stmt->stmt
+hi link nft_dup_stmt_keyword_to nftHL_Command
+syn match nft_dup_stmt_keyword_to "to" skipwhite contained
+\ nextgroup=
+\    @nft_c_stmt_expr
+
+" 'dup'
+" dup_stmt->stmt
+hi link nft_dup_stmt nftHL_Command
+syn match nft_dup_stmt "dup" skipwhite contained
+\ nextgroup=nft_dup_stmt_keyword_to
+
+" 'redirect' 'to' [ ':' ] stmt_expr [ nf_nat_flags ]
+" 'to' [ ':' ] stmt_expr
+syn cluster nft_redir_stmt_redir_stmt_arg_keyword_to_stmt_expr
+\ contains=
+\    @nft_c_stmt_expr
+
+" redir_stmt_arg->redir_stmt
+hi link   nft_redir_stmt_redir_stmt_arg_keyword_to_colon nftHL_Operator
+syn match nft_redir_stmt_redir_stmt_arg_keyword_to_colon /:/ skipwhite contained
+\ nextgroup=nft_redir_stmt_redir_stmt_arg_keyword_to_stmt_expr
+
+" 'to' nf_nat_flags
+" redir_stmt_arg->redir_stmt
+hi link   nft_redir_stmt_redir_stmt_arg_keyword_to nftHL_Command
+syn match nft_redir_stmt_redir_stmt_arg_keyword_to "to" skipwhite contained
+\ nextgroup=
+\    nft_redir_stmt_redir_stmt_arg_keyword_to_colon,
+\    nft_redir_stmt_redir_stmt_arg_keyword_to_stmt_expr
+
+" 'redirect'
+" redir_stmt_alloc->redir_stmt->stmt
+hi link nft_redir_stmt_redir_stmt_alloc_keyword_redir nftHL_Command
+syn match nft_redir_stmt_redir_stmt_alloc_keyword_redir "redir" skipwhite contained
+\ nextgroup=
+\    nft_redir_stmt_redir_stmt_arg_keyword_to,
+\    @nft_c_nf_nat_flags
+
+" 'redirect'
+" redir_stmt->stmt
+syn cluster nft_c_redir_stmt
+\ contains=nft_redir_stmt_redir_stmt_alloc_keyword_redir
+
+" SLE marker "
 
 "##############################################################################3
 " base_cmd add_cmd 'limit' <table_id> <limit_id>
@@ -5368,10 +5466,32 @@ syn cluster nft_c_common_block
 \    nft_EOL
 "\    nft_InlineComment,
 
+" stmt->(meter_stmt_alloc|rule_alloc)
 syn cluster nft_c_stmt
 \ contains=
-\    nft_ct_stmt
-""\    @nft_c_payload_stmt
+\    nft_verdict_stmt,
+\    @nft_c_match_stmt,
+\    @nft_c_meter_stmt,
+\    @nft_c_payload_stmt,
+\    nft_stateful_stmt,
+\    @nft_c_meta_stmt,
+\    nft_log_stmt,
+\    nft_reject_stmt,
+\    nft_nat_stmt,
+\    nft_masq_stmt,
+\    @nft_c_redir_stmt,
+\    nft_tproxy_stmt,
+\    @nft_c_queue_stmt,
+\    nft_ct_stmt,
+\    nft_dup_stmt,
+\    nft_fwd_stmt,
+\    @nft_c_set_stmt,
+\    @nft_c_map_stmt,
+\    nft_optstrip_stmt,
+\    nft_xt_stmt,
+\    nft_objref_stmt,
+\    nft_synproxy_stmt,
+\    nft_chain_stmt
 
 """""""""""""""""""""" END OF SYNTAX """"""""""""""""""""""""""""
 
