@@ -8,7 +8,7 @@
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
-
+table_id chain_id 
 
 reset map
 # <common_block>
@@ -130,8 +130,8 @@ table inet base_table {
                  flags offload;
                  devices = { br0,eth0 };
                  comment "A nice long comment line"
-                 ct state established,related accept # handle 2
                  iifname "lo" accept # handle 3
+                 ct state established,related accept # handle 2
                  ip protocol icmp accept # handle 4
                  drop # handle 5
         }
@@ -527,9 +527,11 @@ set ip myIpTable mySet {   # comment
     policy memory;   # comment
     policy performance;   # comment
     };  # comment
-#####set netdev myNetdevTable myNetdevSet { type ether_addr; flags interval; timeout 15m; gc-interval 2d; elements = {mark}; size 1200; policy performance; auto-merge; }
+}
+set netdev myNetdevTable myNetdevSet { type ether_addr; flags interval; timeout 15m; gc-interval
+    2d; elements = {mark, ipv4_addr; ipv6_addr; }; size 1200; policy performance; auto-merge; }
 set netdev myNetdevTable myNetdevSet { type ether_addr; flags interval; timeout 15m; gc-interval 2d; size 1200; policy performance; auto-merge; }
-set bridge myBridgeTable myBridgeSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = {ether_addr}; size 1200; policy memory; auto-merge; }
+set bridge myBridgeTable myBridgeSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements =         {ether_addr}; size 1200; policy memory; auto-merge; }
 set arp myArpTable myArpSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = {ipv4_addr}; size 1200; policy performance; auto-merge; }
 set ip myIpTable myIpSet { type mark; flags interval; timeout 15m; gc-interval 2d; elements = {ipv4_addr}; size 1200; policy memory; auto-merge; }
 set ip6 myIp6Table myIp6Set { type inet_service; flags interval; timeout 15m; gc-interval 2d; elements = {ipv6_addr}; size 1200; policy memory; auto-merge; }
@@ -574,6 +576,7 @@ element filter blackhole { 10.2.3.4, 10.23.1.42 }
 
 # flowtable <flowtable_spec> { <flowtable_block> }  # without the 'add' keyword
 # Bison: FLOWTABLE flowtable_spec flowtable_block_alloc { flowtable_block } 
+flowtable myIpTable chain_id { devices = { eth0, eth1 } ; }
 flowtable myIpTable myIpFT { devices = { eth0, eth1 } ; }
 # Bison: FLOWTABLE flowtable_spec flowtable_block_alloc { HOOK type PRIORITY NUM; flowtable_block } 
 flowtable myIpTable myIpFT { hook input priority 0; devices = { eth0, eth1 } ; }

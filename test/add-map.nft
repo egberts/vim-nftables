@@ -26,7 +26,7 @@ map T C S { gc-interval 1:00:1 }
 map T C S { flags constant }
 map T C S { flags interval; }
 map T C S { flags timeout };
-map T C S { flags dynamic ; } ;
+map ip T C S { flags dynamic ; } ;
 map T C S { flags constant, interval, timeout, dynamic };
 map T C S { flags constant; flags interval; flags timeout; flags dynamic };
 map T C S { comment *A comment string* }
