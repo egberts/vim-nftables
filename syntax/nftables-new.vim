@@ -1727,14 +1727,17 @@ syn cluster nft_c_meta_stmt
 " variable_expr->chain_expr->verdict_expr
 hi link nft_chain_expr_variable_expr nftHL_Variable
 syn match nft_chain_expr_variable_expr "\v\$[a-zA-Z0-9\/\\_\.]{1,65}" skipwhite contained
+\ nextgroup=nft_EOS
 
 " 'last'->identifier->chain_expr->verdict_expr
 hi link nft_chain_expr_identifier_last nftHL_Action
 syn match nft_chain_expr_identifier_last "last" skipwhite contained
+\ nextgroup=nft_EOS
 
 " <string>->identifier->chain_expr->verdict_expr
 hi link nft_chain_expr_identifier_string nftHL_Action
 syn match nft_chain_expr_identifier_string "\v[a-zA-Z0-9\/\\_\.]{1,65}" skipwhite contained
+\ nextgroup=nft_EOS
 
 " chain_expr->verdict_expr
 syn cluster nft_c_chain_expr
@@ -1746,16 +1749,17 @@ syn cluster nft_c_chain_expr
 
 " ('jump'|'goto')->verdict_expr->(verdict_stmt|set_rhs_expr)
 hi link nft_verdict_expr_chain_expr nftHL_Command
-syn match nft_verdict_expr_chain_expr "\v(accept|drop|continue|return)" skipwhite contained
+syn match nft_verdict_expr_chain_expr "\v(jump|goto)" skipwhite contained
 \ nextgroup=
 \    @nft_c_chain_expr
 
 " ('accept'|'drop'|'continue'|'return')->verdict_expr->(verdict_stmt|set_rhs_expr)
 hi link nft_verdict_expr_keywords_unchained nftHL_Command
 syn match nft_verdict_expr_keywords_unchained "\v(accept|drop|continue|return)" skipwhite contained
+\ nextgroup=nft_EOS
 
 " verdict_expr->(verdict_stmt|set_rhs_expr)
-syn cluster nft_verdict_expr
+syn cluster nft_c_verdict_expr
 \ contains=
 \    nft_verdict_expr_keywords_unchained,
 \    nft_verdict_expr_keywords_chain_expr,
@@ -2178,7 +2182,7 @@ syn cluster nft_initializer_expr
 syn cluster nft_c_set_rhs_expr
 \ contains=
 \    @nft_c_concat_rhs_expr,
-\    @nft_verdict_expr
+\    @nft_c_verdict_expr
 
 " set_lhs_expr->set_elem_key_expr
 syn cluster nft_c_set_lhs_expr
@@ -3862,9 +3866,158 @@ syn match nft_connlimit_stmt_keyword_count "count" skipwhite contained
 
 " 'ct'
 " 'ct'->connlimit_stmt->stateful_stmt
+hi link   nft_connlimit_stmt nftHL_Commanad
 syn match nft_connlimit_stmt "ct" skipwhite contained
 \ nextgroup=
 \    nft_connlimit_stmt_count
+
+
+hi link    nft_verdict_map_expr_block_delimiters nftHL_Normal
+syn region nft_verdict_map_expr_block_delimiters start=/{/ end=/}/ skipwhite contained
+\ contains=
+\    nft_verdict_map_list_member_expr
+
+" '{'
+" verdict_map_expr->verdict_map_stmt
+syn cluster nft_c_verdict_map_expr
+\ contains=
+\    nft_verdict_map_expr_block_delimiters,
+\    @nft_c_set_ref_expr
+
+syn match nft_verdict_map_expr_keyword_vmap "vmap" skipwhite contained
+\ nextgroup=
+\    @nft_c_verdict_map_expr
+
+syn cluster nft_c_verdict_map_stmt
+\ contains=
+\    @nft_c_verdict_map_expr_keyword_vmap
+" TODO: need to insert concat_expr into here
+
+syn cluster nft_c_verdict_stmt
+\ contains=
+\    @nft_c_verdict_expr,
+\    @nft_c_verdict_map_expr
+
+
+" 'jump'|'goto' '{' rule '}'
+" rule->chain_stmt_type->chain_stmt->stmt
+syn cluster nft_c_chain_stmt_block_rule
+\ contains=@nft_c_rule
+" TODO missing stmt_separator
+
+" 'jump'|'goto' '{' ...
+" chain_stmt_type->chain_stmt->stmt
+syn region nft_c_chain_stmt_block_delimiters start=/{/ end=/}/ skipwhite contained
+\ contains=@nft_c_chain_stmt_block_rule
+
+" 'jump'|'goto'
+" chain_stmt_type->chain_stmt->stmt
+syn match nft_chain_stmt_type "\v(jump|goto)" skipwhite contained
+\ nextgroup=nft_c_chain_stmt_block_delimiters
+
+" chain_stmt->stmt
+syn cluster nft_c_chain_stmt
+\ contains=
+\   nft_chain_stmt_type
+
+
+" 'xt' 'string' <STRING>
+" <STRING>->xt_stmt->stmt
+syn match nft_xt_stmt_string "[\w\s]{1,64}" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'xt' 'string'
+" 'string'->xt_stmt->stmt
+syn match nft_xt_stmt_keyword_string "string" skipwhite contained
+\ nextgroup=nft_xt_stmt_string
+
+" 'xt'
+" xt_stmt->stmt
+syn match nft_xt_stmt "xt" skipwhite contained
+\ nextgroup=nft_xt_stmt_keyword_string
+
+
+" stmt->(meter_stmt_alloc|rule_alloc)
+syn cluster nft_c_stmt
+\ contains=
+\    @nft_c_verdict_stmt,
+\    @nft_c_match_stmt,
+\    @nft_c_meter_stmt,
+\    @nft_c_payload_stmt,
+\    nft_stateful_stmt,
+\    @nft_c_meta_stmt,
+\    nft_log_stmt,
+\    @nft_c_reject_stmt,
+\    nft_nat_stmt,
+\    nft_masq_stmt,
+\    @nft_c_redir_stmt,
+\    nft_tproxy_stmt,
+\    @nft_c_queue_stmt,
+\    nft_ct_stmt,
+\    nft_dup_stmt,
+\    nft_fwd_stmt,
+\    @nft_c_set_stmt,
+\    @nft_c_map_stmt,
+\    nft_optstrip_stmt,
+\    nft_xt_stmt,
+\    nft_objref_stmt,
+\    nft_synproxy_stmt,
+\    @nft_c_chain_stmt
+
+" stateful_stmt->(stateful_stmt_list|stmt)
+syn cluster nft_c_stateful_stmt
+\ contains=
+\    nft_counter_stmt,
+\    nft_limit_stmt,
+\    nft_quota_stmt,
+\    nft_connlimit_stmt,
+\    @nft_c_last_stmt
+
+" objref_stmt->stmt
+syn cluster nft_c_objref_stmt
+\ contains=
+\    nft_objref_stmt_counter,
+\    nft_objref_stmt_limit,
+\    nft_objref_stmt_quota,
+\    nft_objref_stmt_synproxy,
+\    nft_objref_stmt_ct
+
+" 'ct' ('timeout'|'expectation') 'set'
+" 'set'->objref_stmt_ct->objref_stmt->stmt
+syn match nft_objref_stmt_keyword_set "set" skipwhite contained
+\ nextgroup=
+\    @nft_c_stmt_expr
+
+" 'ct' 'timeout'
+" 'timeout'->objref_stmt_ct->objref_stmt->stmt
+syn match nft_objref_stmt_keyword_timeout "timeout" skipwhite contained
+\ nextgroup=
+\    nft_objref_stmt_ct_keyword_set
+
+" 'ct' 'expectation'
+" 'expectation'->objref_stmt_ct->objref_stmt->stmt
+syn match nft_objref_stmt_keyword_expectation "expectation" skipwhite contained
+\ nextgroup=
+\    nft_objref_stmt_ct_keyword_set
+
+" 'ct'
+" objref_stmt_ct->objref_stmt->stmt
+syn match nft_objref_stmt_ct "ct" skipwhite contained
+\ nextgroup=
+\    nft_objref_stmt_ct_keyword_timeout,
+\    nft_objref_stmt_ct_keyword_expectation
+
+" 'synproxy' 'name'
+" 'name'->objref_stmt_synproxy->objref_stmt->stmt
+syn match nft_objref_stmt_synproxy_keyword_name "name" skipwhite contained
+\ nextgroup=
+\    @nft_c_stmt_expr
+
+" 'synproxy'
+" objref_stmt_synproxy->objref_stmt->stmt
+syn match nft_objref_stmt_synproxy "synproxy" skipwhite contained
+\ nextgroup=
+\    nft_objref_stmt_synproxy_keyword_name
 
 " SLE marker "
 
@@ -6193,33 +6346,6 @@ syn cluster nft_c_common_block
 \    nft_hash_comment,
 \    nft_EOL
 "\    nft_InlineComment,
-
-" stmt->(meter_stmt_alloc|rule_alloc)
-syn cluster nft_c_stmt
-\ contains=
-\    nft_verdict_stmt,
-\    @nft_c_match_stmt,
-\    @nft_c_meter_stmt,
-\    @nft_c_payload_stmt,
-\    nft_stateful_stmt,
-\    @nft_c_meta_stmt,
-\    nft_log_stmt,
-\    nft_reject_stmt,
-\    nft_nat_stmt,
-\    nft_masq_stmt,
-\    @nft_c_redir_stmt,
-\    nft_tproxy_stmt,
-\    @nft_c_queue_stmt,
-\    nft_ct_stmt,
-\    nft_dup_stmt,
-\    nft_fwd_stmt,
-\    @nft_c_set_stmt,
-\    @nft_c_map_stmt,
-\    nft_optstrip_stmt,
-\    nft_xt_stmt,
-\    nft_objref_stmt,
-\    nft_synproxy_stmt,
-\    nft_chain_stmt
 
 """""""""""""""""""""" END OF SYNTAX """"""""""""""""""""""""""""
 
