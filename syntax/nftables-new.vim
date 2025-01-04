@@ -1875,94 +1875,12 @@ syn cluster nft_c_relational_expr
 \ contains=
 \     @nft_c_expr
 
-" 'packet'->limit_burst_pkts->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_burst_pkts_keyword_packets nftHL_Number
-syn match nft_limit_config_limit_burst_pkts_keyword_packets "packets" skipwhite contained
-
-" num->limit_burst_pkts->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_burst_pkts_num nftHL_Number
-syn match nft_limit_config_limit_burst_pkts_num "\v[0-9]{1,11}" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_burst_pkts_keyword_packets
-
-" 'burst'->limit_burst_pkts->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_burst_pkts_keyword_burst nftHL_Command
-syn match nft_limit_config_limit_burst_pkts_keyword_burst "burst" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_burst_pkts_num
-
-" time_unit->limit_rate_pkts->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_rate_pkts_time_unit nftHL_Action
-syn match nft_limit_config_limit_rate_pkts_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_burst_pkts_keyword_burst
-
-" '/'->limit_rate_pkts->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_rate_pkts_expression_slash nftHL_Expression
-syn match nft_limit_config_limit_rate_pkts_expression_slash "/" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_rate_pkts_time_unit
-
-" 'bytes'->limit_burst_bytes->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_burst_bytes_keyword_packets nftHL_Expression
-syn match nft_limit_config_limit_burst_bytes_keyword_packets "bytes" skipwhite contained
-
-" num->limit_burst_bytes->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_burst_bytes_num nftHL_Number
-syn match nft_limit_config_limit_burst_bytes_num "\v[0-9]{1,11}" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_burst_bytes_keyword_packets
-
-" 'burst'->limit_burst_bytes->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_burst_bytes_keyword_burst nftHL_Command
-syn match nft_limit_config_limit_burst_bytes_keyword_burst "burst" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_burst_bytes_num
-
-" time_unit->limit_rate_bytes->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_rate_bytes_time_unit nftHL_Expression
-syn match nft_limit_config_limit_rate_bytes_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_burst_bytes_keyword_burst
-
-" '/'->limit_rate_bytes->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_rate_bytes_expression_slash nftHL_Expression
-syn match nft_limit_config_limit_rate_bytes_expression_slash "/" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_rate_bytes_time_unit
-
-" 'bytes'->limit_rate_bytes->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_rate_bytes_keyword_bytes nftHL_Expression
-syn match nft_limit_config_limit_rate_bytes_keyword_bytes "bytes" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_rate_bytes_expression_slash
-
-" <string>->limit_rate_bytes->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_rate_bytes_string nftHL_Expression
-syn match nft_limit_config_limit_rate_bytes_string "\w{1,32}" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_burst_bytes_keyword_burst
-
-" <num>->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_num nftHL_Number
-syn match nft_limit_config_num "\v[0-9]{1,11}" skipwhite contained
-\ nextgroup=
-\    nft_limit_config_limit_rate_pkts_expression_slash,
-\    nft_limit_config_limit_rate_bytes_keyword_bytes,
-\    nft_limit_config_limit_rate_bytes_string_unit
-
-" limit_mode->limit_config->(add_cmd|create_cmd|limit_block)
-hi link nft_limit_config_limit_mode nftHL_Action
-syn match nft_limit_config_limit_mode "\v(over|until)" skipwhite contained
-\ nextgroup=
-\    @nft_c_limit_config_num
-
 " limit_config->(add_cmd|create_cmd|limit_block)
 hi link nft_limit_config nftHL_Command
 syn match nft_limit_config "rate" skipwhite contained
 \ nextgroup=
 \    nft_limit_config_limit_mode,
-\    nft_limit_config_num
+\    nft_limit_config_limit_rate_pktsbytes_num
 
 hi link nft_ct_expect_config_ct_l4protoname nftHL_Type
 syn match nft_ct_expect_config_ct_l4protoname "\v(udp|tcp)" skipwhite contained
@@ -2283,115 +2201,38 @@ syn cluster nft_c_set_elem_expr_option
 \    nft_set_elem_expr_option_timeout_expires,
 \    nft_comment_spec
 
+" 'counter' 'packets' <NUM> 'bytes' <NUM>
 "nnum->'bytes'->'counter'->set_elem_stmt->set_elem_expr_alloc
 hi link nft_set_elem_stmt_counter_bytes_num nftHL_Number
 syn match nft_set_elem_stmt_counter_bytes_num "\v\d{1,11}" skipwhite contained
 
+" 'counter' 'packets' <NUM> 'bytes'
 " 'bytes'->'counter'->set_elem_stmt->set_elem_expr_alloc
 hi link nft_set_elem_stmt_counter_bytes nftHL_Action
 syn match nft_set_elem_stmt_counter_bytes "bytes" skipwhite contained
 \ nextgroup=
 \    nft_set_elem_stmt_counter_bytes_num
 
+" 'counter' 'packets' <NUM>
 " num->'packets'->'counter'->set_elem_stmt->set_elem_expr_alloc
 hi link nft_set_elem_stmt_counter_packets_num nftHL_Number
 syn match nft_set_elem_stmt_counter_packets_num "\v\d{1,11}" skipwhite contained
 \ nextgroup=
 \    nft_set_elem_stmt_counter_bytes
 
+" 'counter' 'packets'
 " 'packets'->'counter'->set_elem_stmt->set_elem_expr_alloc
 hi link nft_set_elem_stmt_counter_packets nftHL_Action
 syn match nft_set_elem_stmt_counter_packets "packets" skipwhite contained
 \ nextgroup=
 \    nft_set_elem_stmt_counter_packets_num
 
+" 'counter'
 " 'counter'->set_elem_stmt->set_elem_expr_alloc
 hi link nft_set_elem_stmt_counter nftHL_Command
 syn match nft_set_elem_stmt_counter "counter" skipwhite contained
 \ nextgroup=
 \    nft_set_elem_stmt_counter_packets
-
-" 'packet'->limit_burst_pkts->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_burst_pkts_keyword_packets nftHL_Number
-syn match nft_set_elem_stmt_limit_burst_pkts_keyword_packets "packets" skipwhite contained
-
-" num->limit_burst_pkts->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_burst_pkts_num nftHL_Number
-syn match nft_set_elem_stmt_limit_burst_pkts_num "\v[0-9]{1,11}" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_burst_pkts_keyword_packets
-
-" 'burst'->limit_burst_pkts->->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_burst_pkts_keyword_burst nftHL_Command
-syn match nft_set_elem_stmt_limit_burst_pkts_keyword_burst "burst" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_burst_pkts_num
-
-" time_unit->limit_rate_pkts->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_rate_pkts_time_unit nftHL_Action
-syn match nft_set_elem_stmt_limit_rate_pkts_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_burst_pkts_keyword_burst
-
-" '/'->limit_rate_pkts->set_elem_stmt->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_rate_pkts_expression_slash nftHL_Expression
-syn match nft_set_elem_stmt_limit_rate_pkts_expression_slash "/" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_rate_pkts_time_unit
-
-" 'bytes'->limit_burst_bytes->set_elem_stmt->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_burst_bytes_keyword_packets nftHL_Expression
-syn match nft_set_elem_stmt_limit_burst_bytes_keyword_packets "bytes" skipwhite contained
-
-" num->limit_burst_bytes->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_burst_bytes_num nftHL_Number
-syn match nft_set_elem_stmt_limit_burst_bytes_num "\v[0-9]{1,11}" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_burst_bytes_keyword_packets
-
-" 'burst'->limit_burst_bytes->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_burst_bytes_keyword_burst nftHL_Command
-syn match nft_set_elem_stmt_limit_burst_bytes_keyword_burst "burst" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_burst_bytes_num
-
-" time_unit->limit_rate_bytes->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_rate_bytes_time_unit nftHL_Expression
-syn match nft_set_elem_stmt_limit_rate_bytes_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_burst_bytes_keyword_burst
-
-" '/'->limit_rate_bytes->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_rate_bytes_expression_slash nftHL_Expression
-syn match nft_set_elem_stmt_limit_rate_bytes_expression_slash "/" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_rate_bytes_time_unit
-
-" 'bytes'->limit_rate_bytes->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_rate_bytes_keyword_bytes nftHL_Expression
-syn match nft_set_elem_stmt_limit_rate_bytes_keyword_bytes "bytes" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_rate_bytes_expression_slash
-
-" <string>->limit_rate_bytes->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_rate_bytes_string nftHL_Expression
-syn match nft_set_elem_stmt_limit_rate_bytes_string "\w{1,32}" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_burst_bytes_keyword_burst
-
-" <num>->limit_rate->'limit'->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_rate_num nftHL_Number
-syn match nft_set_elem_stmt_limit_rate_num "\v[0-9]{1,11}" skipwhite contained
-\ nextgroup=
-\    nft_set_elem_stmt_limit_rate_pkts_expression_slash,
-\    nft_set_elem_stmt_limit_rate_bytes_keyword_bytes,
-\    nft_set_elem_stmt_limit_rate_bytes_string_unit
-
-" limit_mode->'limit'->set_elem_stmt->set_elem_expr_alloc
-hi link nft_set_elem_stmt_limit_mode nftHL_Action
-syn match nft_set_elem_stmt_limit_mode "\v(over|until)" skipwhite contained
-\ nextgroup=
-\    @nft_c_limit_config_num
 
 " 'rate'->'limit'->set_elem_stmt->set_elem_expr_alloc
 hi link nft_set_elem_stmt_limit_rate nftHL_Command
@@ -3426,7 +3267,9 @@ syn match nft_nat_stmt "\v(snat|dnat)" skipwhite contained
 " 'reject' 'with' 'icmp' 'type'
 " 'reject' 'with' 'icmp6' 'type'
 " reject_opts->reject_stmt->stmt
-syn cluster nft_c_reject_with_expr "type" skipwhite contained
+
+hi link nft_reject_with_expr nftHL_Statement
+syn match nft_reject_with_expr "type" skipwhite contained
 \ nextgroup=
 \    nft_keyword_string,
 \    nft_integer_expr
@@ -3481,6 +3324,547 @@ syn match nft_reject_stmt_keyword_reject "reject" skipwhite contained
 syn cluster nft_c_reject_stmt
 \ contains=
 \    nft_reject_stmt
+
+
+" limit_burst_pkts
+" 'burst' <NUM> 'packets'
+" 'packet'->limit_burst_pkts->limit_config->(add_cmd|create_cmd|limit_block)
+" 'packet'->limit_burst_pkts->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_limit_burst_pkts_keyword_packets nftHL_Action
+syn match nft_limit_burst_pkts_keyword_packets "packets" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'burst' <NUM>
+" num->limit_burst_pkts->limit_config->(add_cmd|create_cmd|limit_block)
+" num->limit_burst_pkts->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_limit_burst_pkts_num nftHL_Number
+syn match nft_limit_burst_pkts_num "\v[0-9]{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_limit_burst_pkts_keyword_packets
+
+" 'burst'
+" 'rate' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week') 'burst'
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week') 'burst'
+" 'burst'->limit_burst_pkts->limit_config->(add_cmd|create_cmd|limit_block)
+" 'burst'->limit_burst_pkts->->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_limit_burst_pkts_keyword_burst nftHL_Command
+syn match nft_limit_burst_pkts_keyword_burst "burst" skipwhite contained
+\ nextgroup=
+\    nft_limit_burst_pkts_num
+
+
+" limit_burst_bytes
+" 'limit' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week') 'burst' <NUM> ('bytes'|'string')
+" 'bytes'->limit_burst_bytes->limit_config
+hi link   nft_limit_config_limit_burst_bytes_limit_bytes_keyword_bytes nftHL_Action
+syn match nft_limit_config_limit_burst_bytes_limit_bytes_keyword_bytes "\v(bytes|string)" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week') 'burst' <NUM> ('bytes'|'string')
+" 'bytes'->limit_burst_bytes->set_elem_stmt->set_elem_stmt->set_elem_expr_alloc
+hi link nft_set_elem_stmt_limit_burst_bytes_limit_bytes_keyword_bytes nftHL_Action
+syn match nft_set_elem_stmt_limit_burst_bytes_limit_bytes_keyword_bytes "\v(bytes|string)" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'limit' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week') 'burst' <NUM>
+" num->limit_burst_bytes->limit_config->(add_cmd|create_cmd|limit_block)
+hi link   nft_limit_config_limit_burst_bytes_limit_bytes_num nftHL_Number
+syn match nft_limit_config_limit_burst_bytes_limit_bytes_num "\v[0-9]{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_burst_bytes_limit_bytes_keyword_bytes
+
+" limit_burst_bytes
+" 'burst' <NUM>
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week') 'burst' <NUM>
+" num->limit_burst_bytes->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_set_elem_stmt_limit_burst_bytes_limit_bytes_num nftHL_Number
+syn match nft_set_elem_stmt_limit_burst_bytes_limit_bytes_num "\v[0-9]{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_burst_bytes_limit_bytes_keyword_bytes
+
+" 'limit' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week') 'burst'
+" 'burst'->limit_burst_bytes->limit_config->(add_cmd|create_cmd|limit_block)
+hi link   nft_limit_config_limit_burst_bytes_keyword_burst nftHL_Command
+syn match nft_limit_config_limit_burst_bytes_keyword_burst "burst" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_burst_bytes_limit_bytes_num
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week') 'burst'
+" 'burst'->limit_burst_bytes->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_set_elem_stmt_limit_burst_bytes_keyword_burst nftHL_Command
+syn match nft_set_elem_stmt_limit_burst_bytes_keyword_burst "burst" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_burst_bytes_limit_bytes_num
+
+
+" time_unit
+" 'rate' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week')
+" time_unit->limit_rate_pkts->limit_config->(add_cmd|create_cmd|limit_block)
+hi link   nft_limit_config_limit_rate_pkts_time_unit nftHL_Action
+syn match nft_limit_config_limit_rate_pkts_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
+\ nextgroup=
+\    nft_limit_burst_pkts_keyword_burst
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week')
+" time_unit->limit_rate_pkts->limit_stmt->stateful_stmt
+hi link   nft_limit_stmt_limit_rate_pkts_time_unit nftHL_Action
+syn match nft_limit_stmt_limit_rate_pkts_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
+\ nextgroup=
+\    nft_limit_burst_pkts_keyword_burst
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> '/' ('second'|'minute'|'hour'|'day'|'week')
+" time_unit->limit_rate_pkts->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_set_elem_stmt_limit_rate_pkts_time_unit nftHL_Action
+syn match nft_set_elem_stmt_limit_rate_pkts_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
+\ nextgroup=
+\    nft_limit_burst_pkts_keyword_burst
+
+" time_unit
+" 'rate' [ 'over'|'until' ] <NUM> 'bytes' '/' ('second'|'minute'|'hour'|'day'|'week')
+" time_unit->limit_rate_bytes->limit_config->(add_cmd|create_cmd|limit_block)
+hi link nft_limit_config_limit_rate_bytes_time_unit nftHL_Expression
+syn match nft_limit_config_limit_rate_bytes_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_burst_bytes_keyword_burst,
+\    nft_EOS
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> 'bytes' '/' ('second'|'minute'|'hour'|'day'|'week')
+" time_unit->limit_rate_bytes->limit_stmt->stateful_stmt
+hi link nft_limit_stmt_limit_rate_bytes_time_unit nftHL_Expression
+syn match nft_limit_stmt_limit_rate_bytes_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
+\ nextgroup=
+\    nft_limit_stmt_limit_burst_bytes_keyword_burst,
+\    nft_EOS
+
+" time_unit
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> ('bytes'|'string') '/' ('second'|'minute'|'hour'|'day'|'week')
+" time_unit->limit_rate_bytes->set_elem_stmt->set_elem_expr_alloc
+hi link nft_set_elem_stmt_limit_rate_bytes_time_unit nftHL_Expression
+syn match nft_set_elem_stmt_limit_rate_bytes_time_unit "\v(second|minute|hour|day|week)" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_burst_bytes_keyword_burst,
+\    nft_EOS
+
+
+" limit_rate_pkts
+" 'rate' [ 'over'|'until' ] <NUM> '/'
+" '/'->limit_rate_pkts->limit_config->(add_cmd|create_cmd|limit_block)
+hi link nft_limit_config_limit_rate_pkts_expression_slash nftHL_Expression
+syn match nft_limit_config_limit_rate_pkts_expression_slash "/" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_rate_pkts_time_unit
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> '/'
+" '/'->limit_rate_pkts->limit_stmt->(add_cmd|create_cmd|limit_block)
+hi link nft_limit_stmt_limit_rate_pkts_expression_slash nftHL_Expression
+syn match nft_limit_stmt_limit_rate_pkts_expression_slash "/" skipwhite contained
+\ nextgroup=
+\    nft_limit_stmt_limit_rate_pkts_time_unit
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> '/'
+" '/'->limit_rate_pkts->set_elem_stmt->set_elem_stmt->set_elem_expr_alloc
+hi link nft_set_elem_stmt_limit_rate_pkts_expression_slash nftHL_Expression
+syn match nft_set_elem_stmt_limit_rate_pkts_expression_slash "/" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_rate_pkts_time_unit
+
+" limit_rate_bytes
+" 'rate' [ 'over'|'until' ] <NUM> 'bytes' '/'
+" '/'->limit_rate_bytes->limit_config->(add_cmd|create_cmd|limit_block)
+hi link nft_limit_config_limit_rate_bytes_expression_slash nftHL_Expression
+syn match nft_limit_config_limit_rate_bytes_expression_slash "/" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_rate_bytes_time_unit
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> 'bytes' '/'
+" '/'->limit_rate_bytes->limit_stmt->stateful_stmt
+hi link nft_limit_stmt_limit_rate_bytes_expression_slash nftHL_Expression
+syn match nft_limit_stmt_limit_rate_bytes_expression_slash "/" skipwhite contained
+\ nextgroup=
+\    nft_limit_stmt_limit_rate_bytes_time_unit
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> 'bytes' '/'
+" '/'->limit_rate_bytes->set_elem_stmt->set_elem_expr_alloc
+hi link nft_set_elem_stmt_limit_rate_bytes_expression_slash nftHL_Expression
+syn match nft_set_elem_stmt_limit_rate_bytes_expression_slash "/" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_rate_bytes_time_unit
+
+
+" 'rate' [ 'over'|'until' ] <NUM> 'bytes'
+" 'bytes'->limit_rate_bytes->limit_config->(add_cmd|create_cmd|limit_block)
+hi link   nft_limit_config_limit_rate_bytes_limit_bytes_keyword_bytes nftHL_Expression
+syn match nft_limit_config_limit_rate_bytes_limit_bytes_keyword_bytes "bytes" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_rate_bytes_expression_slash
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> 'bytes'
+" 'bytes'->limit_rate_bytes->limit_stmt->stateful_stmt
+hi link   nft_limit_stmt_limit_rate_bytes_limit_bytes_keyword_bytes nftHL_Expression
+syn match nft_limit_stmt_limit_rate_bytes_limit_bytes_keyword_bytes "bytes" skipwhite contained
+\ nextgroup=
+\    nft_limit_stmt_limit_rate_bytes_expression_slash
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> 'bytes'
+" 'bytes'->limit_rate_bytes->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_set_elem_stmt_limit_rate_bytes_limit_bytes_keyword_bytes nftHL_Expression
+syn match nft_set_elem_stmt_limit_rate_bytes_limit_bytes_keyword_bytes "bytes" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_rate_bytes_expression_slash
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> 'string'
+" 'string'->limit_rate_bytes->limit_config->(add_cmd|create_cmd|limit_block)
+hi link   nft_limit_config_limit_rate_bytes_keyword_string nftHL_Expression
+syn match nft_limit_config_limit_rate_bytes_keyword_string "string" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_rate_bytes_expression_slash,
+\    nft_EOS
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> 'string'
+" 'string'->limit_rate_bytes->limit_stmt->stateful_stmt
+hi link   nft_limit_stmt_limit_rate_bytes_keyword_string nftHL_Expression
+syn match nft_limit_stmt_limit_rate_bytes_keyword_string "string" skipwhite contained
+\ nextgroup=
+\    nft_limit_stmt_limit_rate_bytes_expression_slash,
+\    nft_EOS
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM> 'string'
+" 'string'->limit_rate_bytes->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_set_elem_stmt_limit_rate_bytes_keyword_string nftHL_Expression
+syn match nft_set_elem_stmt_limit_rate_bytes_keyword_string "string" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_rate_bytes_expression_slash,
+\    nft_EOS
+
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM>
+" <num>->*->limit_config->(add_cmd|create_cmd|limit_block)
+hi link nft_limit_config_limit_rate_pktsbytes_num nftHL_Number
+syn match nft_limit_config_limit_rate_pktsbytes_num "\v[0-9]{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_rate_bytes_keyword_string,
+\    nft_limit_config_limit_rate_pkts_expression_slash,
+\    nft_limit_config_limit_rate_bytes_limit_bytes_keyword_bytes
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM>
+" <num>->*->limit_stmt->stateful_stmt
+hi link   nft_limit_stmt_limit_rate_pktsbytes_num nftHL_Number
+syn match nft_limit_stmt_limit_rate_pktsbytes_num "\v[0-9]{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_limit_stmt_limit_rate_bytes_keyword_string,
+\    nft_limit_stmt_limit_rate_pkts_expression_slash,
+\    nft_limit_stmt_limit_rate_bytes_limit_bytes_keyword_bytes
+
+" 'limit' 'rate' [ 'over'|'until' ] <NUM>
+" <num>->limit_rate->'limit'->set_elem_stmt->set_elem_expr_alloc
+hi link   nft_set_elem_stmt_limit_rate_pktsbytes_num nftHL_Number
+syn match nft_set_elem_stmt_limit_rate_pktsbytes_num "\v[0-9]{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_rate_bytes_keyword_string,
+\    nft_limit_config_limit_rate_pkts_expression_slash,
+\    nft_set_elem_stmt_limit_rate_bytes_limit_bytes_keyword_bytes
+
+
+" 'quota' <NUM> ('bytes'|'string') [ 'used' <NUM> ('bytes'|'string') ]
+" quota_unit->quota_stmt->stateful_stmt
+hi link   nft_quota_stmt_quota_used_quota_unit nftHL_Action
+syn match nft_quota_stmt_quota_used_quota_unit "\v(bytes|string)" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'quota' <NUM> ('bytes'|'string') [ 'used' <NUM> ... ]
+" <NUM>->quota_used->quota_stmt->stateful_stmt
+hi link   nft_quota_stmt_quota_used_num nftHL_Number
+syn match nft_quota_stmt_quota_used_num "\d{1,11}" skipwhite contained
+\ nextgroup=nft_quota_stmt_quota_used_quota_unit
+
+" 'quota' <NUM> ('bytes'|'string') [ 'used' ... ]
+" 'used'->quota_used->quota_stmt->stateful_stmt
+hi link   nft_quota_stmt_quota_used_keyword_used nftHL_Statement
+syn match nft_quota_stmt_quota_used_keyword_used "used" skipwhite contained
+\ nextgroup=nft_quota_stmt_quota_used_num
+
+" 'quota' <NUM> ('bytes'|'string')
+" quota_unit->quota_stmt->stateful_stmt
+hi link   nft_quota_stmt_quota_unit nftHL_Action
+syn match nft_quota_stmt_quota_unit "\v(bytes|string)" skipwhite contained
+\ nextgroup=
+\    nft_quota_stmt_quota_used_keyword_used,
+\    nft_EOS
+
+" 'quota' <NUM>
+" <NUM>->quota_mode->quota_stmt->stateful_stmt
+hi link   nft_quota_stmt_num nftHL_Number
+syn match nft_quota_stmt_num "\d{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_quota_stmt_quota_unit
+
+" 'quota' quota_mode
+" quota_mode->quota_stmt->stateful_stmt
+hi link   nft_quota_mode nftHL_Action
+syn match nft_quota_mode "\v(over|until)" skipwhite contained
+\ nextgroup=nft_quota_stmt_num
+
+" 'quota'
+" quota_stmt->stateful_stmt
+hi link   nft_quota_mode nftHL_Command
+syn match nft_quota_stmt "quota" skipwhite contained
+\ nextgroup=
+\    nft_quota_mode,
+\    nft_quota_stmt_num
+
+
+" 'rate' [ 'over'|'until' ]
+" limit_mode->limit_config->(add_cmd|create_cmd|limit_block)
+hi link nft_limit_config_limit_mode nftHL_Action
+syn match nft_limit_config_limit_mode "\v(over|until)" skipwhite contained
+\ nextgroup=
+\    nft_limit_config_limit_rate_pktsbytes_num
+
+" 'limit' 'rate' [ 'over'|'until' ]
+" limit_mode->limit_stmt->stateful_stmt
+hi link nft_limit_stmt_limit_config_limit_mode nftHL_Action
+syn match nft_limit_stmt_limit_config_limit_mode "\v(over|until)" skipwhite contained
+\ nextgroup=
+\    nft_limit_stmt_limit_rate_pktsbytes_num
+
+" 'limit' 'rate' [ 'over'|'until' ]
+" limit_mode->'limit'->set_elem_stmt->set_elem_expr_alloc
+hi link nft_set_elem_stmt_limit_mode nftHL_Action
+syn match nft_set_elem_stmt_limit_mode "\v(over|until)" skipwhite contained
+\ nextgroup=
+\    nft_set_elem_stmt_limit_rate_pktsbytes_num
+
+" 'rate'->limit_stmt->stateful_stmt
+hi link   nft_limit_stmt_keyword_rate nftHL_Statement
+syn match nft_limit_stmt_keyword_rate "rate" skipwhite contained
+\ nextgroup=
+\    nft_limit_mode
+
+
+" 'limit'
+" 'limit'->limit_stmt->stateful_stmt
+hi link   nft_limit_stmt nftHL_Command
+syn match nft_limit_stmt "limit"
+\ nextgroup=nft_limit_stmt_keyword_rate
+
+
+" 'log' 'flags' 'tcp' log_flag_tcp ',' log_flag_tcp
+" log_flag_tcp->log_flags->log_arg->log_stmt->stmt
+hi link   nft_log_flags_log_flag_keyword_tcp nftHL_Action
+syn match nft_log_flags_log_flag_keyword_tcp "\v(sequence|options)" skipwhite contained
+\ nextgroup=nft_log_flags_log_flags_tcp_expression_comma
+
+" 'log' 'flags' 'tcp' 'sequence'|'options' ','
+" ','->log_flag_tcp->log_arg->log_stmt->stmt
+syn match nft_log_flags_log_flags_tcp_expression_comma /,/ skipwhite contained
+\ nextgroup=
+\    @nft_c_log_flags_log_flags_tcp,
+\    nft_EOS
+
+" 'log' 'flags' 'tcp' ('sequence'|'options')
+" log_flag_tcp->log_arg->log_stmt->stmt
+syn cluster nft_c_log_flags_log_flags_tcp
+\ contains=
+\    nft_log_flags_log_flag_keyword_tcp
+
+" 'log' 'flags' 'tcp'
+" 'tcp'->log_arg->log_stmt->stmt
+hi link   nft_log_flags_keyword_tcp nftHL_Action
+syn match nft_log_flags_keyword_tcp "tcp" skipwhite contained
+\ nextgroup=@nft_c_log_flags_log_flags_tcp
+
+" 'log' 'flags' 'ip' 'options'
+" 'options'->log_arg->log_stmt->stmt
+hi link   nft_log_flags_keyword_ip_keyword_options nftHL_Action
+syn match nft_log_flags_keyword_ip_keyword_options "options" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'log' 'flags' 'ip'
+" 'ip'->log_arg->log_stmt->stmt
+hi link   nft_log_flags_keyword_ip nftHL_Action
+syn match nft_log_flags_keyword_ip "ip" skipwhite contained
+\ nextgroup=
+\    nft_log_flags_keyword_ip_keyword_options
+
+" 'log' 'flags' 'skuid'
+" 'skuid'->log_arg->log_stmt->stmt
+hi link   nft_log_flags_keyword_skuid nftHL_Action
+syn match nft_log_flags_keyword_skuid "skuid" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'log' 'flags' 'ether'
+" 'ether'->log_arg->log_stmt->stmt
+hi link   nft_log_flags_keyword_ether nftHL_Action
+syn match nft_log_flags_keyword_ether "ether" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'log' 'flags' 'all'
+" 'all'->log_arg->log_stmt->stmt
+hi link   nft_log_flags_keyword_all nftHL_Action
+syn match nft_log_flags_keyword_all "all" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'log' 'flags' ('tcp'|'ip'|'skuid'|'ether'|'all')
+" log_flags->log_arg->log_stmt->stmt
+hi link   nft_c_log_flags nftHL_Element
+syn match nft_c_log_flags "flags" skipwhite contained
+\ contains=
+\    nft_log_flags_keyword_tcp,
+\    nft_log_flags_keyword_ip,
+\    nft_log_flags_keyword_skuid,
+\    nft_log_flags_keyword_ether,
+\    nft_log_flags_keyword_all
+
+" 'log' 'prefix' <STRING>
+hi link nft_log_arg_string nftHL_String
+syn match nft_log_arg_string "[\s\w]{1,64}" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'log' 'level' <STRING>
+hi link nft_log_arg_string_level nftHL_String
+syn match nft_log_arg_string_level "[\s\w]{1,64}" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'log' 'group' <NUM>
+" 'log' 'snaplen' <NUM>
+" 'log' 'queue-threshold' <NUM>
+hi link nft_log_arg_num nftHL_Number
+syn match nft_log_arg_num "\d{1,11}" skipwhite contained
+\ nextgroup=nft_EOS
+
+" nft_log_arg_keyword_prefix
+hi link   nft_log_arg_keyword_prefix nftHL_Statement
+syn match nft_log_arg_keyword_prefix "prefix" skipwhite contained
+\ nextgroup=nft_log_arg_prefix_string
+
+" nft_log_arg_keyword_group
+hi link   nft_log_arg_keyword_group nftHL_Statement
+syn match nft_log_arg_keyword_group "group" skipwhite contained
+\ nextgroup=nft_log_arg_num
+
+" nft_log_arg_keyword_snaplen
+hi link   nft_log_arg_keyword_snaplen nftHL_Statement
+syn match nft_log_arg_keyword_snaplen "snaplen" skipwhite contained
+\ nextgroup=nft_log_arg_num
+
+"  nft_log_arg_keyword_queue_threshold
+hi link   nft_log_arg_keyword_queue_threshold nftHL_Statement
+syn match nft_log_arg_keyword_queue_threshold "queue\-threshold" skipwhite contained
+\ nextgroup=nft_log_arg_num
+
+" nft_log_arg_keyword_level
+hi link   nft_log_arg_keyword_level nftHL_Statement
+syn match nft_log_arg_keyword_level "level" skipwhite contained
+\ nextgroup=nft_log_arg_string_level
+
+" 'log' 'flags'
+" nft_log_arg_keyword_flags
+hi link   nft_log_arg_keyword_flags nftHL_Statement
+syn match nft_log_arg_keyword_flags "flags" skipwhite contained
+\ nextgroup=@nft_c_log_flags
+
+" 'log' ( log_arg )*
+" log_arg->log_stmt->stmt
+syn cluster nft_c_log_arg
+\ contains=
+\    nft_log_arg_keyword_prefix,
+\    nft_log_arg_keyword_group,
+\    nft_log_arg_keyword_snaplen,
+\    nft_log_arg_keyword_queue_threshold,
+\    nft_log_arg_keyword_level,
+\    nft_log_arg_keyword_flags
+
+" 'log'
+" log_stmt->stmt
+hi link   nft_log_stmt nftHL_Command
+syn match nft_log_stmt "log" skipwhite contained
+\ nextgroup=
+\    @nft_c_log_arg,
+\    nft_EOS
+
+
+" 'last' 'used' time_spec
+" time_spec->last_stmt->stateful_stmt
+hi link   nft_last_stmt_time_spec nftHL_String
+syn match nft_last_stmt_time_spec "\v[\s\w]{1,63}" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'last' 'used' 'never'
+" 'never'->last_stmt->stateful_stmt
+hi link   nft_last_stmt_time_spec nftHL_Action
+syn match nft_last_stmt_keyword_never "never" skipwhite contained
+\ nextgroup=nft_EOS
+
+" 'last' 'used'
+" 'used'->last_stmt->stateful_stmt
+hi link   nft_last_stmt_keyword_used nftHL_Statement
+syn match nft_last_stmt_keyword_used "used" skipwhite contained
+\ nextgroup=
+\    nft_last_stmt_keyword_never,
+\    nft_last_stmt_time_spec
+
+" 'last'
+" last_stmt->stateful_stmt
+hi link   nft_last_stmt_keyword_last nftHL_Command
+syn match nft_last_stmt_keyword_last "last" skipwhite contained
+\ nextgroup=
+\    nft_last_stmt_keyword_used,
+\    nft_EOS
+
+syn cluster nft_c_last_stmt
+\ contains=
+\    nft_last_stmt_keyword_last
+
+
+syn cluster nft_c_counter_arg
+\ contains=
+\    nft_counter_arg
+
+" 'packets'|'bytes' <NUM>
+" <NUM>->counter_arg->counter_stmt->stateful_stmt
+syn match nft_counter_arg_num "\v\d{1,11}" skipwhite contained
+\ nextgroup=
+\    @nft_c_counter_arg,
+\    nft_EOS
+
+" 'packets'|'bytes'
+" counter_arg->counter_stmt->stateful_stmt
+syn match nft_counter_arg "\v(packets|bytes)" skipwhite contained
+\ nextgroup=
+\    nft_counter_arg_num
+
+" 'counter'
+" counter_stmt->stateful_stmt
+syn match nft_counter_stmt "counter" skipwhite contained
+\ nextgroup=
+\    @nft_c_counter_arg,
+\    nft_EOS
+
+
+" 'ct' 'count' [ 'over' ] <NUM>
+" <NUM>->connlimit_stmt->stateful_stmt
+syn match nft_connlimit_stmt_num "\d{1,11}" skipwhite contained
+\ nextgroup=
+\    nft_EOS
+
+" 'ct' 'count' 'over'
+" 'over'->connlimit_stmt->stateful_stmt
+syn match nft_connlimit_stmt_keyword_over "over" skipwhite contained
+\ nextgroup=
+\    nft_connlimit_stmt_num
+
+" 'ct' 'count'
+" 'count'->connlimit_stmt->stateful_stmt
+syn match nft_connlimit_stmt_keyword_count "count" skipwhite contained
+\ nextgroup=
+\    nft_connlimit_stmt_keyword_over,
+\    nft_connlimit_stmt_num
+
+" 'ct'
+" 'ct'->connlimit_stmt->stateful_stmt
+syn match nft_connlimit_stmt "ct" skipwhite contained
+\ nextgroup=
+\    nft_connlimit_stmt_count
 
 " SLE marker "
 
