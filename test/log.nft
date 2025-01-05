@@ -1,0 +1,42 @@
+#!/usr/sbin/nft -f
+# File: log.nft
+# Description: A test NFT file to exercise 'log' Vim syntax highlightings.
+#
+# base_cmd log_cmd
+# nft_line/nft_base_cmd/nft_base_cmd_log
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+# base_cmd log_cmd
+
+rule table_id chain_id log 
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+set T
+
+set ip S
+
+add set 
+
+
+
+add set T C 
+
+
+
+

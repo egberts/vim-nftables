@@ -8,10 +8,10 @@
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
-# TODO: 
 
 # base_cmd 'replace'
 
+# ruleid_spec table_spec handle_id
 replace rule table_id chain_id handle 777
 replace rule ip table_id chain_id handle 321
 replace rule ip6 table_id chain_id handle 4
@@ -28,22 +28,312 @@ replace rule netdev table_id chain_id handle 7654321     ;
 replace rule bridge table_id chain_id handle 10     ;
 replace rule arp table_id chain_id handle 777     ;
 
+# ruleid_spec table_spec position_id
 replace rule ip table_id chain_id position 321 
+
+# ruleid_spec table_spec index_id
 replace rule ip table_id chain_id index 321  ;
+
+# ruleid_spec stmt
+
+# ruleid_spec payload_stmt icmp_hdr_expr
+replace rule ip table_id chain_id icmp type;
+replace rule ip table_id chain_id icmp code;
+replace rule ip table_id chain_id icmp checksum;
+replace rule ip table_id chain_id icmp id;
+replace rule ip table_id chain_id icmp seq;
+replace rule ip table_id chain_id icmp gateway;
+replace rule ip table_id chain_id icmp mtu;
+
+# ruleid_spec payload_stmt ip_hdr_expr
+replace rule ip table_id chain_id ip version
+replace rule ip table_id chain_id ip hdrlength
+replace rule ip table_id chain_id ip dscp
+replace rule ip table_id chain_id ip ecn
+replace rule ip table_id chain_id ip length
+replace rule ip table_id chain_id ip id
+replace rule ip table_id chain_id ip fra_off
+replace rule ip table_id chain_id ip ttl
+replace rule ip table_id chain_id ip protocol
+replace rule ip table_id chain_id ip checksum
+replace rule ip table_id chain_id ip saddr
+replace rule ip table_id chain_id ip daddr
+replace rule ip table_id chain_id ip option ra;
+replace rule ip table_id chain_id ip option ra type;
+replace rule ip table_id chain_id ip option ra length;
+replace rule ip table_id chain_id ip option ra value
+replace rule ip table_id chain_id ip option ra ptr
+replace rule ip table_id chain_id ip option ra addr
+replace rule ip table_id chain_id ip option ssrr;
+replace rule ip table_id chain_id ip option lsrr;
+replace rule ip table_id chain_id ip option rr;
+
+# ruleid_spec payload_stmt arp_hdr_expr
+replace rule ip table_id chain_id arp htype
+replace rule ip table_id chain_id arp ptype
+replace rule ip table_id chain_id arp hlen
+replace rule ip table_id chain_id arp plen
+replace rule ip table_id chain_id arp operation
+replace rule ip table_id chain_id arp saddr ether
+replace rule ip table_id chain_id arp saddr ip
+replace rule ip table_id chain_id arp daddr ether
+replace rule ip table_id chain_id arp daddr ip
+
+# ruleid_spec payload_stmt vlan_hdr_expr
+replace rule ip table_id chain_id vlan id
+replace rule ip table_id chain_id vlan cfi
+replace rule ip table_id chain_id vlan dei
+replace rule ip table_id chain_id vlan pcp
+replace rule ip table_id chain_id vlan type
+
+# ruleid_spec payload_stmt eth_hdr_expr
+replace rule ip table_id chain_id ether saddr
+replace rule ip table_id chain_id ether daddr
+replace rule ip table_id chain_id ether type
+
+# ruleid_spec payload_stmt payload_hdr_expr
+replace rule ip table_id chain_id at ll, 3, 7
+replace rule ip table_id chain_id at nh, 1, 2
+replace rule ip table_id chain_id at th, 1, 2
+replace rule ip table_id chain_id at string, 1, 2
+
+# ruleid_spec payload_stmt igmp_hdr_expr
+replace rule ip table_id chain_id igmp type
+replace rule ip table_id chain_id igmp checksum
+replace rule ip table_id chain_id igmp mrt
+replace rule ip table_id chain_id igmp group
+
+
+# ruleid_spec payload_stmt ip6_hdr_expr
+replace rule ip table_id chain_id ip6 version
+replace rule ip table_id chain_id ip6 dscp
+replace rule ip table_id chain_id ip6 ecn
+replace rule ip table_id chain_id ip6 flowlabel
+replace rule ip table_id chain_id ip6 length
+replace rule ip table_id chain_id ip6 nexthdr
+replace rule ip table_id chain_id ip6 hoplimit
+replace rule ip table_id chain_id ip6 saddr
+replace rule ip table_id chain_id ip6 daddr
+
+# ruleid_spec payload_stmt icmp6_hdr_expr
+replace rule ip table_id chain_id icmpv6 type
+replace rule ip table_id chain_id icmpv6 code
+replace rule ip table_id chain_id icmpv6 checksum
+replace rule ip table_id chain_id icmpv6 param-problem
+replace rule ip table_id chain_id icmpv6 mtu
+replace rule ip table_id chain_id icmpv6 id
+replace rule ip table_id chain_id icmpv6 seq
+replace rule ip table_id chain_id icmpv6 max-delay
+replace rule ip table_id chain_id icmpv6 taddr
+replace rule ip table_id chain_id icmpv6 daddr
+
+# ruleid_spec payload_stmt auth_hdr_expr
+replace rule ip table_id chain_id auth nexthdr 
+replace rule ip table_id chain_id auth hdrlength 
+replace rule ip table_id chain_id auth reserved 
+replace rule ip table_id chain_id auth spi 
+replace rule ip table_id chain_id auth seq 
+
+# ruleid_spec payload_stmt esp_hdr_expr
+replace rule ip table_id chain_id esp seq 
+
+# ruleid_spec payload_stmt comp_hdr_expr
+replace rule ip table_id chain_id comp nexthdr
+replace rule ip table_id chain_id comp flags
+replace rule ip table_id chain_id comp cpi
+
+# ruleid_spec payload_stmt udp_hdr_expr
+replace rule ip table_id chain_id udp sport
+replace rule ip table_id chain_id udp dport
+replace rule ip table_id chain_id udp length
+replace rule ip table_id chain_id udp checksum
+
+# ruleid_spec payload_stmt udplite_hdr_expr
+replace rule ip table_id chain_id udplite sport
+replace rule ip table_id chain_id udplite dport
+replace rule ip table_id chain_id udplite csumcov
+replace rule ip table_id chain_id udplite checksum
+
+
+# ruleid_spec payload_stmt tcp_hdr_expr
+replace rule ip table_id chain_id tcp
+replace rule ip table_id chain_id tcp option sack
+replace rule ip table_id chain_id tcp option sack left
+replace rule ip table_id chain_id tcp option sack right
+replace rule ip table_id chain_id tcp option sack0
+replace rule ip table_id chain_id tcp option sack1
+replace rule ip table_id chain_id tcp option sack2
+replace rule ip table_id chain_id tcp option sack3
+replace rule ip table_id chain_id tcp option echo
+replace rule ip table_id chain_id tcp option eol
+replace rule ip table_id chain_id tcp option fastopen
+replace rule ip table_id chain_id tcp option md5sig
+replace rule ip table_id chain_id tcp option mptcp
+replace rule ip table_id chain_id tcp option mss
+replace rule ip table_id chain_id tcp option nop
+replace rule ip table_id chain_id tcp option sack-permitted
+replace rule ip table_id chain_id tcp option timestamp
+replace rule ip table_id chain_id tcp option num
+replace rule ip table_id chain_id reset+tcp+option  option num
+
+replace rule ip table_id chain_id gre version
+replace rule ip table_id chain_id gre flags
+replace rule ip table_id chain_id gre protocol
+
+replace rule ip table_id chain_id gretap ether
+replace rule ip table_id chain_id gretap ether saddr
+replace rule ip table_id chain_id gretap ether daddr
+replace rule ip table_id chain_id gretap ether type
+replace rule ip table_id chain_id gretap arp htype
+replace rule ip table_id chain_id gretap arp ptype
+replace rule ip table_id chain_id gretap arp hlen
+replace rule ip table_id chain_id gretap arp plen
+replace rule ip table_id chain_id gretap arp operation
+replace rule ip table_id chain_id gretap arp saddr ether
+replace rule ip table_id chain_id gretap arp saddr ip
+replace rule ip table_id chain_id gretap arp daddr ether
+replace rule ip table_id chain_id gretap arp daddr ip
+
+replace rule ip table_id chain_id geneve vni
+replace rule ip table_id chain_id geneve type
+replace rule ip table_id chain_id geneve ether saddr
+replace rule ip table_id chain_id geneve ether daddr
+replace rule ip table_id chain_id geneve ether type
+replace rule ip table_id chain_id geneve arp htype
+replace rule ip table_id chain_id geneve arp ptype
+replace rule ip table_id chain_id geneve arp hlen
+replace rule ip table_id chain_id geneve arp plen
+replace rule ip table_id chain_id geneve arp operation
+replace rule ip table_id chain_id geneve arp saddr ether
+replace rule ip table_id chain_id geneve arp saddr ip
+replace rule ip table_id chain_id geneve arp daddr ether
+replace rule ip table_id chain_id geneve arp daddr ip
+
+replace rule ip table_id chain_id vxlan vni
+replace rule ip table_id chain_id vxlan flags
+replace rule ip table_id chain_id vxlan ether saddr
+replace rule ip table_id chain_id vxlan ether daddr
+replace rule ip table_id chain_id vxlan ether type
+replace rule ip table_id chain_id vxlan arp htype
+replace rule ip table_id chain_id vxlan arp ptype
+replace rule ip table_id chain_id vxlan arp hlen
+replace rule ip table_id chain_id vxlan arp plen
+replace rule ip table_id chain_id vxlan arp operation
+replace rule ip table_id chain_id vxlan arp saddr ether
+replace rule ip table_id chain_id vxlan arp saddr ip
+replace rule ip table_id chain_id vxlan arp daddr ether
+replace rule ip table_id chain_id vxlan arp daddr ip
+
+replace rule ip table_id chain_id dccp sport 
+replace rule ip table_id chain_id dccp dport 
+replace rule ip table_id chain_id dccp type 
+replace rule ip table_id chain_id dccp option 1 
+
+# sctp_hdr_field
+replace rule ip table_id chain_id sctp sport
+replace rule ip table_id chain_id sctp dport
+replace rule ip table_id chain_id sctp vtag
+replace rule ip table_id chain_id sctp checksum
+
+# sctp_chunk_data
+replace rule ip table_id chain_id sctp chunk data 
+replace rule ip table_id chain_id sctp chunk data type
+replace rule ip table_id chain_id sctp chunk data flags
+replace rule ip table_id chain_id sctp chunk data length
+replace rule ip table_id chain_id sctp chunk data tsn
+replace rule ip table_id chain_id sctp chunk data stream
+replace rule ip table_id chain_id sctp chunk data ssn
+replace rule ip table_id chain_id sctp chunk data ppid
+
+# sctp_chunk_init_field
+replace rule ip table_id chain_id sctp chunk init init-tag
+replace rule ip table_id chain_id sctp chunk init a-rwnd
+replace rule ip table_id chain_id sctp chunk init num-outbound-streams
+replace rule ip table_id chain_id sctp chunk init num-inbound-streams
+replace rule ip table_id chain_id sctp chunk init initial-tsn
+replace rule ip table_id chain_id sctp chunk init-ack init-tag
+replace rule ip table_id chain_id sctp chunk init-ack a-rwnd
+replace rule ip table_id chain_id sctp chunk init-ack num-outbound-streams
+replace rule ip table_id chain_id sctp chunk init-ack num-inbound-streams
+replace rule ip table_id chain_id sctp chunk init-ack initial-tsn
+
+# sctp_chunk_sack_field
+replace rule ip table_id chain_id sctp chunk sack
+replace rule ip table_id chain_id sctp chunk sack cum-tsn-ack
+replace rule ip table_id chain_id sctp chunk sack a-rwnd
+replace rule ip table_id chain_id sctp chunk sack num-gap-ack-blocks
+replace rule ip table_id chain_id sctp chunk sack num-dup-tsns
+replace rule ip table_id chain_id sctp chunk heartbeat
+replace rule ip table_id chain_id sctp chunk heartbeat type
+replace rule ip table_id chain_id sctp chunk heartbeat flags
+replace rule ip table_id chain_id sctp chunk heartbeat length
+replace rule ip table_id chain_id sctp chunk heartbeat-ack 
+replace rule ip table_id chain_id sctp chunk heartbeat-ack type
+replace rule ip table_id chain_id sctp chunk heartbeat-ack flags
+replace rule ip table_id chain_id sctp chunk heartbeat-ack length
+replace rule ip table_id chain_id sctp chunk abort
+replace rule ip table_id chain_id sctp chunk abort type
+replace rule ip table_id chain_id sctp chunk abort flags
+replace rule ip table_id chain_id sctp chunk abort length
+replace rule ip table_id chain_id sctp chunk shutdown
+replace rule ip table_id chain_id sctp chunk shutdown type
+replace rule ip table_id chain_id sctp chunk shutdown flags
+replace rule ip table_id chain_id sctp chunk shutdown length
+replace rule ip table_id chain_id sctp chunk shutdown cum-tsn-ack
+replace rule ip table_id chain_id sctp chunk shutdown-ack
+replace rule ip table_id chain_id sctp chunk shutdown-ack type
+replace rule ip table_id chain_id sctp chunk shutdown-ack flags
+replace rule ip table_id chain_id sctp chunk shutdown-ack length
+replace rule ip table_id chain_id sctp chunk error
+replace rule ip table_id chain_id sctp chunk error type
+replace rule ip table_id chain_id sctp chunk error flags
+replace rule ip table_id chain_id sctp chunk error length
+replace rule ip table_id chain_id sctp chunk cookie-ack
+replace rule ip table_id chain_id sctp chunk cookie-ack type
+replace rule ip table_id chain_id sctp chunk cookie-ack flags
+replace rule ip table_id chain_id sctp chunk cookie-ack length
+replace rule ip table_id chain_id sctp chunk cookie-echo
+replace rule ip table_id chain_id sctp chunk cookie-echo type
+replace rule ip table_id chain_id sctp chunk cookie-echo flags
+replace rule ip table_id chain_id sctp chunk cookie-echo length
+replace rule ip table_id chain_id sctp chunk ecne 
+replace rule ip table_id chain_id sctp chunk ecne lowest-tsn
+replace rule ip table_id chain_id sctp chunk cwr
+replace rule ip table_id chain_id sctp chunk cwr lowest-tsn
+replace rule ip table_id chain_id sctp chunk shutdown-complete
+replace rule ip table_id chain_id sctp chunk shutdown-complete type
+replace rule ip table_id chain_id sctp chunk shutdown-complete flags
+replace rule ip table_id chain_id sctp chunk shutdown-complete length
+replace rule ip table_id chain_id sctp chunk asconf-ack
+replace rule ip table_id chain_id sctp chunk asconf-ack seqno
+replace rule ip table_id chain_id sctp chunk asconf-ack type
+replace rule ip table_id chain_id sctp chunk asconf-ack flags
+replace rule ip table_id chain_id sctp chunk asconf-ack length
+replace rule ip table_id chain_id sctp chunk forward-tsn new-cum-tsn
+replace rule ip table_id chain_id sctp chunk asconf 
+replace rule ip table_id chain_id sctp chunk asconf seqno
+replace rule ip table_id chain_id sctp chunk asconf type
+replace rule ip table_id chain_id sctp chunk asconf flags
+replace rule ip table_id chain_id sctp chunk asconf length
 
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
+replace table 
+replace chain 
+replace map 
+replace set 
+
 replace rule invalid_family_spec
 replace rule invalid{table_id} table_id chain_id handle 777
 
-replace rule tableid chain-id missing_handle_keyword
+replace rule tableid invalid-chain-id missing_handle_keyword
 replace rule netdev table_id chain_id missing_handle_keyword
 
 replace rule ip table_id chain_id unexpected_string handle 123 
 
-replace rule tableid chain-id handle 777 invalid_rule
+replace rule tableid chain_id handle 777 invalid_rule
 
 
 ##################################################################################
