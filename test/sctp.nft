@@ -1,0 +1,112 @@
+
+
+tableid chainid sctp 
+rule tableid chainid sctp 
+add rule tableid chainid sctp 
+
+ip tableid chainid sctp 
+rule ip6 tableid chainid sctp 
+add rule inet tableid chainid sctp 
+replace rule bridge tableid chainid sctp
+rule netdev tableid chainid sctp
+rule arp tableid chainid sctp
+
+
+# sctp_chunk_data
+replace rule ip table_id chain_id sctp chunk data 
+replace rule ip table_id chain_id sctp chunk data type
+replace rule ip table_id chain_id sctp chunk data flags
+replace rule ip table_id chain_id sctp chunk data length
+replace rule ip table_id chain_id sctp chunk data tsn
+replace rule ip table_id chain_id sctp chunk data stream
+replace rule ip table_id chain_id sctp chunk data ssn
+replace rule ip table_id chain_id sctp chunk data ppid
+
+# sctp_chunk_init_field
+replace rule ip table_id chain_id sctp chunk init init-tag
+replace rule ip table_id chain_id sctp chunk init a-rwnd
+replace rule ip table_id chain_id sctp chunk init num-outbound-streams
+replace rule ip table_id chain_id sctp chunk init num-inbound-streams
+replace rule ip table_id chain_id sctp chunk init initial-tsn
+replace rule ip table_id chain_id sctp chunk init-ack init-tag
+replace rule ip table_id chain_id sctp chunk init-ack a-rwnd
+replace rule ip table_id chain_id sctp chunk init-ack num-outbound-streams
+replace rule ip table_id chain_id sctp chunk init-ack num-inbound-streams
+replace rule ip table_id chain_id sctp chunk init-ack initial-tsn
+
+# sctp_chunk_sack_field
+ip table_id chain_id sctp chunk sack
+ip6 table_id chain_id sctp chunk sack cum-tsn-ack
+inet table_id chain_id sctp chunk sack a-rwnd
+bridge table_id chain_id sctp chunk sack num-gap-ack-blocks
+netdev table_id chain_id sctp chunk sack num-dup-tsns
+arp table_id chain_id sctp chunk heartbeat
+table_id chain_id sctp chunk heartbeat type
+table_id chain_id sctp chunk heartbeat flags
+table_id chain_id sctp chunk heartbeat length
+table_id chain_id sctp chunk heartbeat-ack 
+table_id chain_id sctp chunk heartbeat-ack type
+table_id chain_id sctp chunk heartbeat-ack flags
+table_id chain_id sctp chunk heartbeat-ack length
+table_id chain_id sctp chunk abort
+table_id chain_id sctp chunk abort type
+table_id chain_id sctp chunk abort flags
+table_id chain_id sctp chunk abort length
+table_id chain_id sctp chunk shutdown
+table_id chain_id sctp chunk shutdown type
+table_id chain_id sctp chunk shutdown flags
+table_id chain_id sctp chunk shutdown length
+table_id chain_id sctp chunk shutdown cum-tsn-ack
+table_id chain_id sctp chunk shutdown-ack
+table_id chain_id sctp chunk shutdown-ack type
+table_id chain_id sctp chunk shutdown-ack flags
+table_id chain_id sctp chunk shutdown-ack length
+table_id chain_id sctp chunk error
+table_id chain_id sctp chunk error type
+table_id chain_id sctp chunk error flags
+table_id chain_id sctp chunk error length
+table_id chain_id sctp chunk cookie-ack
+table_id chain_id sctp chunk cookie-ack type
+table_id chain_id sctp chunk cookie-ack flags
+table_id chain_id sctp chunk cookie-ack length
+table_id chain_id sctp chunk cookie-echo
+table_id chain_id sctp chunk cookie-echo type
+table_id chain_id sctp chunk cookie-echo flags
+table_id chain_id sctp chunk cookie-echo length
+table_id chain_id sctp chunk ecne 
+table_id chain_id sctp chunk ecne lowest-tsn
+table_id chain_id sctp chunk cwr
+table_id chain_id sctp chunk cwr lowest-tsn
+table_id chain_id sctp chunk shutdown-complete
+table_id chain_id sctp chunk shutdown-complete type
+table_id chain_id sctp chunk shutdown-complete flags
+table_id chain_id sctp chunk shutdown-complete length
+table_id chain_id sctp chunk asconf-ack
+table_id chain_id sctp chunk asconf-ack seqno
+table_id chain_id sctp chunk asconf-ack type
+table_id chain_id sctp chunk asconf-ack flags
+table_id chain_id sctp chunk asconf-ack length
+table_id chain_id sctp chunk forward-tsn new-cum-tsn
+table_id chain_id sctp chunk asconf 
+table_id chain_id sctp chunk asconf seqno
+table_id chain_id sctp chunk asconf type
+table_id chain_id sctp chunk asconf flags
+table_id chain_id sctp chunk asconf length
+
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+delete tableid chainid sctp 
+
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+
+

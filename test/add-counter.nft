@@ -2,6 +2,17 @@
 # File: all-counter.nft
 # Description: A test NFT file to exercise '[add] counter' Vim syntax highlightings.
 #
+# nftables manpage shows:
+#
+#   {add | delete | destroy | list | reset} counter [family] table object
+#   add counter [family] table name [{ [ packets packets bytes bytes ; ] [ comment comment ; }]
+#   list counters
+#   list counters [family]
+#   delete counter [family] table name
+#   delete counter [family] table handle handle
+#   destroy counter [family] table handle handle
+#   reset counters [family]
+#
 # base_cmd add_cmd 'counter' 
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_counter
 #
@@ -11,69 +22,162 @@
 
 # base_cmd add_cmd 'counter'
 
-counter T O
- counter T O
-counter T0 O
-counter T_ O
-counter T\ O
-counter T/T O
+counter table_id counter_id
+add counter table_id counter_id
 
-counter T O0
-counter T O_
-counter T O\
-counter T O/O
+# line->add_cmd->rule_position
+counter T C
 
-counter T O ;
 
-counter ip T O
-counter ip6 T O 
-counter inet T O
-counter netdev T O
-counter bridge T O
-counter arp T O
+counter T C
+counter T0 C
+counter T_ C
+counter T\ C
+counter T C/C
 
-counter ip T O ;
-counter ip6 T O ;
-counter inet T O ; 
-counter netdev T O;
-counter bridge T O; 
-counter arp T O  ;  
-counter T last xxx
-counter T last 123 
-counter T last;
+counter T C ;
 
-counter T last packet 123 bytes 12345;
+counter ip T C
+counter ip6 T C 
+counter inet T C
+counter netdev T C
+counter bridge T C
+counter arp T C
+
+counter ip T C ;
+counter ip6 T C ;
+counter inet T C ; 
+counter netdev T C;
+counter bridge T C; 
+counter arp T C  ;  
 
 # Prototyping error highlighting here
-counter T O { packet 123 bytes 12345 }
-counter T O { packet 123 bytes 12345 }
+counter T C { packet 123 bytes 12345 }
+counter T C { packet 123 bytes 12345 }
 counter T last { packet 123 bytes 12345 };
-counter ip T O { packet 123 bytes 123 };
+counter ip T C { packet 123 bytes 123 };
+counter ip T C { 
+    include "include_counters_file.nft";
+    packet 123 bytes 123 
+};
 
-add counter T O
-add counter ip O
-add counter T O ;
+add counter T/T C
+add counter T C0
+add counter T C_
+add counter T C\
+add counter T C ;
 add counter T last;
 add counter T last packet 123 bytes 12345;
-add counter T O { packet 123 bytes 12345 };
-add counter T O { packet 123 bytes 12345 };
-add counter T O ;
-add counter ip T O { packet 123 bytes 123 };
+add counter T C { packet 123 bytes 12345 };
+add counter T C { packet 123 bytes 12345 };
+add counter T C ;
+add counter ip T C { packet 123 bytes 123 };
+counter T last;
+counter T last packet 123 bytes 12345;
+
+add counter filter http
+
+
+add counter filter https
+
+add rule filter input tcp dport 80 counter name \"http\"  # nftables manpage
+add rule filter input counter name tcp dport map { 80 : "http", 443 : "https" }  # nftables manpage
+
+delete counter table_id counter_id
+delete counter table_id counter_id handle handle_id
+delete counter table_id counter_id index index_id
+
+destroy counter table_id counter_id
+destroy counter table_id counter_id handle handle_id
+destroy counter table_id counter_id index index_id
+
+list counter table_id counter_id
+list counter table_id counter_id handle handle_id
+list counter table_id counter_id index index_id
+
+reset counter table_id counter_id
+reset counter table_id counter_id handle handle_id
+reset counter table_id counter_id index index_id
+
+
+table inet x {  # from nftables manpage
+    chain y {
+        type filter hook input priority filter; policy accept;
+        socket cgroupv2 level 1 "user.slice" counter
+    }
+}
+
+
 
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
 
-counter T& O
-counter T+ O
-counter T= O
-counter T) O
+counter 
 
-counter T O* x
-counter T O%
-counter T O
-counter T O
+
+counter ;
+
+
+counter table_id
+
+counter table_id 
+
+
+counter table_id     
+
+
+counter T ;
+
+counter T^ ;
+
+counter ip T ;
+
+counter ip T C;
+
+
+counter T C X
+
+counter T C& 
+
+
+counter T& C
+
+
+counter T+ C
+
+
+counter T= C
+
+
+counter T) C
+
+
+counter T C* x
+
+
+counter T C%
+
+
+counter ip 
+
+
+counter ip ;
+
+
+add counter  
+
+
+add counter T ;
+
+add counter  ip6 
+
+
+add counter T 
+
+
+add counter T C X
 
 
 ##################################################################################
@@ -84,18 +188,26 @@ counter T O
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
-counter T O packet !xxx
-counter T O packet 123 xxx xxx; 
+
+add counter
+
+counter
+  
+ 
+counter T C packet !xxx
+counter T C packet 123 xxx xxx; 
 counter T last packet !xxx
 counter T last packet 123 xxx xxx; 
+counter T last xxx
+counter T last 123 
 
-counter T C { automerge }
-add counter T C { automerge }
+counter T C { automerge }  # non-supporting block option
+add counter T C { automerge }  # non-supporting block option
 
-counter T O& # invalid character
-counter T O+ # invalid character
-counter T O= # invalid character
-counter T O) # invalid character
+counter T C&  # invalid character
+counter T C+  # invalid character
+counter T C=  # invalid character
+counter T C)  # invalid character
 
 
 

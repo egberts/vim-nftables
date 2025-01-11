@@ -1,42 +1,30 @@
 #!/usr/sbin/nft -f
-# File: log.nft
-# Description: A test NFT file to exercise 'log' Vim syntax highlightings.
+# File: meter.nft
+# Description: A test NFT file to exercise 'meter_stmt' in Vim syntax highlightings.
 #
-# base_cmd log_cmd
-# nft_line/nft_base_cmd/nft_base_cmd_log
 #
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 
-# base_cmd log_cmd
+add rule ip filter input tcp flags syn tcp dport ssh meter flood size 128000 { ip saddr timeout 10s limit rate over 10/second} add @blackhole { ip saddr timeout 1m } drop
 
-rule table_id chain_id log 
-add rule table_id chain_id log 
+list meter table_name identifier
+list meter ip table_name identifier
+list meter bridge table_name identifier
+list meter netdev table_name identifier
 
-tableid chainid log 
-tableId chainId log prefix 
-tableId chainId log group 15
-tableId chainId log snaplen 512
-tableId chainId log queue-threshold 5
-tableId chainId log level log_string
-tableId chainId log flags tcp seq
-tableId chainId log flags tcp seq,options
-tableId chainId log flags tcp options,seq
-tableId chainId log flags tcp options
-tableId chainId log flags ip options
-tableId chainId log flags skuid
-tableId chainId log flags ether 
-tableId chainId log flags all
-
+flush meter myIpTable mySet
+flush meter ip myIpTable mySet
+flush meter ip6 myIp6Table mySet
+flush meter inet myInetTable mySet ; 
+flush meter netdev myNetdevTable mySet
+flush meter bridge myBridgeTable mySet
+flush meter arp myArpTable mySet
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
-
-tableId chainId log flags ip 
-
-
 
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
@@ -47,25 +35,5 @@ tableId chainId log flags ip
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
 
-set T
-
-set ip S
-
-add set 
-
-
-
-add set T C 
-
-
-
-
-# nesting "stmt"
-tableid chainid log log
-
-
-
-
-
-
-
+list meter  # premature EOS
+flush meter  # premature EOS

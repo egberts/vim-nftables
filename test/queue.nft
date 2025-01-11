@@ -1,41 +1,26 @@
 #!/usr/sbin/nft -f
-# File: log.nft
-# Description: A test NFT file to exercise 'log' Vim syntax highlightings.
+# File: queue.nft
 #
-# base_cmd log_cmd
-# nft_line/nft_base_cmd/nft_base_cmd_log
+# Description: A test NFT file to exercise 'queue' expression in Vim syntax highlightings.
+#
 #
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 
-# base_cmd log_cmd
 
-rule table_id chain_id log 
-add rule table_id chain_id log 
+add rule myTable myChain queue
+add rule myTable myChain queue num 2
+add rule myTable myChain queue num 2-3
+add rule myTable myChain queue num 4-5 fanout bypass
+add rule myTable myChain queue num 4-5 fanout
+add rule myTable myChain queue num 4-5 bypass
 
-tableid chainid log 
-tableId chainId log prefix 
-tableId chainId log group 15
-tableId chainId log snaplen 512
-tableId chainId log queue-threshold 5
-tableId chainId log level log_string
-tableId chainId log flags tcp seq
-tableId chainId log flags tcp seq,options
-tableId chainId log flags tcp options,seq
-tableId chainId log flags tcp options
-tableId chainId log flags ip options
-tableId chainId log flags skuid
-tableId chainId log flags ether 
-tableId chainId log flags all
 
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
-
-tableId chainId log flags ip 
-
 
 
 ##################################################################################
@@ -46,26 +31,4 @@ tableId chainId log flags ip
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
-
-set T
-
-set ip S
-
-add set 
-
-
-
-add set T C 
-
-
-
-
-# nesting "stmt"
-tableid chainid log log
-
-
-
-
-
-
 

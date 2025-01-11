@@ -10,27 +10,122 @@
 ##################################################################################
 
 # base_cmd add_cmd 'flowtable'
+flowtable T 
 
-add flowtable T C F
+flowtable T F
+add flowtable T F
+add flowtable T F
+
 add flowtable ip S F
-add flowtable ip6 S F
-add flowtable inet S F
-add flowtable netdev S F
-add flowtable bridge S F
-add flowtable arp S F
+add flowtable ip6 S F 
+add flowtable inet S  F
+add flowtable netdev  S F
+add flowtable  bridge S F
+add  flowtable arp S F
  add flowtable arp S F
 
-add flowtable ip T C F { hook b };
-add flowtable T C F { devices = eth0 };
-add flowtable T C F { flags offload; }
-add flowtable T C F { flags offload ;}
-add flowtable T C F { flags offload ; };
-add flowtable T C F { counter }
+add flowtable ip T F { hook b };
+add flowtable T F { devices = eth0 };
+add flowtable T F { hook "handler" 123; }
+add flowtable T F { flags offload ;}
+add flowtable T F { flags offload ; };
+add flowtable T F { counter flags offload devices = eth0 }
+
+# ->flowtable_spec->'flowtable'->'delete'->delete_cmd->base_cmd
+delete flowtable table_id flowtable_id 
+delete flowtable ip table_id flowtable_id 
+delete flowtable ip6 table_id flowtable_id 
+delete flowtable inet table_id flowtable_id 
+delete flowtable netdev table_id flowtable_id 
+delete flowtable bridge table_id flowtable_id 
+delete flowtable arp table_id flowtable_id 
+
+# flowtable_block->'{'->flowtable_spec->'flowtable'->'delete'->delete_cmd->base_cmd
+delete flowtable table_id flowtable_id { flowtable_block }
+delete flowtable ip table_id flowtable_id { flowtable_block }
+delete flowtable ip6 table_id flowtable_id { flowtable_block }
+delete flowtable inet table_id flowtable_id { flowtable_block }
+delete flowtable netdev table_id flowtable_id { flowtable_block }
+delete flowtable bridge table_id flowtable_id { flowtable_block }
+delete flowtable arp table_id flowtable_id { flowtable_block }
+
+# flowtableid_spec->'flowtable'->'delete'->delete_cmd->base_cmd
+delete flowtable table_id handle 15 
+delete flowtable ip table_id handle 15 
+delete flowtable ip6 table_id handle 15 
+delete flowtable inet table_id handle 15 
+delete flowtable netdev table_id handle 15 
+delete flowtable bridge table_id handle 15 
+delete flowtable arp table_id handle 15 
+
+# flowtableid_spec->'flowtable'->'destroy'->destroy_cmd->base_cmd
+destroy flowtable table_id handle 15 
+destroy flowtable ip table_id handle 15 
+destroy flowtable ip6 table_id handle 15 
+destroy flowtable inet table_id handle 15 
+destroy flowtable netdev table_id handle 15 
+destroy flowtable bridge table_id handle 15 
+destroy flowtable arp table_id handle 15 
+
+# ->flowtable_spec->'flowtable'->'destroy'->destroy_cmd->base_cmd
+destroy flowtable table_id flowtable_id 
+destroy flowtable ip table_id flowtable_id 
+destroy flowtable ip6 table_id flowtable_id 
+destroy flowtable inet table_id flowtable_id 
+destroy flowtable netdev table_id flowtable_id 
+destroy flowtable bridge table_id flowtable_id 
+destroy flowtable arp table_id flowtable_id 
+
+# flowtable_block->'{'->flowtable_spec->'flowtable'->'destroy'->destroy_cmd->base_cmd
+destroy flowtable table_id flowtable_id { flowtable_block }
+destroy flowtable ip table_id flowtable_id { flowtable_block }
+destroy flowtable ip6 table_id flowtable_id { flowtable_block }
+destroy flowtable inet table_id flowtable_id { flowtable_block }
+destroy flowtable netdev table_id flowtable_id { flowtable_block }
+destroy flowtable bridge table_id flowtable_id { flowtable_block }
+destroy flowtable arp table_id flowtable_id { flowtable_block }
+
+# set_spec->'table'->'flow'->list_cmd->base_cmd
+list flow table table_id synproxy_id
+list flow table ip table_id synproxy_id
+list flow table ip6 table_id synproxy_id
+list flow table inet table_id synproxy_id
+
+# ruleset_spec->'tables'->'flow'->list_cmd->base_cmd
+list flow tables
+list flow tables ip
+list flow tables ip6
+list flow tables inet
+
+# ruleset_spec->'flowtables'->'list'->list_cmd->base_cmd
+list flowtables
+list flowtables ip
+list flowtables ip6
+list flowtables inet
+
+# set_spec->'table'->'flow'->flush_cmd->base_cmd
+flush flow table table_id flow_id
+flush flow table ip table_id flow_id
+flush flow table ip6 table_id flow_id
+flush flow table inet table_id flow_id
+flush flow table netdev table_id flow_id
+flush flow table bridge table_id flow_id
+flush flow table arp table_id flow_id
 
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
+
+list flow table netdev table_id synproxy_id
+list flow table bridge table_id synproxy_id
+list flow table arp table_id synproxy_id
+list flow tables netdev
+list flow tables bridge
+list flow tables arp
+list flowtables netdev
+list flowtables bridge
+list flowtables arp
 
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)

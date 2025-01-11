@@ -1,0 +1,65 @@
+#!/usr/sbin/nft -f
+# File: nat.nft
+# Description: A test NFT file to exercise 'nat_stmt' Vim syntax highlightings.
+#
+# nftables syntax name: nat_stmt
+# nftables patyhway:    nat_stmt->stmt
+#
+##################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect)
+##################################################################################
+
+tableid chainid dnat
+rule tableid chainid dnat
+add rule tableid chainid dnat
+
+tableid chainid snat
+rule tableid chainid snat
+add rule tableid chainid snat
+
+# variable_expr->symbol_expr->symbol_stmt_expr->stmt_expr->'to'->nat_stmt->stmt
+tableid chainid snat to $VARIABLE_NAME 
+
+# 'ether'->keyword_expr->symbol_stmt_expr->stmt_expr->'to'->nat_stmt->stmt
+tableid chainid snat to ether 
+
+# ':'->'to'->nat_stmt->stmt
+tableid chainid snat to : dnat 
+
+# stmt_expr->'to'->nat_stmt->stmt
+tableid chainid snat to destroy : last 
+
+# stmt_expr->'to'->'interval'->nat_stmt->stmt
+tableid chainid snat interval to ecn 
+
+# stmt_expr->'to'->'prefix'->nat_stmt->stmt
+tableid chainid snat prefix to reset 
+
+# stmt_expr->keyword_expr->'prefix'->nat_stmt->stmt
+tableid chainid snat ip to last 
+tableid chainid snat ip to original : last
+tableid chainid snat ip6 to label 
+tableid chainid snat ip6 to reply : arp
+tableid chainid snat ip6 addr . port to
+tableid chainid snat ip6 interval to
+tableid chainid snat ip6 prefix to
+
+# nf_nat_flags->nat_stmt->stmt
+tableid chainid snat ip to original : last random
+tableid chainid snat ip to original : last fully-random
+tableid chainid snat ip to original : last persistent
+tableid chainid snat ip to original : last persistent,random
+tableid chainid snat ip to original : last persistent,random,fully-random
+
+##################################################################################
+# true negative test (properly hightlighted wrongly to show an error; so far, so good)
+##################################################################################
+
+##################################################################################
+# false negative test (highlighted wrongly; still has good content; oops)
+##################################################################################
+
+##################################################################################
+# false positive test (looks highlighted correctly; has bad content; oops)
+##################################################################################
+

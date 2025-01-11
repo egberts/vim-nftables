@@ -2,95 +2,436 @@
 # File: ct.nft
 # Description: A test NFT file to exercise 'ct' Vim syntax highlightings.
 #
-# base_cmd add_cmd 'ct' 
-# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_ct
+# There are two syntaxes for 'ct' that must be kept separate due to the 
+# following convolution of primary_expr->basic_expr->primary_expr that
+# connects two syntaxes together to its top-level base_cmd/primary_expr:
+#
+#    ct_stmt
+#    ct_expr
+#
+# ct_stmt->stmt is used ONLY within add_cmd, rule_alloc, chain_block, chain_stmt, insert_cmd replace_cmd & meter_stmt_alloc
+# custom ct is used in list_cmd, delete_cmd, destroy_cmd
+# ct_expr is used ONLY after expr syntax
+#
+# ct_stmt/ct_expr are used in:
+#
+#   ct_stmt
+#   table ip filter {
+#     ct_stmt
+#     chain x {
+#         goto { ct_stmt }
+#         jump { ct_stmt }
+#         tcp dport 22 add @ssh_flood '{ ip saddr ct ct_expr}' reject
+#     }
+#   }
+# 
+#
+# Both ct_stmt and ct_expr have nearly all identical 2nd sub-keywords 
+# (except for breakaway standalone 'list ct helpers' syntax, note plural 
+# form) but only ct_stmt have a mandatory 3rd keyword 'set' after 
+# its sub-keywords.
+#
+# NFTABLES MANPAGE details the following syntaxes:
+#
+#   Connection Tracking Statement (ct_stmt)
+#
+#     The enforced syntax are:
+#
+#       [add rule ] ct {mark | event | label | zone} set value
+#
+#   Connection Tracking Expression (ct_expr)
+#
+#     The enforced syntax are:
+#
+#       ct {state | direction | status | mark | expiration | helper | label | count | id}
+#       ct [original | reply] {l3proto | protocol | bytes | packets | avgpkt | zone}
+#       ct {original | reply} {proto-src | proto-dst}
+#       ct {original | reply} {ip | ip6} {saddr | daddr}
+#
+#   Listing (list_cmd)
+#     The enforced syntax are:
+#
+#       list ct { timeout | expectation | helper | helpers } table [family] table
+#
+#   Delete (delete_cmd)
+#
+#       delete ct helper [family] table name
+#
+#   Connection Limit Statement (connlimit_stmt->stateful_stmt)
+#
+#       add rule tcp port 15 ct count over 15
+#
+# PARSER (BISON) details the following:
+#   According to parser_bison.y, the possible 2nd keywords after 'ct' in ct_expr syntax are
+#
+#     [add rule ] ct avgpkt
+#     ct bytes
+#     ct count   # not found in ct_stmt
+#     ct daddr
+#     ct direction
+#     ct event
+#     ct expiration
+#     ct helper
+#     ct id
+#     ct label
+#     ct l3proto
+#     ct mark
+#     ct original avgpkt
+#     ct original bytes
+#     ct original daddr
+#     ct original ip saddr
+#     ct original ip daddr
+#     ct original ip6 saddr
+#     ct original ip6 daddr
+#     ct original l3proto
+#     ct original packets
+#     ct original proto-src
+#     ct original proto-dst
+#     ct original protocol
+#     ct original saddr
+#     ct original zone
+#     ct packets
+#     ct proto-src
+#     ct proto-dst
+#     ct protocol
+#     ct reply avgpkt
+#     ct reply bytes
+#     ct reply daddr
+#     ct reply ip saddr
+#     ct reply ip daddr
+#     ct reply ip6 saddr
+#     ct reply ip6 daddr
+#     ct reply l3proto
+#     ct reply packets
+#     ct reply proto-src
+#     ct reply proto-dst
+#     ct reply protocol
+#     ct reply saddr
+#     ct reply zone
+#     ct saddr
+#     ct state
+#     ct status
+#     ct secmark
+#     ct zone
+#
+#   For ct_stmt, 2nd keywords after 'ct' syntax:
+#     [ add rule ] ct avgpkt set
+#     ct bytes set
+#     ct daddr set
+#     ct direction set
+#     ct event set
+#     ct expectation set
+#     ct expiration set
+#     ct helper set
+#     ct id set
+#     ct l3proto set
+#     ct label set
+#     ct mark set
+#     ct original bytes set
+#     ct original packets set
+#     ct original avgpkt set
+#     ct original zone set
+#     ct original set $VARIABLE
+#     ct packets
+#     ct proto-src set
+#     ct proto-dst set
+#     ct protocol set
+#     ct reply avgpkt set
+#     ct reply bytes set
+#     ct reply packets set
+#     ct reply set 
+#     ct reply zone set
+#     ct saddr set
+#     ct secmark set
+#     ct state set
+#     ct status set
+#     ct zone
+#
+# Other syntax usage of 'ct' are given below for completeness:
+#
+#   list_cmd
+#     list ct expectations family_spec
+#     list ct expectations [ family_spec ] table_id ct_id
+#     list ct expectations table [ family_spec ] table_id
+#     list ct helper family_spec
+#     list ct helper  [ family_spec ] table_id ct_id
+#     list ct helpers table [ family_spec ] table_id 
+#     list ct timeout family_spec
+#     list ct timeout [ family_spec ] table_id ct_id
+#     list ct timeout table [ family_spec ] table_id
+#   counter_cmd
+#     counter ct count <NUM>
+#     counter ct count over <NUM>
+#   add_cmd
+#     ct helper
+#     ct timeout
+#     ct expectation
+#     add ct helper
+#     add ct timeout
+#     add ct expectation
+#   create_cmd
+#     create ct helper
+#     create ct timeout
+#     create ct expectation
+#   delete_cmd
+#     delete ct helper
+#     delete ct timeout
+#     delete ct expectation
+#   destroy_cmd
+#     destroy ct helper
+#     destroy ct timeout
+#     destroy ct expectation
+#
+# Because of the different syntax pathway after ct's 2nd subkeyword,
+# all ct sub-keywords must be kept separate (and duplicated) between 
+# ct_stmt and ct_expr.  This is important for a simple follow-on 
+# parser used by syntax highlighters like Vim/NeoVim.
+#
+# Furthermore, a breakout of 2nd-subkeyword 'helpers' will be created
+# apart from 
+#
+# The following keywords after ANY 'ct' keyword are (in lexical order):
+#
+#     avgpkt     ct_key_dir_optional->ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     bytes      ct_key_dir_optional->ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     daddr      ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     direction  ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     expiration ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     event      ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     helper     ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     id         ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     l3proto    ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     label      ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     mark       ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     original   ct_dir->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     packets    ct_key_dir_optional->ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     proto-src  ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     proto-dst  ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     protocol   ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     reply      ct_dir->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     saddr       ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     state      ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     status     ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     secmark    ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#     zone       ct_key_dir_optional->ct_key->'ct'->ct_expr->(primary_expr|primary_stmt_expr)
+#
+#     expectation ct_obj_type->'delete'->delete_cmd->base_cmd
+#     expectation ct_obj_type->'destroy'->destroy_cmd->base_cmd
+#     expectation ct_obj_type->'list'->list_cmd->base_cmd
+#     expectation ct_cmd_type->'list'->list_cmd->base_cmd
+#     expectation 'ct'->add_cmd->base_cmd
+#     expectation create_cmd->base_cmd
+#     expectation table_block->'table'->add_cmd->base_cmd
+#     expectation table_block->create_cmd->base_cmd
+#     helper     'ct'->add_cmd->base_cmd
+#     helper     create_cmd->base_cmd
+#     helper     ct_obj_type->'delete'->delete_cmd->base_cmd
+#     helper     ct_obj_type->'destroy'->destroy_cmd->base_cmd
+#     helper     ct_obj_type->'list'->list_cmd->base_cmd
+#     helper     table_block->add_cmd->base_cmd
+#     helper     table_block->create_cmd->base_cmd
+#
+#     helpers    ct_cmd_type->'list'->list_cmd->base_cmd
+#     timeout    'ct'->add_cmd->base_cmd
+#     timeout    create_cmd->base_cmd
+#     timeout    ct_obj_type->'delete'->delete_cmd->base_cmd
+#     timeout    ct_obj_type->'destroy'->destroy_cmd->base_cmd
+#     timeout    ct_cmd_type->'list'->list_cmd->base_cmd
+#     timeout    ct_obj_type->'list'->list_cmd->base_cmd
+#     timeout    table_block->add_cmd->base_cmd
+#     timeout    table_block->create_cmd->base_cmd
+#
+#     avgpkt     'set' ct_key_dir_optional->ct_key->'ct'->ct_stmt->stmt
+#     bytes      'set' ct_key_dir_optional->ct_key->'ct'->ct_stmt->stmt
+#     daddr      'set' ct_key->'ct'->ct_stmt->stmt
+#     direction  'set' ct_key->'ct'->ct_stmt->stmt
+#     expiration 'set' ct_key->'ct'->ct_stmt->stmt
+#     event      'set' ct_key->'ct'->ct_stmt->stmt
+#     helper     'set' ct_key->'ct'->ct_stmt->stmt
+#     id         'set' ct_key->'ct'->ct_stmt->stmt
+#     l3proto    'set' ct_key->'ct'->ct_stmt->stmt
+#     label      'set' ct_key->'ct'->ct_stmt->stmt
+#     mark       'set' ct_key->'ct'->ct_stmt->stmt
+#     expectation 'set' 'ct'->objref_stmt_ct->objref_stmt->stmt 
+#     original   'set' ct_dir->'ct'->ct_stmt->stmt
+#     packets    'set' ct_key_dir_optional->ct_key->'ct'->ct_stmt->stmt
+#     proto-src  'set' ct_key->'ct'->ct_stmt->stmt
+#     proto-dst  'set' ct_key->'ct'->ct_stmt->stmt
+#     protocol   'set' ct_key->'ct'->ct_stmt->stmt
+#     reply      'set' ct_dir->'ct'->ct_stmt->stmt
+#     saddr      'set' ct_key->'ct'->ct_stmt->stmt
+#     secmark    'set' ct_key->'ct'->ct_stmt->stmt
+#     state      'set' ct_key->'ct'->ct_stmt->stmt
+#     status     'set' ct_key->'ct'->ct_stmt->stmt
+#     zone       'set' ct_key_dir_optional->ct_key->'ct'->ct_stmt->stmt
+#     timeout    'set' 'ct'->objref_stmt_ct->objref_stmt->stmt 
+#
+#     
+# clarification on stmt, top-down approach
+#  stmt->
+#  concat_expr->basic_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  primary_expr->basic_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->describe_cmd->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->add_cmd->map_block->typeof_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->create_cmd->map_block->typeof_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->add_cmd->table_block->map_block->typeof_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->add_cmd->table_block->map_block->typeof_data_expr->typeof_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->add_cmd->set_block->typeof_key_expr->typeof_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->create_cmd->set_block->typeof_key_expr->typeof_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->add_cmd->table_block->set_block->typeof_key_expr->typeof_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#
+#  base_cmd->add_cmd->table_block->map_block->typeof_data_expr->typeof_verdict_expr->typeof_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  base_cmd->add_cmd->table_block->map_block->typeof_verdict_expr->primary_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->ct_stmt->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->dup_stmt->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->fwd_stmt->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->masq_stmt->masq_stmt_args->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->meta_stmt->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->nat_stmt->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->objref_stmt->objref_stmt_counter->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->objref_stmt->objref_stmt_ct->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->objref_stmt->objref_stmt_limit->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->objref_stmt->objref_stmt_quota->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->objref_stmt->objref_stmt_synproxy->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->payload_stmt->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->redir_stmt->redir_stmt_arg->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->tproxy_stmt->stmt_expr->map_stmt_expr->concat_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->*->stmt_expr->map_stmt_expr->concat_stmt_expr->basic_stmt_expr->exclusive_or_stmt_expr->and_stmt_expr->shift_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->*->stmt_expr->multiton_stmt_expr->prefix_stmt_expr->basic_stmt_expr->exclusive_or_stmt_expr->and_stmt_expr->shift_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  concat_stmt_expr->primary_stmt_expr->basic_stmt_expr->exclusive_or_stmt_expr->and_stmt_expr->shift_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->*->stmt_expr->map_stmt_expr->shift_stmt_expr->primary_stmt_expr->basic_stmt_expr->exclusive_or_stmt_expr->and_stmt_expr->shift_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->*->stmt_expr->multiton_stmt_expr->range_stmt_expr->basic_stmt_expr->exclusive_or_stmt_expr->and_stmt_expr->shift_stmt_expr->primary_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->queue_stmt->queue_stmt_expr->hash_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->match_stmt->relational_expr->expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->*->hash_expr->expr->map_expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->match_stmt->relational_expr->expr->map_expr->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->queue_stmt->queue_stmt_expr->map_expr->concat_expr->basic-expr->primary_expr->ct_expr
+#
+#  stmt->meter_stmt->meter_stmt_alloc->meter_key_expr->meter_key_expr_alloc->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->map_stmt->set_elem_expr_stmt->set_elem_expr_stmt_alloc->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->set_stmt->set_elem_expr_stmt->set_elem_expr_stmt_alloc->concat_expr->basic-expr->primary_expr->ct_expr
+#  stmt->verdict_stmt->verdict_map_stmt->concat_expr->basic-expr->primary_expr->ct_expr
+#
+#  primary_expr->basic-expr->primary_expr->ct_expr
+#  basic-expr->primary_expr->ct_expr
+#  base_cmd->describe_cmd->primary_expr->ct_expr
+#  typeof_expr->>primary_expr->ct_expr
+#  typeof_verdict_expr->>primary_expr->ct_expr
+#  primary_expr->ct_expr
+#  primary_stmt_expr->ct_expr
+#
+# Note:
+#   Syntax '*_cmd' is the command, often at the beginning of a line, block, or group.
+#   Syntax '*_stmt' is the statement, almost always after the 'add rule', 
+#       'rule' or alone by itself on a line.
 #
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 
-# Bison: CT HELPER obj_spec ct_obj ct_config { ct_block } close_scope_ct 
-# ct helper <obj_spec> { <ct_helper_block> }
-# ct helper <table_spec> <chain_id> { <ct_helper_block> }
-# ct helper <family_spec> <table_id> <chain_id> { <ct_helper_block> }
-# ct helper <obj_spec> { }
-ct helper ip l3proto zone set ip6 myIpTable myCTHchain { };
-ct helper ip6 l3proto zone set ip6 myIpTable myCTHchain { };
-ct helper inet l3proto zone set ip6 myIpTable myCTHchain { };
-ct helper netdev l3proto zone set ip6 myIpTable myCTHchain { };
-ct helper bridge l3proto zone set ip6 myIpTable myCTHchain { };
-ct helper arp l3proto zone set ip6 myIpTable myCTHchain { };
-ct timeout  l3proto zone set ip6 myIpTable myCTHchain { };
-ct expectation  l3proto zone set ip6 myIpTable myCTHchain { };
+# Lexical: [ [ 'add' ] 'rule' ] ct_stmt
+# add_cmd without the 'add'
+#
+# Bison: ct helper <obj_spec> '{' }
+ct helper table_id ct_id { }
 
-rt classid 
-rt nexthop 
-rt mtu 
-rt ipsec 
-rt ip classid 
-rt ip6 classid 
+# Bison: ct helper <obj_spec> '{' ';' '}'
+ct helper ip table_id ct_id { ; };
 
-add ct l3proto zone set ip6 myIpTable myCTHchain { };
+# ct helper <obj_spec> '{' <common_block> '}'
+# ct helper <obj_spec> '{' <include> '}'
+ct helper ip table_id ct_id { 
+    include "ct-helper-rules.nft"; 
+};
+# ct helper <obj_spec> '{' <define> '}'
+ct helper ip table_id ct_id { 
+    define X = 1;
+};
+# ct helper <obj_spec> '{' <redefine> '}'
+ct helper ip table_id ct_id { 
+    redefine X = 1;
+};
+# ct helper <obj_spec> '{' <undefine> '}'
+ct helper ip table_id ct_id { 
+    undefine X;
+};
 
-add rule ip6 myTable myChain position 1 ct proto zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct mark zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct state zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct direction zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct status zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct expiration zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct helper zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct saddr zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct daddr zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct proto-src zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct proto-dst zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct label zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct event zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct secmark zone set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct id zone set ip6 myIpTable myCTHchain { };
+# ct helper <obj_spec> '{' type <quoted_str> protocol <ct_l4protoname> '}'
+ct helper table_id { type "sip" protocol tcp; l3proto ip; }
+ct helper ip table_id cth { type "sip" protocol tcp; l3proto ip; }
+ct helper ip6 table_id cth { type "sip" protocol tcp; l3proto ip; }
+ct helper inet table_id cth { type "sip" protocol tcp; l3proto ip; }
+ct helper arp table_id cth { type "sip" protocol tcp; l3proto ip; }
+ct helper bridge table_id cth { type "sip" protocol tcp; l3proto ip; }
+ct helper netdev table_id cth { type "sip" protocol tcp; l3proto ip; }
 
-add rule ip6 myTable myChain position 1 ct bytes set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct packets set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct avgpkt set ip6 myIpTable myCTHchain { };
-add rule ip6 myTable myChain position 1 ct zone set ip6 myIpTable myCTHchain { };
 
-rule ip6 myTable myChain position 1 ct helper set ip6 myIpTable myCTHchain { };
-rule ip6 myTable myChain position 1 ct original set ip myIpTable myCTHchain { };
-rule ip6 myTable myChain position 1 ct reply set inet myIpTable myCTHchain { };
-# ct helper <obj_spec> { <stmt_separator> }
-ct helper myIpTable myCTHchain { ; }
-ct helper myIpTable myCTHchain { ; };
-# ct helper <obj_spec> { <common_block> }
-# ct helper <obj_spec> { <include> }
-# ct helper <obj_spec> { <define> }
-# ct helper <obj_spec> { <redefine> }
-# ct helper <obj_spec> { <undefine> }
-# ct helper <obj_spec> { <ct_helper_config> }
-# ct helper <obj_spec> { type <quoted_str> protocol <ct_l4protoname> }
-ct helper myIpTable myCTHchain { type "sip" protocol tcp; l3proto ip; }
-ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
-ct helper ip6 myIpTable cth { type "sip" protocol tcp; l3proto ip; }
-ct helper inet myIpTable cth { type "sip" protocol tcp; l3proto ip; }
-ct helper arp myIpTable cth { type "sip" protocol tcp; l3proto ip; }
-ct helper bridge myIpTable cth { type "sip" protocol tcp; l3proto ip; }
-ct helper netdev myIpTable cth { type "sip" protocol tcp; l3proto ip; }
+# Bison: CT HELPER obj_spec ct_obj ct_config '{' ct_block } close_scope_ct 
+# Bison: ct helper <obj_spec> '{' <ct_helper_block> }
+# Bison: ct helper <table_spec> '{' <ct_helper_block> }
+# Bison: ct helper <family_spec> <table_id> '{' <ct_helper_block> }
+# Syntax: obj_spec->'helper'->'ct'->add_cmd->base_cmd
+ct helper ip table_id ct_id l3proto zone set ip6 table_id { };
+ct helper ip6 table_id ct_id l3proto type sip zone set ip6 { };
+ct helper inet table_id ct_id l3proto zone set ip6 table_id { };
+ct helper netdev table_id ct_id l3proto zone set ip6 table_id { };
+ct helper bridge table_id ct_id l3proto zone set ip6 table_id { };
+ct helper arp table_id ct_id l3proto zone set ip6 table_id { };
 
-# ct timeout obj_spec ct_obj_alloc { ct_timeout_block } close_scope_ct
-ct timeout myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+# obj_spec->'helper'->'ct'->'rule'->add_cmd->base_cmd
+rule ct helper ip table_id ct_id l3proto zone set ip6 table_id { };
+rule ct helper ip6 table_id ct_id l3proto type sip zone set ip6 { };
+rule ct helper inet table_id ct_id l3proto zone set ip6 table_id { };
+rule ct helper netdev table_id ct_id l3proto zone set ip6 table_id { };
+rule ct helper bridge table_id ct_id l3proto zone set ip6 table_id { };
+rule ct helper arp table_id ct_id l3proto zone set ip6 table_id { };
+
+# 'helper'->'ct'->'rule'->'add'->add_cmd->base_cmd
+add rule ct helper ip table_id l3proto zone set ip6 table_id { };
+add rule ct helper ip6 table_id l3proto type sip zone set ip6 { };
+add rule ct helper inet table_id l3proto zone set ip6 table_id { };
+add rule ct helper netdev table_id l3proto zone set ip6 table_id { };
+add rule ct helper bridge table_id l3proto zone set ip6 table_id { };
+add rule ct helper arp table_id l3proto zone set ip6 table_id { };
+#
+add rule table_id chain_id { ct helper ip table_id type l3proto zone set ip6 { }; }
+
+# ct helper <obj_spec> '{' <ct_helper_config> '}'
+add rule table_id chain_id { ct helper ip table_id type l3proto zone set ip6 { }; }
+
+# ct timeout obj_spec ct_obj_alloc '{' ct_timeout_block '}' close_scope_ct
+ct timeout  l3proto zone set ip6 table_id { };
+ct timeout table_id ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 ct timeout netdev myNetdevTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 ct timeout bridge myBridgeTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 ct timeout arp myArpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-ct timeout ip myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+ct timeout ip table_id ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 ct timeout ip6 myIp6Table ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 ct timeout inet myInetTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-ct timeout myTable agressive-tcp {
+
+ct timeout table_id agressive-tcp {
         l3proto ip;
         protocol tcp;
         policy = {established: 100, close_wait: 4, close: 4}
     }
 
-ct expectation myTable myExpectation { ; }
-ct expectation myTable myExpectation { ; } 
-ct expectation myTable e_pgsql {
+table ip filter {  # nftables manpage
+    ct timeout customtimeout {
+        protocol tcp;
+        l3proto ip
+        policy = { established: 120, close: 20 }
+    }
+
+    chain output {
+        type filter hook output priority filter; policy accept;
+        ct timeout set "customtimeout"
+    }
+}
+
+# Bison: ADD CT EXPECTATION obj_spec ct_obj_alloc '{' ct_expect_block '}' close_scope_ct
+ct expectation  l3proto zone set ip6 table_id { };
+ct expectation table_id myExpectation { ; } 
+ct expectation table_id e_pgsql {
         protocol tcp
         dport 5432
         timeout 1h
@@ -98,427 +439,33 @@ ct expectation myTable e_pgsql {
         l3proto ip
     }
 
-add rule myTable myChain ct state { new, established, related, untracked }
-add rule myTable myChain ct state != related
-add rule myTable myChain ct state established
-add rule myTable myChain ct state 8
-add rule myTable myChain ct direction original
-add rule myTable myChain ct direction != original
-add rule myTable myChain ct direction { reply, original }
-add rule myTable myChain ct status expected
-add rule myTable myChain (ct status & expected) != expected
-add rule myTable myChain ct status { expected, seen-reply, assured, confirmed, snat, dnat, dying }
-add rule myTable myChain ct mark 0
-add rule myTable myChain ct mark or 0x23 == 0x11
-add rule myTable myChain ct mark or 0x3 != 0x1
-add rule myTable myChain ct mark and 0x23 == 0x11
-add rule myTable myChain ct mark and 0x3 != 0x1
-add rule myTable myChain ct mark xor 0x23 == 0x11
-add rule myTable myChain ct mark xor 0x3 != 0x1
-add rule myTable myChain ct mark 0x00000032
-add rule myTable myChain ct mark != 0x00000032
-add rule myTable myChain ct mark 0x00000032-0x00000045
-add rule myTable myChain ct mark != 0x00000032-0x00000045
-add rule myTable myChain ct mark { 0x32, 0x2222, 0x42de3 }
-add rule myTable myChain ct mark { 0x32-0x2222, 0x4444-0x42de3 }
-add rule myTable myChain ct mark set 0x11 xor 0x1331
-add rule myTable myChain ct mark set 0x11333 and 0x11
-add rule myTable myChain ct mark set 0x12 or 0x11
-add rule myTable myChain ct mark set 0x11
-add rule myTable myChain ct mark set mark
-add rule myTable myChain ct mark set mark map { 1 : 10, 2 : 20, 3 : 30 }
-add rule myTable myChain ct expiration 30
-add rule myTable myChain ct expiration 30s
-add rule myTable myChain ct expiration != 233
-add rule myTable myChain ct expiration != 3m53s
-add rule myTable myChain ct expiration 33-45
-add rule myTable myChain ct expiration 33s-45s
-add rule myTable myChain ct expiration != 33-45
-add rule myTable myChain ct expiration != 33s-45s
-add rule myTable myChain ct expiration { 33, 55, 67, 88 }
-add rule myTable myChain ct expiration { 1m7s, 33s, 55s, 1m28s }
-add rule myTable myChain ct helper "ftp"
-add rule myTable myChain ct original bytes > 100000
-add rule myTable myChain ct bytes > 100000
-add rule myTable myChain ct reply packets < 100
-add rule myTable myChain ct original ip saddr 192.168.0.1
-add rule myTable myChain ct reply ip saddr 192.168.0.1
-add rule myTable myChain ct original ip saddr 192.168.1.0/24
-add rule myTable myChain ct reply ip saddr 192.168.1.0/24
-add rule myTable myChain ct original ip daddr 192.168.0.1
-add rule myTable myChain ct reply ip daddr 192.168.0.1
-add rule myTable myChain ct original ip daddr 192.168.1.0/24
-add rule myTable myChain ct reply ip daddr 192.168.1.0/24
-add rule myTable myChain ct original l3proto ipv4
-add rule myTable myChain ct original protocol 6
-add rule myTable myChain ct original proto-dst 22
-add rule myTable myChain ct reply proto-src 53
-add rule myTable myChain ct count over 2
+# create_cmd
+# create ct helper  obj_spec ct_obj_alloc '{' ct_helper_block '}' close_scope_ct
+create ct helper table_id { };
+create ct helper table_id { ; }
+create ct helper table_id { ; };
+create ct helper table_id { type "sip" protocol tcp; l3proto ip; }
+create ct helper ip table_id cth { type "sip" protocol tcp; l3proto ip; }
 
-add rule myTable myChain reject with icmp type net-unreachable
-add rule myTable myChain reject with icmp type prot-unreachable
-add rule myTable myChain reject with icmp type port-unreachable
-add rule myTable myChain reject with icmp type net-prohibited
-add rule myTable myChain reject with icmp type host-prohibited
-add rule myTable myChain reject with icmp type admin-prohibited
-add rule myTable myChain reject with icmpv6 type no-route
-add rule myTable myChain reject with icmpv6 type admin-prohibited
-add rule myTable myChain reject with icmpv6 type addr-unreachable
-add rule myTable myChain reject with icmpv6 type port-unreachable
-add rule myTable myChain reject with icmpx type host-unreachable
-add rule myTable myChain reject with icmpx type no-route
-add rule myTable myChain reject with icmpx type admin-prohibited
-add rule myTable myChain reject with icmpx type port-unreachable
-add rule myTable myChain ip protocol tcp reject with tcp reset
-add rule myTable myChain dnat to ct mark map { 0x00000014 : 1.2.3.4 }
-
-# add set <set_spec> { <set_block> }
-add set my_filter_table my_ssh_meter { type ipv4_addr . inet_proto; flags dynamic ;}
-add set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout;}
-###add set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout . dynamic ;}  # 'flags timeout . dynamic' not available yet
-
-# add map set_spec map_block_alloc { map_block }
-# Bison: ADD MAP set_spec { map_block }
-add rule route output mark set 123  # placeholde for 'add map' entries
-add map myNetdevTable myNetdevMap { flags interval; elements = { ether_addr }; size 1200; policy performance; }
-add map arp myArpTable myArpMap { flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-###add map arp myArpTable myArpMap { type mark; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }  # 'type mark' nor 'type mark 5' is available yet
-add map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-###add map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { ipv6_addr }; size 1200; policy performance; }  # 'type mark' nor 'type mark 5' is available yet
-add map ip6 myIp6Table myIp6Map { flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
-###add map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }  # 'type mark' nor 'type mark 5' is available yet
-add map inet myInetTable myInetMap { flags interval; elements = { inet_proto }; size 1200; policy performance; }
-###add map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
-add map netdev myNetdevTable myNetdevMap { flags interval; elements = { ether_addr }; size 1200; policy performance; }
-###add map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
-add map bridge myBridgeTable myBridgeMap { flags interval; elements = { ether_addr }; size 1200; policy performance; }
-add map filter whitelist { type ipv4_addr . inet_service : ipv6_addr; }
-add map filter ports { type inet_service : ipv4_addr ; }
-###add map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }  # 'type mark : 5' is not available yet
-
-
-# add element set_spec set_block_expr
-# Bison: ADD ELEMENT set_spec set_block_expr
-add set myTable myset {
-    type inet_service
-    flags timeout
-    elements = { http expires 9s};
-};
-add element filter blackhole { 192.168.0.1, 192.168.0.10 };
-add element inet myfilter myset {10.0.0.1 timeout 10s };
-add element netdev myNetdevTable myNetdevMap { 1.2.3.4 timeout 5s };
-####add element netdev myNetdevTable myNetdevMap { elements = { ether_addr } ; }  # 'elements = {}' N/A
-add element bridge myBridgeTable myBridgeMap { 2.2.2.2 timeout 3h }
-####add element bridge myBridgeTable myBridgeMap { elements = { ether_addr } ; }
-add element arp myArpTable myArpMap { 3.3.3.3 timeout 1d }
-####add element arp myArpTable myArpMap { elements = { ipv4_addr } ; }
-add element ip myIpTable myIpMap { 4.4.4.4 timeout 8d }
-add element ip6 myIp6Table myIp6Map { 5.5.5.5 timeout 60m }
-add element inet myInetTable myInetMap { 6.6.6.6 timeout 24h }
-add element filter ports { 80 : "http-quota" }
-add element filter ports { 22 : "ssh-quota" }
-add element ip myIpTable myTestMap { 10.11.1.15 : jump test_1_15 }
-add element filter blackhole { 10.2.3.4, 10.23.1.42 };
-
-# add flowtable <flowtable_spec> { <flowtable_block> }
-add flowtable myIpTable myIpFT { hook input priority 0; devices = { eth1, eth0 } ; }
-add flowtable ip myIpTable myIpFT { hook input priority 0; devices = { eth0, eth1 } ; }
-add flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { eth1, eth0 } ; }
-add flowtable inet myInetTable myInetFT { hook input priority 0; devices = { eth1, eth1 } ; }
-
-# add counter <obj_spec>
-add counter obj_spec close_scope_counter
-# Bison: ADD COUNTER obj_spec counter_obj counter_config close_scope_counter
-add counter myIpTable https-filter
-add counter netdev myNetdevTable https-filter  
-add counter bridge myBridgeTable https-filter  
-add counter arp myArpTable https-filter  
-add counter ip myIpTable https-filter  
-add counter ip6 myIp6Table https-filter  
-add counter inet myInetTable https-filter  
-# add counter <obj_spec> <counter_obj>  # TBD
-add counter myIpTable https-filter
-add counter netdev myNetdevTable https-filter  
-add counter bridge myBridgeTable https-filter  
-add counter arp myArpTable https-filter  
-add counter ip myIpTable https-filter  
-add counter ip6 myIp6Table https-filter  
-add counter inet myInetTable https-filter  
-# Bison: ADD COUNTER obj_spec counter_obj counter_config { counter_block } close_scope_counter
-
-# add quota <obj_spec> <quota_odj>
-# Bison: ADD QUOTA <obj_spec> <quota_odj>
-add quota filter http-quota over 25 mbytes
-add quota netdev myIpfilter http-quota over 25 mbytes;
-add quota bridge myIpfilter http-quota over 25 mbytes
-add quota arp myIpfilter http-quota over 25 mbytes
-add quota ip myIpfilter http-quota over 25 mbytes
-add quota ip6 myIpfilter http-quota until 525 kbytes
-add quota inet myIpfilter http-quota over 25 mbytes
-# Bison: ADD QUOTA obj_spec quota_obj quota_config { quota_block } close_scope_quota
-add quota filter http-quota { over 25 mbytes };
-add quota filter ssh-quota { 10 kbytes }
-
-# add ct helper <obj_spec> { <ct_helper_block> }
-# add ct helper <table_spec> <chain_id> { <ct_helper_block> }
-# add ct helper <family_spec> <table_id> <chain_id> { <ct_helper_block> }
-# add ct helper <obj_spec> { }
-# add ct helper <obj_spec> { <common_block> }
-# add ct helper <obj_spec> { <include> }
-# add ct helper <obj_spec> { <define> }
-# add ct helper <obj_spec> { <redefine> }
-# add ct helper <obj_spec> { <undefine> }
-# add ct helper <obj_spec> { <stmt_separator> }
-# add ct helper <obj_spec> { <ct_helper_config> }
-# add ct helper <obj_spec> { type <quoted_str> protocol <ct_l4protoname> }
-add ct helper myIpTable myCTHchain { };
-add ct helper myIpTable myCTHchain { ; }
-add ct helper myIpTable myCTHchain { ; };
-add ct helper myIpTable myCTHchain { type "sip" protocol tcp; l3proto ip; }
-add ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
-
-# add ct timeout obj_spec ct_obj_alloc { ct_timeout_block } close_scope_ct
-# Bison: ADD CT timeout myTimeout { .... }
-# Bison: ADD CT TIMEOUT obj_spec ct_obj_alloc { ct_timeout_block } close_scope_ct
-add ct timeout myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-add ct timeout netdev myNetdevTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-add ct timeout bridge myBridgeTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-add ct timeout arp myArpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-add ct timeout ip myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-add ct timeout ip6 myIp6Table ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-add ct timeout inet myInetTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-
-# Bison: ADD CT EXPECTATION obj_spec ct_obj_alloc { ct_expect_block } close_scope_ct
-add ct expectation myTable myCHain { ; } 
-add ct expectation myTable e_pgsql {
-        protocol tcp
-        dport 5432
-        timeout 1h
-        size 12
-        l3proto ip
-    }
-
-# add limit <obj_spec> <limit_obj>
-# add limit obj_spec limit_obj limit_config close_scope_limit
-# add limit obj_spec limit_obj { limit_block } close_scope_limit
-add limit myIpTable myIpLimit rate 1/second 
-add limit netdev myNetdevTable myNetdevLimit rate 1/minute 
-add limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
-add limit ip myIpTable myIpLimit rate 1/ day
-add limit ip6 myIp6Table myIp6Limit rate 1 / week
-add limit inet myInetTable myInetLimit rate 1/second
-add limit myIpTable myIpLimit rate 1/second burst 15 packets
-####add limit myIpTable myIpLimit rate 1/second burst 1514 bytes  # 'burst 1514 bytes' N/A
-
-# Bison: SECMARK obj_spec secmark_obj secmark_config { secmark_block } close_scope_secmark 
-add secmark myTable myTable mySecMark 
-# Bison: SECMARK obj_spec secmark_obj secmark_config { common_block } close_scope_secmark 
-add secmark myTable sshtag { "system_u:object_r:ssh_server_packet_t:s0" }
-
-#   add synproxy obj_spec synproxy_obj synproxy_config close_scope_synproxy (without the 'add' keyword)
-#   Bison: ADD SYNPROXY obj_spec synproxy_obj synproxy_config { common_block } close_scope_synproxy 
-add synproxy myTable synproxy_obj mss 1500 wscale 7;
-add synproxy ip myTable synproxy_obj mss 1492 wscale 5;
-add synproxy ip6 myTable synproxy_obj mss 1498 wscale 6;
-add synproxy inet myTable synproxy_obj mss 1496 wscale 4;
-add synproxy arp myTable synproxy_obj mss 1512  wscale 2;
-add synproxy bridge myTable synproxy_obj mss 1518 wscale 3;
-add synproxy netdev myTable synproxy_obj mss 1593 wscale 1
-#   Bison: SYNPROXY obj_spec synproxy_obj synproxy_config { common_block } close_scope_synproxy (w/o 'add')
-#   Bison: SYNPROXY obj_spec synproxy_obj synproxy_config { common_block } close_scope_synproxy (w/o 'add')
-add synproxy myTable https-synproxy {
-    mss 1460
-    wscale 7
-    timestamp sack-perm
-}
-add synproxy myTable other-synproxy {
-    mss 1460
-    wscale 5
-}
-
-
-# REPLACE (replace_cmd)
-# REPLACE rule [<family>] <table> <chain> [handle <handle>] <matches> <statements>
-# Bison: replace ruleid_spec(chain_spec handle_spec) rule
-replace rule ip myTable myChain handle 1 counter
-
-# Section: base_cmd/ADD/CREATE
-# CREATE (create_cmd)
-#  create is similar to the add command, but returns 
-#  an error if the chain already exists.
-create table myIpTable 
-create table my.IpTable
-create table my/IpTable
-create table my_IpTable
-create table my./_IpTable
-create table netdev myNetdev 
-create table bridge myBridge 
-create table arp myArpTable 
-create table ip myIpTable 
-create table ip6 myIp6Table 
-create table inet myInetTable 
-create table myIpTable { flags dormant; }
-create table netdev myNetdev { flags dormant; }
-create table bridge myBridge { flags dormant; }
-create table arp myArpTable { flags dormant; }
-create table ip myIpTable { flags dormant; }
-create table ip6 myIp6Table { flags dormant; }
-create table inet myInetTable { flags dormant; }
-
-
-# Two kinds of a base chain for syntax handling:
-#  1. Unidentified family chain
-#  2. Explictly-identified family chain
-
-# create chain <chain_spec>
-create chain myIpTable myIpChain
-create chain netdev myNetdevTable myNetdevTable 
-create chain bridge myBridgeTable myBridgeChain 
-create chain arp myArpTable myArpChain 
-create chain ip myIpTable myIpChain 
-create chain ip6 myIp6Table myIp6Chain 
-create chain inet myInetTable myInetChain 
-
-# create chain <chain_spec> { <chain_block> }
-create chain myIpTable myIpChain { type filter hook prerouting priority 0; policy drop; } ;
-create chain myIpTable myIpChain { type filter hook input priority 0; policy drop;};
-create chain myIpTable myIpChain { type filter hook forward priority 0; policy drop;}
-create chain myIpTable myIpChain { type filter hook output priority 0; policy drop;}
-create chain myIpTable myIpChain { type filter hook postrouting priority 0; policy drop;}
-create chain myIpTable myIpChain { type filter hook input device eth0 priority 0; policy drop;}
-create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept; }
-create chain arp myArpTable myArpChain { type filter hook input priority 0; policy accept; }
-create chain arp myArpTable myArpChain { type filter hook output priority 0; policy accept; }
-create chain arp myArpTable myArpChain { type filter hook input device eth0 priority 0; policy accept; }
-create chain bridge myBridgeTable myBridgeChain { type filter hook input priority 0; policy accept; }
-create chain bridge myBridgeTable myBridgeChain { type filter hook output priority 0; policy accept; }
-create chain bridge myBridgeTable myBridgeChain { type filter hook input device eth0 priority 0; policy accept; }
-create chain netdev myNetdevTable myNetdevChain 
-create chain netdev myNetdevTable myNetdevChain { type filter hook ingress device vlan0 priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type filter hook prerouting priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type filter hook input priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type filter hook forward priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type filter hook output priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type filter hook postrouting priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type nat hook prerouting priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type nat hook input priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type nat hook output priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type nat hook postrouting priority 0; policy accept; }
-create chain ip myIpTable myIpChain { type route hook output priority 0; policy accept; }
-
-create chain ip myIpTable myIpChain { type filter hook input device eth0 priority 0; policy accept; }
-
-create chain ip6 myIp6Table myIp6Chain { type filter hook prerouting priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type filter hook input priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type filter hook forward priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type filter hook output priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type filter hook postrouting priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type nat hook prerouting priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type nat hook input priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type nat hook output priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type nat hook postrouting priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type route hook output priority 0; policy accept; }
-create chain ip6 myIp6Table myIp6Chain { type filter hook input device eth0 priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type filter hook prerouting priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type filter hook input priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type filter hook forward priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type filter hook output priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type filter hook postrouting priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type nat hook prerouting priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type nat hook input priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type nat hook output priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type nat hook postrouting priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type route hook output priority 0; policy accept; }
-create chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy accept; }
-
-create chain netdev myIpTable myIpChain { type filter hook ingress devices = { eth0, eth1, eth2 } priority 0; policy drop;}
-create chain bridge myBridgeTable myBridgeChain { type filter hook prerouting devices = { eth0, eth1, eth2 } priority 0; policy drop;}
-create chain arp myArpTable myArpChain { type filter hook input devices = { eth0, eth1, eth2 } priority 0; policy drop;}
-create chain ip myIpTable myIpChain { type nat hook postrouting devices = { eth0, eth1, eth2 } priority 0; policy drop;}
-create chain ip6 myIp6Table myIp6Chain { type filter hook input devices = { eth0, eth1, eth2 } priority 0; policy drop;}
-create chain inet myInetTable myInetChain { type route hook output devices = { eth0, eth1, eth2 } priority 0; policy drop;}
-
-# create set <set_spec> { <set_block> }
-create set my_filter_table my_ssh_meter { type ipv4_addr . inet_proto; flags dynamic ;}
-create set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout;}
-####create set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout . dynamic ;}
-
-# create map <set_spec> { <map_block> }
-create map myIpTable myIpMap { flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-####create map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-create map netdev myNetdevTable myNetdevMap { flags interval; elements = { ether_addr }; size 1200; policy performance; }
-####create map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
-create map bridge myBridgeTable myBridgeMap { flags interval; elements = { ether_addr }; size 1200; policy performance; }
-####create map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
-create map arp myArpTable myArpMap { flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-####create map arp myArpTable myArpMap { type mark; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-create map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-create map ip6 myIp6Table myIp6Map { flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
-####create map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
-create map inet myInetTable myInetMap { flags interval; elements = { inet_proto }; size 1200; policy performance; }
-####create map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
-
-# create element <set_spec> <set_block_expr>
-#create element myIpTable myIpSet { element, element }
-create element netdev myNetdevTable myNetdevSet { 10.20.255.48/29 : goto group_114, 10.20.255.88/29 : goto group_114, 10.20.255.128/29 : goto group_114 } 
-create element bridge myBridgeTable myBridgeSet { 8.8.8.8, 8.8.4.4 }
-create element arp myArpTable myArpSet { 10.20.255.50 : 1:ffd8, 10.20.255.90 : 1:ffd5, 10.20.255.130 : 1:ffd2 }
-create element ip myIpTable myIpSet { 10.20.255.88/29 : goto group_114 }
-create element ip6 myIp6Table myIp6Set { 10.20.255.128/29 : goto group_114 }
-create element inet myInetTable myInetSet { 10.20.255.50/32 : "1:0xffd9" }
-
-# create flowtable <flowtable_spec> { <flowtable_block> }
-create flowtable myIpTable myIpFT { hook input priority 0; devices = { br0, eth0, eth1} ; }
-create flowtable ip myIpTable myIpFT { hook input priority 0; devices = { eth0, eth1 } ; }
-create flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { br0, eth0 } ; }
-create flowtable inet myInetTable myInetFT { hook input priority 0; devices = { br0, eth1 } ; }
-
-# create counter <obj_spec> close_scope_counter 
-# create counter <obj_spec> counter_obj counter_config close_scope_counter  
-create counter myIpTable https-filter
-create counter netdev myNetdevTable https-filter  
-create counter bridge myBridgeTable https-filter  
-create counter arp myArpTable https-filter  
-create counter ip myIpTable https-filter  
-create counter ip6 myIp6Table https-filter  
-create counter inet myInetTable https-filter  
-
-# create quota <obj_spec> <quota_odj> <quota_config>
-create quota filter http-quota over 25 mbytes
-###create quota filter http-quota { over 25 mbytes };
-###create quota filter ssh-quota { 10 kbytes }
-create quota netdev myIpfilter http-quota over 25 mbytes;
-create quota bridge myIpfilter http-quota over 25 mbytes
-create quota arp myIpfilter http-quota over 25 mbytes
-create quota ip myIpfilter http-quota over 25 mbytes
-create quota ip6 myIpfilter http-quota until 525 kbytes
-create quota inet myIpfilter http-quota over 25 mbytes
-
-# create ct helper  obj_spec ct_obj_alloc { ct_helper_block } close_scope_ct
-create ct helper myIpTable myCTHchain { };
-create ct helper myIpTable myCTHchain { ; }
-create ct helper myIpTable myCTHchain { ; };
-create ct helper myIpTable myCTHchain { type "sip" protocol tcp; l3proto ip; }
-create ct helper ip myIpTable cth { type "sip" protocol tcp; l3proto ip; }
-
-# create ct timeout  obj_spec ct_obj_alloc { ct_timeout_block } 
-create ct timeout myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+# create ct timeout  obj_spec ct_obj_alloc '{' ct_timeout_block '}' 
+create ct timeout
+create ct timeout table_id ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 create ct timeout netdev myNetdevTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 create ct timeout bridge myBridgeTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 create ct timeout arp myArpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-create ct timeout ip myIpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+create ct timeout ip table_id ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 create ct timeout ip6 myIp6Table ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 create ct timeout inet myInetTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
-create ct timeout myTable agressive-tcp {
+create ct timeout table_id agressive-tcp {
         l3proto ip;
         protocol tcp;
         policy = {established: 100, close_wait: 4, close: 4}
     }
 
-# create ct expectation  obj_spec ct_obj_alloc { ct_expect_block } close_scope_ct
-create ct expectation myTable myExpectation { ; }
-create ct expectation myTable myExpectation { ; } 
-create ct expectation myTable e_pgsql {
+# create ct expectation  obj_spec ct_obj_alloc '{' ct_expect_block '}' close_scope_ct
+create ct expectation table_id myExpectation { ; }
+create ct expectation table_id myExpectation { ; } 
+create ct expectation table_id e_pgsql {
         protocol tcp
         dport 5432
         timeout 1h
@@ -526,1629 +473,298 @@ create ct expectation myTable e_pgsql {
         l3proto ip
     }
 
+# list_cmd
+list ct expectation table_id ct_id
+list ct expectation ip table_id ct_id
+list ct expectation ip6 table_id ct_id
+list ct expectation inet table_id ct_id
+list ct expectation netdev table_id ct_id
+list ct expectation bridge table_id ct_id
+list ct expectation arp table_id ct_id
+list ct expectation table table_id
+list ct expectation table ip table_id
+list ct expectation table ip6 table_id
+list ct expectation table inet table_id
+list ct expectation table netdev table_id
+list ct expectation table bridge table_id
+list ct expectation table arp table_id
+list ct helper table_id ct_id
+list ct helper ip table_id ct_id
+list ct helper ip6 table_id ct_id
+list ct helper net table_id ct_id
+list ct helper netdev table_id ct_id
+list ct helper bridge table_id ct_id
+list ct helper arp table_id ct_id
 
-# create limit <obj_spec> <limit_obj> <limit_config>
-create limit myIpTable myIpLimit rate 1/second
-create limit netdev myNetdevTable myNetdevLimit rate 1/minute
-create limit bridge myBridgeTable myBridgeLimit rate 1/hour
-create limit ip myIpTable myIpLimit rate 1/day
-create limit ip6 myIp6Table myIp6Limit rate 1/week
-create limit inet myInetTable myInetLimit rate 1/second
-create limit myIpTable myIpLimit rate 1/second burst 15 packets
-###create limit myIpTable myIpLimit rate 1/second burst 1514 bytes
+# table_spec->'table'->'helpers'->list_cmd->base_cmd
+list ct helpers table table_id
+list ct helpers table ip table_id
+list ct helpers table ip6 table_id
+list ct helpers table inet table_id
+list ct helpers table netdev table_id
+list ct helpers table bridge table_id
+list ct helpers table arp table_id
 
-# create secmark obj_spec secmark_obj secmark_config close_scope_secmark
-# Bison: CREATE SECMARK obj_spec secmark_obj secmark_config { secmark_block } close_scope_secmark 
-create secmark myTable myTable mySecMark 
-# Bison: CREATE SECMARK obj_spec secmark_obj secmark_config { common_block } close_scope_secmark 
-####create secmark myTable sshtag { "system_u:object_r:ssh_server_packet_t:s0" }
 
-# create synproxy obj_spec synproxy_obj synproxy_config close_scope_synproxy
-#   Bison: ADD SYNPROXY obj_spec synproxy_obj synproxy_config { common_block } close_scope_synproxy 
-create synproxy myTable synproxy_obj mss 1500 wscale 7;
-create synproxy ip myTable synproxy_obj mss 1492 wscale 5;
-create synproxy ip6 myTable synproxy_obj mss 1498 wscale 6;
-create synproxy inet myTable synproxy_obj mss 1496 wscale 4;
-create synproxy arp myTable synproxy_obj mss 1512  wscale 2;
-create synproxy bridge myTable synproxy_obj mss 1518 wscale 3;
-create synproxy netdev myTable synproxy_obj mss 1593 wscale 1
-#   Bison: SYNPROXY obj_spec synproxy_obj synproxy_config { common_block } close_scope_synproxy (w/o 'add')
-###create synproxy myTable https-synproxy {
-###    mss 1460
-###    wscale 7
-###    timestamp sack-perm
-###}
-###create synproxy myTable other-synproxy {
-###    mss 1460
-###    wscale 5
-###}
+# table_spec->'table'->'helpers'->list_cmd->base_cmd
+list ct timeout table_id ct_id
+list ct timeout ip table_id ct_id
+list ct timeout ip6 table_id ct_id
+list ct timeout inet table_id ct_id
+list ct timeout netdev table_id ct_id
+list ct timeout bridge table_id ct_id
+list ct timeout arp table_id ct_id
+list ct timeout table table_id
+list ct timeout table ip table_id
+list ct timeout table ip6 table_id
+list ct timeout table inet table_id
+list ct timeout table netdev table_id
+list ct timeout table bridge table_id
+list ct timeout table arp table_id
 
-# insert_cmd
-insert rule filter output ip daddr 192.168.0.0/24 accept # 'ip filter' is assumed
+list ct helper table_id {}
+list ct helper table_id { };
+list ct helper table_id { ; }
+list ct helper table_id { ; };
 
 # delete_cmd
-# delete table <table_spec>
-delete table myIpTable
-delete table netdev myNetdevTable
-delete table bridge myBridgeTable
-delete table arp myArpTable
-delete table ip myIpTable
-delete table ip6 myIp6Table
-delete table inet myInetTable
-# delete table <tableid_spec>
-delete table netdev handle 123
-delete table handle 4321  # comment
+# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
+delete ct helper table_id ct_id
+delete ct helper ip table_id ct_id
+delete ct helper ip6 table_id ct_id
+delete ct helper inet table_id ct_id
+delete ct helper netdev table_id ct_id
+delete ct helper bridge table_id ct_id
+delete ct helper arp table_id ct_id
 
-delete chain table_name chain_name
-delete chain ip table_name chain_name
-delete chain ip6 table_name chain_name
-delete chain inet table_name chain_name
-delete chain arp table_name chain_name
-delete chain bridge table_name chain_name
-delete chain netdev table_name chain_name
-delete chain table_name handle 15
-delete chain ip table_name handle 15
-delete chain ip6 table_name handle 15
-delete chain inet table_name handle 15
-delete chain arp table_name handle 15
-delete chain bridge table_name handle 15
-delete chain netdev table_name handle 15
+delete ct helper table_id {}
+delete ct helper table_id { };
+delete ct timeout
+delete ct expectation
 
-# delete rule <ruleid_spec>
-delete rule myInetTable myChain handle 42
-delete rule ip myInetTable myChain handle 42
-delete rule ip6 table_name chain_name handle 16
-delete rule inet table_name chain_name handle 16
-delete rule arp table_name chain_name handle 16
-delete rule bridge table_name chain_name handle 16
-delete rule netdev table_name chain_name handle 16
+# destroy_cmd
+destroy ct helper
+destroy ct timeout
+destroy ct expectation
 
-# delete set <set_spec>
-delete set myIpTable myIpSet
-delete set netdev myNetdevTable mySet
-delete set bridge myBridgeTable myBridgeSet
-delete set arp myArpTable myArpSet
-delete set ip myIpTable myIpSet
-delete set ip6 myIp6Table myIp6Set
-delete set inet myInetTable myInetSet
-# delete set <setid_spec>
-delete set myIpTable handle 123
-delete set ip myIpTable handle 123
-delete set inet myInetTable handle 42 # comment
+destroy ct helper table_id {}
+destroy ct helper table_id { };
 
-# delete map <set_spec>
-delete map myIpTable myIpMap 
-delete map netdev myNetdevTable myNetdevMap 
-delete map bridge myBridgeTable myBridgeMap 
-delete map arp myArpTable myArpMap 
-delete map ip myIpTable myIpMap 
-delete map ip6 myIp6Table myIp6Map 
-delete map inet myInetTable myInetMap 
 
-# delete element <set_spec> <set_block_expr>
-delete element inet myfilter myset { 10.0.0.1 }
-delete element netdev myNetdevTable myNetdevSet { 10.0.0.1, 127.0.0.1 }
-delete element bridge myBridgeTable myBridgeSet { 4.4.4.4 }
-delete element arp myArpTable myArpSet { 4.4.4.4 }
-delete element ip myIpTable myIpSet { 4.4.4.4 }
-delete element ip6 myIp6Table myIp6Set { 4.4.4.4 }
-delete element inet myInetTable myInetSet { 4.4.4.4 }
-delete element myIpTable myIpMap { 4.4.4.4 }
-delete element netdev myNetdevTable myNetdevMap { 4.4.4.4 }
-delete element bridge myBridgeTable myBridgeMap { 4.4.4.4 }
-delete element arp myArpTable myArpMap { 4.4.4.4 }
-delete element ip myIpTable myIpMap { 4.4.4.4 }
-delete element ip6 myIp6Table myIp6Map { 4.4.4.4 }
-delete element inet myInetTable myInetMap { 4.4.4.4 }
 
-# delete flowtable <flowtable_spec>
-delete flowtable myIpTable myIpFT
-delete flowtable ip myIpTable myIpFT
-delete flowtable ip6 myIp6Table myIp6FT
-delete flowtable inet myInetTable myInetFT
-# there is no 'arp/bridge/netdev' in flowtable
-delete flowtable table_name handle 15
-delete flowtable ip table_name handle 15
-delete flowtable ip6 table_name handle 15
-delete flowtable inet table_name handle 15
-delete flowtable myIpTable myIpFT { hook input priority 0; devices = { br0, eth0, eth1} ; }
-delete flowtable ip myIpTable myIpFT { hook input priority 0; devices = { eth0, eth1 } ; }
-delete flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { br0, eth0 } ; }
-delete flowtable inet myInetTable myInetFT { hook input priority 0; devices = { br0, eth1 } ; }
+############################################################################################
+# ct_expr
+############################################################################################
+table_id myChain position 1 ct helper set ip6 table_id myCTHchain { };
+table_id myChain position 1 ct original set ip table_id myCTHchain { };
+table_id myChain position 1 ct reply set inet table_id myCTHchain { };
 
-# delete counter <obj_spec>
-delete counter myIpTable myIpCounter
-delete counter netdev myNetdevTable myNetdevCounter
-delete counter bridge myBridgeTable myBridgeCounter
-delete counter arp myArpTable myArpCounter
-delete counter ip myIpTable myIpCounter
-delete counter ip6 myIp6Table myIp6Counter
-delete counter inet myInetTable myInetCounter
-delete counter myIpTable https-filter  
-delete counter netdev myNetdevTable https-filter  
-delete counter bridge myBridgeTable https-filter  
-delete counter arp myArpTable https-filter  
-delete counter ip myIpTable https-filter  
-delete counter ip6 myIp6Table https-filter  
-delete counter inet myInetTable https-filter  
-# delete counter <objid_spec>
-delete counter netdev myNetdevTable handle 1
-### delete counter bridge myBridgeTable position 1  # not yet available
-###delete counter arp myArpTable index 1  # not yet available
+ip6 table_id myChain position 1 ct helper set ip6 table_id myCTHchain { };
+ip6 table_id myChain position 1 ct original set ip table_id myCTHchain { };
+ip6 table_id myChain position 1 ct reply set inet table_id myCTHchain { };
 
-# delete quota <obj_spec>
-delete quota table_name quota_name 
-delete quota ip table_name quota_name
-delete quota ip6 table_name quota_name
-delete quota inet table_name quota_name
-delete quota arp table_name quota_name
-delete quota bridge table_name quota_name
-delete quota netdev table_name quota_name
-# delete quota <objid_spec>
-delete quota table_name handle 15
-delete quota ip table_name handle 15
-delete quota ip6 table_name handle 15
-delete quota inet myInetFilter handle 123
-###delete quota inet myInetFilter position 234  # not yet available
-###delete quota inet myInetFilter index 345  # not yet available
-delete quota arp table_name handle 15
-delete quota bridge table_name handle 15
-delete quota netdev table_name handle 15
+rule ip6 table_id myChain position 1 ct helper set ip6 table_id myCTHchain { };
+rule ip6 table_id myChain position 1 ct original set ip table_id myCTHchain { };
+rule ip6 table_id myChain position 1 ct reply set inet table_id myCTHchain { };
+
+add rule ip6 table_id myChain position 1 ct proto zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct mark zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct state zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct direction zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct status zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct expiration zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct helper zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct saddr zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct daddr zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct proto-src zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct proto-dst zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct label zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct event zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct secmark zone set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct id zone set ip6 table_id myCTHchain { };
+
+add rule ip6 table_id myChain position 1 ct bytes set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct packets set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct avgpkt set ip6 table_id myCTHchain { };
+add rule ip6 table_id myChain position 1 ct zone set ip6 table_id myCTHchain { };
+
+add rule table_id myChain ct state { new, established, related, untracked }
+add rule table_id myChain ct state != related
+add rule table_id myChain ct state established
+add rule table_id myChain ct state 8
+add rule table_id myChain ct direction original
+add rule table_id myChain ct direction != original
+add rule table_id myChain ct direction { reply, original }
+add rule table_id myChain ct status expected
+add rule table_id myChain (ct status & expected) != expected
+add rule table_id myChain ct status { expected, seen-reply, assured, confirmed, snat, dnat, dying }
+add rule table_id myChain ct mark 0
+add rule table_id myChain ct mark or 0x23 == 0x11
+add rule table_id myChain ct mark or 0x3 != 0x1
+add rule table_id myChain ct mark and 0x23 == 0x11
+add rule table_id myChain ct mark and 0x3 != 0x1
+add rule table_id myChain ct mark xor 0x23 == 0x11
+add rule table_id myChain ct mark xor 0x3 != 0x1
+add rule table_id myChain ct mark 0x00000032
+add rule table_id myChain ct mark != 0x00000032
+add rule table_id myChain ct mark 0x00000032-0x00000045
+add rule table_id myChain ct mark != 0x00000032-0x00000045
+add rule table_id myChain ct mark { 0x32, 0x2222, 0x42de3 }
+add rule table_id myChain ct mark { 0x32-0x2222, 0x4444-0x42de3 }
+add rule table_id myChain ct mark set 0x11 xor 0x1331
+add rule table_id myChain ct mark set 0x11333 and 0x11
+add rule table_id myChain ct mark set 0x12 or 0x11
+add rule table_id myChain ct mark set 0x11
+add rule table_id myChain ct mark set mark
+add rule table_id myChain ct mark set mark map { 1 : 10, 2 : 20, 3 : 30 }
+add rule table_id myChain ct expiration 30
+add rule table_id myChain ct expiration 30s
+add rule table_id myChain ct expiration != 233
+add rule table_id myChain ct expiration != 3m53s
+add rule table_id myChain ct expiration 33-45
+add rule table_id myChain ct expiration 33s-45s
+add rule table_id myChain ct expiration != 33-45
+add rule table_id myChain ct expiration != 33s-45s
+add rule table_id myChain ct expiration { 33, 55, 67, 88 }
+add rule table_id myChain ct expiration { 1m7s, 33s, 55s, 1m28s }
+add rule table_id myChain ct helper "ftp"
+add rule table_id myChain ct original bytes > 100000
+add rule table_id myChain ct bytes > 100000
+add rule table_id myChain ct reply packets < 100
+add rule table_id myChain ct original ip saddr 192.168.0.1
+add rule table_id myChain ct reply ip saddr 192.168.0.1
+add rule table_id myChain ct original ip saddr 192.168.1.0/24
+add rule table_id myChain ct reply ip saddr 192.168.1.0/24
+add rule table_id myChain ct original ip daddr 192.168.0.1
+add rule table_id myChain ct reply ip daddr 192.168.0.1
+add rule table_id myChain ct original ip daddr 192.168.1.0/24
+add rule table_id myChain ct reply ip daddr 192.168.1.0/24
+add rule table_id myChain ct original l3proto ipv4
+add rule table_id myChain ct original protocol 6
+add rule table_id myChain ct original proto-dst 22
+add rule table_id myChain ct reply proto-src 53
+add rule table_id myChain ct count over 2
 
 # delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
-delete ct helper myIpTable cth
-delete ct helper netdev myIpTable cth
-delete ct helper bridge myIpTable cth
-delete ct helper arp myIpTable cth
-delete ct helper ip myIpTable cth
-delete ct helper ip6 myIpTable cth
-delete ct helper inet myIpTable cth
-
-# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
-delete ct timeout myIpTable ctt
+delete ct timeout table_id ctt
+delete ct timeout ip table_id ctt
+delete ct timeout ip6 myIp6Table ctt
+delete ct timeout inet myInetTable ctt
 delete ct timeout netdev myNetdevTable ctt
 delete ct timeout bridge myBridgeTable ctt
 delete ct timeout arp myArpTable ctt
-delete ct timeout ip myIpTable ctt
-delete ct timeout ip6 myIp6Table ctt
-delete ct timeout inet myInetTable ctt
 
 delete ct expectation table_name quota_name 
 delete ct expectation ip table_name quota_name
 delete ct expectation ip6 table_name quota_name
 delete ct expectation inet table_name quota_name
+delete ct expectation netdev table_name quota_name
 delete ct expectation arp table_name quota_name
 delete ct expectation bridge table_name quota_name
-delete ct expectation netdev table_name quota_name
 
-delete limit table_name limit_name 
-delete limit ip table_name limit_name
-delete limit ip6 table_name limit_name
-delete limit inet table_name limit_name
-delete limit arp table_name limit_name
-delete limit bridge table_name limit_name
-delete limit netdev table_name limit_name
-delete limit table_name handle 15
-delete limit ip table_name handle 15
-delete limit ip6 table_name handle 15
-delete limit inet table_name handle 15
-delete limit arp table_name handle 15
-delete limit bridge table_name handle 15
-delete limit netdev table_name handle 15
-delete secmark table_name secmark_name 
-delete secmark ip table_name secmark_name
-delete secmark ip6 table_name secmark_name
-delete secmark inet table_name secmark_name
-delete secmark arp table_name secmark_name
-delete secmark bridge table_name secmark_name
-delete secmark netdev table_name secmark_name
-delete secmark table_name handle 15
-delete secmark ip table_name handle 15
-delete secmark ip6 table_name handle 15
-delete secmark inet table_name handle 15
-delete secmark arp table_name handle 15
-delete secmark bridge table_name handle 15
-delete secmark netdev table_name handle 15
-delete synproxy table_name synproxy_name 
-delete synproxy ip table_name synproxy_name
-delete synproxy ip6 table_name synproxy_name
-delete synproxy inet table_name synproxy_name
-delete synproxy arp table_name synproxy_name
-delete synproxy bridge table_name synproxy_name
-delete synproxy netdev table_name synproxy_name
-delete synproxy table_name handle 15
-delete synproxy ip table_name handle 15
-delete synproxy ip6 table_name handle 15
-delete synproxy inet table_name handle 15
-delete synproxy arp table_name handle 15
-delete synproxy bridge table_name handle 15
-delete synproxy netdev table_name handle 15
-
-# get_cmd
-# Bison: get element set_spec { set_list_member_expr }
-# Bison: get element set_spec { set_list_expr , set_list_member_expr }
-define variable_name = 123
-get element myTable mySetChain { $variable_name }
-get element ip filter mySetChain { 1.1.1.1 }
-get element ip6 myTable mySetChain { 2.2.2.2, 3.3.3.3 }
-get element inet myTable mySetChain { 4.4.4.4 }
-get element arp myTable mySetChain{ 4.4.4.4 }
-get element bridge myTable mySetChain { 4.4.4.4 }
-get element netdev myTable mySetChain { 4.4.4.4 }
-
-# LIST (ordered as in parser_bison.y source code)
-# list table <table_spec>
-# list_cmd
-list table table_name
-list table ip table_name
-list table ip6 table_name
-list table inet table_name
-list table arp table_name
-list table bridge table_name
-list table netdev table_name
-
-list tables 
-list tables ip
-list tables ip6
-list tables inet
-list tables bridge
-list tables netdev
-
-list chain table_name chain_name 
-list chain ip table_name chain_name
-list chain ip6 table_name chain_name
-list chain inet table_name chain_name
-list chain arp table_name chain_name
-list chain bridge table_name chain_name
-list chain netdev table_name chain_name
-
-list chains 
-list chains ip
-list chains ip6
-list chains inet
-list chains arp
-list chains bridge
-list chains netdev
-
-# list_cmd
-# Bison: LIST SETS ruleset_spec
-list sets
-list sets ip
-list sets ip6
-list sets inet
-list sets arp
-list sets bridge
-list sets netdev
-# Bison: LIST SETS table_spec
-list sets table table_name
-list sets table ip table_name 
-list sets table ip6 table_name 
-list sets table inet table_name 
-list sets table arp table_name 
-list sets table bridge table_name 
-list sets table netdev table_name 
-
-list set table_name chain_name 
-list set ip table_name chain_name
-list set ip6 table_name chain_name
-list set inet table_name chain_name
-list set arp table_name chain_name
-list set bridge table_name chain_name
-list set netdev table_name chain_name
-
-list counters table ruleset_spec
-list counters table table_name
-list counters table ip table_name
-list counters table ip6 table_name
-list counters table inet table_name
-list counters table arp table_name
-list counters table bridge table_name
-
-# LIST COUNTER obj_spec close_scope_counter
-# Bison: COUNTER obj_spec close_scope_counter
-list counter myTable counter_name 
-list counter ip myTable counter_name 
-list counter ip6 myTable counter_name 
-list counter inet myTable counter_name 
-list counter arp myTable counter_name 
-list counter bridge myTable counter_name 
-list counter netdev myTable counter_name 
-
-list quota myTable quota_name
-list quota ip myTable quota_name
-list quota ip6 myTable quota_name
-list quota inet myTable quota_name
-list quota arp myTable quota_name
-list quota bridge myTable quota_name
-list quota netdev myTable quota_name
-
-# list quotas table ruleset_spec
-list quotas table table_name
-list quotas table ip table_name
-list quotas table ip6 table_name
-list quotas table inet table_name
-list quotas table arp table_name
-list quotas table bridge table_name
-list quotas table netdev table_name
-# list quotas table <table_spec>
-list quotas table myIpTable
-list quotas table netdev myNetdevTable
-list quotas table bridge myBridgeTable
-list quotas table arp myArpTable
-list quotas table ip myIpTable
-list quotas table ip6 myIp6Table
-list quotas table inet myInetTable
-
-list limits table ruleset_spec
-list limits table table_name
-list limits table ip table_name
-list limits table ip6 table_name
-list limits table inet table_name
-list limits table arp table_name
-list limits table bridge table_name
-list limits table netdev table_name
-
-list limit myTable limit_name
-list limit ip myTable limit_name
-list limit ip6 myTable limit_name
-list limit inet myTable limit_name
-list limit arp myTable limit_name
-list limit bridge myTable limit_name
-list limit netdev myTable limit_name
-
-list secmark myTable secmark_name
-list secmark ip myTable secmark_name
-list secmark ip6 myTable secmark_name
-list secmark inet myTable secmark_name
-list secmark arp myTable secmark_name
-list secmark bridge myTable secmark_name
-list secmark netdev myTable secmark_name
-
-list secmarks table myTable 
-list secmarks table ip myTable
-list secmarks table ip6 myTable 
-list secmarks table inet myTable 
-list secmarks table arp myTable 
-list secmarks table bridge myTable 
-list secmarks table netdev myTable
-
-list synproxy myTable mySynProxy
-list synproxy ip myTable mySynProxy
-list synproxy ip6 myTable mySynProxy
-list synproxy inet myTable mySynProxy
-list synproxy arp myTable mySynProxy
-list synproxy bridge myTable mySynProxy
-list synproxy netdev myTable mySynProxy
-
-list synproxys
-list synproxys ip
-list synproxys ip6
-list synproxys inet
-list synproxys arp
-list synproxys bridge
-list synproxys netdev
-
-list synproxys table myTable
-list synproxys table ip myTable
-list synproxys table ip6 myTable
-list synproxys table inet myTable
-list synproxys table arp myTable
-list synproxys table bridge myTable
-list synproxys table netdev myTable
-
-list ruleset
-list ruleset ip
-list ruleset ip6
-list ruleset netdev
-list ruleset arp
-list ruleset bridge
-list ruleset netdev
-
-list flow tables 
-list flow tables ip
-list flow tables ip6
-list flow tables inet
-
-list flow table table_name identifier
-list flow table ip table_name identifier
-list flow table ip6 table_name identifier
-list flow table inet table_name identifier
-
-list meters 
-list meters ip
-list meters ip6
-list meters inet
-list meters arp
-list meters bridge
-list meters netdev
-
-list meter table_name identifier
-list meter ip table_name identifier
-list meter bridge table_name identifier
-list meter netdev table_name identifier
-
-list flowtables 
-list flowtables ip
-list flowtables ip6
-list flowtables inet
-
-list flowtable table_name identifier
-list flowtable ip table_name identifier
-list flowtable ip6 table_name identifier
-list flowtable inet table_name identifier
-
-list maps 
-list maps ip
-list maps ip6
-list maps inet
-list maps arp
-list maps bridge
-list maps netdev
-list map table_name chain_name 
-list map ip table_name chain_name
-list map ip6 table_name chain_name
-list map inet table_name chain_name
-list map arp table_name chain_name
-list map bridge table_name chain_name
-list map netdev table_name chain_name
-# incomplete list_cmd
-#
-
-# reset counters <ruleset_spec>
-# Bison: RESET COUNTERS ruleset_spec
-reset counters     # this one is covered by RESET COUNTERS table_spec <empty-table>
-reset counters ip
-reset counters ip6
-reset counters inet
-reset counters arp
-reset counters bridge
-reset counters netdev
-# Bison: RESET COUNTERS table_spec
-###reset counters ip myTable   # not available yet
-###reset counters inet myTable   # not available yet
-###reset counters arp myTable   # not available yet
-###reset counters bridge myTable   # not available yet
-###reset counters netdev myTable   # not available yet
-# Bison: RESET COUNTERS TABLE table_spec
-reset counters table table_name 
-reset counters table ip table_name 
-reset counters table ip6 table_name 
-reset counters table inet table_name 
-reset counters table arp table_name 
-reset counters table bridge table_name 
-reset counters table netdev table_name 
-
-# reset counter <obj_spec>
-# Bison: RESET COUNTER obj_spec
-reset counter myTable my_custom_counter 
-
-# reset quotas ruleset_spec
-# reset quotas [<family>] <table_spec>
-reset quotas ip
-reset quotas ip6
-reset quotas inet
-reset quotas arp
-reset quotas bridge
-reset quotas netdev
-###reset quotas ip myIpFilter  # not yet available
-###reset quotas ip6 myIpFilter  # not yet available
-###reset quotas inet myIpFilter  # not yet available
-###reset quotas arp myIpFilter  # not yet available
-###reset quotas bridge myIpFilter  # not yet available
-###reset quotas netdev myIpFilter  # not yet available
-# reset quotas table [<family>] <table_spec>
-reset quotas table myIpFilter
-reset quotas table netdev myIpFilter
-reset quotas table bridge myIpFilter
-reset quotas table arp myIpFilter
-reset quotas table ip myIpFilter
-reset quotas table ip6 myIpFilter
-reset quotas table inet myIpFilter
-
-# reset quota <obj_spec>
-reset quota myIpTable myFilter ;
-
-# reset_cmd RULES
-###reset rules   # covered by 'RESET RULES table_spec'   # not yet available
-# Bison: RESET RULES table_spec
-###reset rules table_identifier  # not yet available
-# Bison: RESET RULES ruleset_spec
-###reset rules ip  # not yet available
-###reset rules ip6  # not yet available
-###reset rules inet  # not yet available
-###reset rules arp  # not yet available
-###reset rules bridge  # not yet available
-###reset rules netdev  # not yet available
-# Bison: RESET RULES TABLE table_spec
-###reset rules table table_identifier  # not yet available
-# Bison: RESET RULES chain_spec
-###reset rules table_identifier chain_identifier  # not yet available
-# Bison: RESET RULES CHAIN chain_spec
-###reset rules chain table_id chain_identifier  # not yet available
-###reset rules quota  # not yet available
-
-# Bison: RESET RULE ruleid_spec
-# Bison: RESET RULE table_spec identifier handle_spec
-# Bison: RESET RULE [family_spec] identifier identifier handle_spec
-###reset rule myTable myChain handle 1 # not yet available
-
-### reset element table_name chain_name   # not yet available
-### reset element ip table_name chain_name  # not yet available
-### reset element ip6 table_name chain_name  # not yet available
-### reset element inet table_name chain_name  # not yet available
-### reset element arp table_name chain_name  # not yet available
-### reset element bridge table_name chain_name  # not yet available
-### reset element netdev table_name chain_name  # not yet available
-
-### reset set table_name chain_name  # not yet available
-### reset set ip table_name chain_name  # not yet available
-### reset set ip6 table_name chain_name  # not yet available
-### reset set inet table_name chain_name  # not yet available
-### reset set arp table_name chain_name  # not yet available
-### reset set bridge table_name chain_name  # not yet available
-### reset set netdev table_name chain_name  # not yet available
-# reset set ruleid_spec
-### reset set table_name handle 15  # not yet available
-### reset set ip table_name handle 15  # not yet available
-### reset set ip6 table_name handle 15  # not yet available
-### reset set inet table_name handle 15  # not yet available
-### reset set arp table_name handle 15  # not yet available
-### reset set bridge table_name handle 15  # not yet available
-### reset set netdev table_name handle 15  # not yet available
-
-### reset map table_name chain_name  # not yet available
-### reset map ip table_name chain_name  # not yet available
-### reset map ip6 table_name chain_name  # not yet available
-### reset map inet table_name chain_name  # not yet available
-### reset map arp table_name chain_name  # not yet available
-### reset map bridge table_name chain_name  # not yet available
-### reset map netdev table_name chain_name  # not yet available
-### reset map table_name handle 15  # not yet available
-### reset map ip table_name handle 15  # not yet available
-### reset map ip6 table_name handle 15  # not yet available
-### reset map inet table_name handle 15  # not yet available
-### reset map arp table_name handle 15  # not yet available
-### reset map bridge table_name handle 15  # not yet available
-### reset map netdev table_name handle 15  # not yet available
-
-# FLUSH (flush_cmd)
-# flush table <table_spec>
-flush table myArpTable
-flush table netdev TABLE_NETDEV
-flush table bridge myBridgeTable
-flush table arp myArpTable
-flush table ip myIpTable
-flush table ip6 myIp6Table
-flush table inet myInetTable
-
-# flush chain <chain_spec>
-flush chain myIpTable myIpChain
-flush chain netdev myNetdev myNetdevChain
-flush chain bridge myBridge myBridgeChain
-flush chain arp myArp myArpChain
-flush chain ip myIp myIpChain
-flush chain ip6 myIp6 myIp6Chain
-flush chain inet myInet myInetChain
-flush chain myIpTable myIpChain ; flush chain netdev myNetDev X;
-
-# flush set <set_spec>
-flush set myIpTable mySet
-flush set netdev myNetdevTable mySet
-flush set bridge myBridgeTable mySet
-flush set arp myArpTable mySet
-flush set ip myIpTable mySet
-flush set ip6 myIp6Table mySet
-flush set inet myInetTable mySet ; 
-
-# flush map <set_spec>
-flush map myIpTable myIpMap 
-flush map netdev myNetdevTable myNetdevMap 
-flush map bridge myBridgeTable myBridgeMap 
-flush map arp myArpTable myArpMap 
-flush map ip myIpTable myIpMap 
-flush map ip6 myIp6Table myIp6Map 
-flush map inet myInetTable myInetMap 
-
-# flush flow table <flowtable_spec>
-flush flow table myIpTable mySet
-flush flow table netdev myNetdevTable mySet
-flush flow table bridge myBridgeTable mySet
-flush flow table arp myArpTable mySet
-flush flow table ip myIpTable mySet
-flush flow table ip6 myIp6Table mySet
-flush flow table inet myInetTable mySet ; 
-
-# flush meter <set_spec>
-flush meter myIpTable mySet
-flush meter netdev myNetdevTable mySet
-flush meter bridge myBridgeTable mySet
-flush meter arp myArpTable mySet
-flush meter ip myIpTable mySet
-flush meter ip6 myIp6Table mySet
-flush meter inet myInetTable mySet ; 
-
-# flush ruleset <ruleset_spec>
-flush ruleset
-flush ruleset netdev
-flush ruleset bridge
-flush ruleset arp
-flush ruleset ip
-flush ruleset ip6
-flush ruleset inet
-
-# replace rule <ruleid_spec> <rule>  # TODO
-rename chain myIpTable myIpChain newMyIpChain
-rename chain netdev myNetdevTable myNetdevChain newMyNetdevChain    ;    
-rename chain bridge myBridgeTable myBridgeChain newMyBridgeChain;
-rename chain arp myArpTable myArpChain newMyArpChain  ;
-rename chain ip myIpTable myIpChain newMyIpChain    ;    # comment
-rename chain ip6 myIp6Table myIp6Chain newMyIp6Chain  # comment
-rename chain inet myInetTable myInetChain newMyInetChain
-
-# IMPORT
-import ruleset xml
-import ruleset json
-import ruleset vm json
-
-# export_cmd
-export ruleset xml
-export ruleset json
-
-
-
-# add quota <obj_spec> <quota_obj>
-# add quota <obj_spec> <quota_config>
-# add quota <obj_spec> <quota_mode> NUM <quota_unit> <quota_used>
-# create quota <obj_spec> <quota_obj>
-# create quota <obj_spec> <quota_config>
-# create quota <obj_spec> <quota_mode> NUM <quota_unit> <quota_used>
-#
-# also as part of 'table':
-# <table_block> quota <quota_name> { <quota_block> }
-# table myTable {
-#     chain myChain {
-#         quota <quota_name> { <quota_block; ... }
-#         <quota_stmt>
-#         quota <quota_mode> NUM <quota_unit> <quota_used>
-#         quota name <stmt_expr>
-#     }
-# }
-# <rule>
-# <rule_alloc>
-# <rule_alloc> <comment>
-# <stmt_list> <comment>
-# <stmt> <comment>
-# <quota_stmt> <quota_stmt>
-# quota <quota_mode> NUM <quota_unit> <quota_used>
-# quota <quota_config>  # Let's use this condense version
-#
-# TODO Need to study syntax for secmark/synproxy
-
-#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-# list quota <obj_spec>
-list quota
-list quota myInetTable myInetChain
-list quota netdev myNetdevTable myNetdevChain
-list quota bridge myBridgeTable myBridgeChain
-list quota arp myArpTable myArpChain
-list quota ip myIpTable myIpChain
-list quota ip6 myIp6Table myIp6Chain
-list quota inet myInetTable myInetChain
-
-# list limits <ruleset_spec>
-list limits
-list limits netdev
-list limits bridge
-list limits arp
-list limits ip
-list limits ip6
-list limits inet
-
-# list limit <obj_spec>
-list limit myIpTable myIpChain
-list limit netdev myNetdevTable myNetdevChain
-list limit ip myBridgeTable myBridgeChain
-list limit ip myArpTable myArpChain
-list limit ip myIpTable myIpChain
-list limit ip myIp6Table myIp6Chain
-list limit ip myInetTable myInetChain
-
-# list ruleset <ruleset_spec>
-list ruleset   
-list ruleset  ;  
-list ruleset netdev
-list ruleset bridge
-list ruleset arp
-list ruleset ip
-list ruleset ip6
-list ruleset inet
-list ruleset inet
-
-list ruleset netdev oopsie;  # invalid syntax
-
-list flowtable netdev myIpTable myIpFT  # intentional syntax error
-# list flow tables <ruleset_spec>
-list flow tables   
-list flow tables  ;  
-list flow tables netdev
-list flow tables bridge
-list flow tables arp
-list flow tables ip
-list flow tables ip6
-list flow tables inet
-
-# list flow table <set_spec>
-list flow table   
-list flow table  ;  
-list flow table myIpTable myIpFlow;  
-list flow table netdev myNetdevTable myNetdevFlow
-list flow table bridge myBridgeTable myBridgeFlow
-list flow table arp myArpTable myArpFlow
-list flow table ip myIpTable myIpFlow;  
-list flow table ip6 myIp6Table myIp6Flow
-list flow table inet myInetTable myInetFlow
-
-# list meters <ruleset_spec>
-list meters   
-list meters  ;  
-list meters netdev
-list meters bridge
-list meters arp
-list meters ip
-list meters ip6
-list meters inet
-
-# list meter <set_spec>
-list meter myIpTable myIpMeter
-list meter myIpTable myIpMeter ;  
-list meter netdev myNetdevTable myNetdevMeter
-list meter bridge myBridgeTable myBridgeMeter
-list meter arp myArpTable myArpMeter
-list meter ip myIpTable myIpMeter
-list meter ip6 myIp6Table myIp6Meter
-list meter inet myInetTable myInetMeter
-list meter ip filter flood
-
-# list flowtables <ruleset_spec>
-#   (legacy keywords, got joined together later on)
-list flowtables   
-list flowtables  ;  
-list flowtables netdev
-list flowtables bridge
-list flowtables arp
-list flowtables ip
-list flowtables ip6
-list flowtables inet
-
-# list maps <ruleset_spec>
-list maps
-list maps netdev 
-list maps bridge 
-list maps arp 
-list maps ip 
-list maps ip6 
-list maps inet 
-
-# list map <set_spec>
-list map myIpTable myIpMap 
-list map netdev myNetdevTable myNetdevMap 
-list map bridge myBridgeTable myBridgeMap 
-list map arp myArpTable myArpMap 
-list map ip myIpTable myIpMap 
-list map ip6 myIp6Table myIp6Map 
-list map inet myInetTable myInetMap 
-
-# list ct helpers table <table_spec>
-list ct helpers table 
-list ct helpers table myIpTable
-list ct helpers table netdev myNetdevTable
-list ct helpers table bridge myBridgeTable
-list ct helpers table arp myArpTable
-list ct helpers table ip myIpTable
-list ct helpers table ip6 myIp6Table
-list ct helpers table inet myInetTable
-
-# list ct helpers table <table_spec>
-list ct helpers table myIpTable
-list ct helpers table netdev myNetdevTable
-list ct helpers table bridge myBridgeTable
-list ct helpers table arp myArpTable
-list ct helpers table ip myIpTable
-list ct helpers table ip6 myIp6Table
-list ct helpers table inet myInetTable
-
-ct helper myHelper { type "myFtp" protocol tcp ; l3proto ip }
-
-export json
-export xml
-export ruleset json
-export ruleset xml
-
-describe tcp flag; # oopsie
-
-# reset counters <ruleset_spec>
-reset counters
-reset counters netdev
-reset counters bridge
-reset counters arp
-reset counters ip
-reset counters ip6
-reset counters inet
-
-# reset counters table <table_spec>
-reset counters table myIpTable
-reset counters table netdev myNetdevTable
-reset counters table bridge myBridgeTable
-reset counters table arp myArpTable
-reset counters table ip myIpTable
-reset counters table ip6 myIp6Table
-reset counters table inet myInetTable
-
-# reset counter <obj_spec>
-reset counter netdev
-reset counter bridge
-reset counter arp
-reset counter ip
-reset counter ip6
-reset counter inet
-reset counter netdev myNetdevTable
-reset counter bridge myBridgeTable
-reset counter arp myArpTable
-reset counter ip myIpTable
-reset counter ip6 myIp6Table
-reset counter inet myInetTable
-
-# reset counter <objid_spec>
-reset counter myIpTable handle 5
-reset counter netdev myNetdevTable handle 5
-reset counter bridge myBridgeTable handle 5
-reset counter arp myArpTable handle 5
-reset counter ip myIpTable handle 5
-reset counter ip6 myIp6Table handle 5
-reset counter inet myInetTable handle 5
-
-
-# delete chain <chain_spec>
-delete chain myIpTable myIpChain
-delete chain netdev myNetdev myNetdevChain
-delete chain bridge myBridge myBridgeChain
-delete chain arp myArp myArpChain
-delete chain ip myIp myIpChain
-delete chain ip6 myIp6 myIp6Chain
-delete chain inet myInet myInetChain
-# delete chain <chainid_spec>
-delete chain myInet handle 123123
-delete chain inet myInet handle 42 # comment
-
-# MONITOR
-monitor 
-
-# monitor [new | destroy] [tables | chains | sets | rules | elements] [xml | json]
-# monitor <monitor_event> 
-monitor new  # monitor 'ANY'
-# monitor <monitor_event> <monitor_object> 
-monitor new tables 
-monitor new chains
-monitor new sets
-monitor new rules
-monitor new elements 
-monitor new ruleset
-monitor new trace 
-# monitor /* empty */ <monitor_object> 
-monitor tables;
-monitor chains
-monitor sets
-monitor rules
-monitor elements
-monitor ruleset
-monitor trace
-# monitor /* empty */ <monitor_object> <monitor_format>
-monitor tables json;
-monitor chains xml
-monitor sets json
-monitor rules vm json
-monitor elements json
-monitor ruleset json
-monitor trace json
-monitor trace json
-# monitor <monitor_event> <monitor_object> <monitor_format>
-monitor new tables json
-monitor new chains json
-monitor new sets vm json
-monitor new rules json
-monitor new elements json
-monitor new ruleset json
-monitor new trace  json
-#
-monitor destroy 
-monitor destroy tables 
-monitor destroy chains
-monitor destroy sets
-monitor destroy rules
-monitor destroy elements
-monitor destroy trace 
-
-# COMPLEX REAL-WORLD EXAMPLES
-table arp A0b_._/RP_TABLE {
-    chain ARP_INPUT_FILTER {
-       type filter hook input priority 0;
-       policy drop;
-       counter log drop
+list chain table_name chain_name ct
+
+# 
+# connlimit_stmt->stateful_stmt->stmt->rule_position->rule->add_cmd
+ct count 123
+ct count 123
+rule ct count over 123
+add rule ct count over 15
+
+##########################################################################
+# complex
+##########################################################################
+table inet raw {  # nftables manpage
+  chain prerouting {
+      type filter hook prerouting priority raw;
+      ct zone set iif map { "eth1" : 1, "veth1" : 2 }
+  }
+  chain output {
+      type filter hook output priority raw;
+      ct zone set oif map { "eth1" : 1, "veth1" : 2 }
+  }
+}
+
+table ip filter {  # nftables manpage
+    ct timeout customtimeout {
+        protocol tcp;
+        l3proto ip
+        policy = { established: 120, close: 20 }
     }
-    chain ARP_INPUT_FILTER {
-       type filter hook prerouting priority 0;
-       policy drop;
-       counter log return
-    }
-    chain workstation_arp_filter_output {
-        type filter hook output priority 0;
-        policy drop;
-        counter log drop
+    chain output {
+        type filter hook output priority filter; policy accept;
+        ct timeout set "customtimeout"
     }
 }
 
-table netdev NETDEV_TABLE {
-    # mind the NIC, it must exists
-    chain ingress_filter_netdev_lo { 
-        type filter hook ingress device lo priority -100; policy accept
-        udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
-    };
-    chain red_ingress_netdev_eth0 { 
-        # You'll get a cryptic error if 'device eth0' is missing after 'chain'
-        type filter hook ingress device eth0 priority -100; 
-        policy accept;
-
-        # tcp dport 80 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set jhash ip saddr . tcp sport mod 2 map { 0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
-        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+table inet myhelpers {  # nftables manpage
+    ct helper ftp-standard {
+        type "ftp" protocol tcp
     }
-}
-
-table bridge workstation_bridge {
-    chain workstn_bridge_filter_input {
-        type filter hook input priority -200;
-        policy accept;
-        ct state established,related accept # handle 4
-        ct helper ftp-standard {
-            type "ftp" protocol tcp
-        }
-    }
-    chain workstn_bridge_filter_output {
-        type filter hook output priority -200;
-        policy accept;
-    }
-
-    chain workstn_bridge_filter_forward {
-        type filter hook forward priority -200;
-        # default drop on all bridge forwarding
-        policy drop;
-
-        oif eth0 ip protocol icmp icmp type echo-request accept
-        iif eth0 ip protocol icmp icmp type echo-reply accept
-        counter log drop
-    }
-}
-
-table inet INET_TABLE {
-define interface_name2 = "br0"
-    chain workstation_inet_filter_input {
-        # Things that make this chain unique (input, filter)
-        type filter hook input priority 0;
-        policy drop;
-        iif lo accept
-        # Things that make this chain unique ('eth0', input, filter)
-        # meta iifname != $interface_name2 drop;  # workstation wants all intfs
-        # Let things back in if they've been established before new firewall
-        ct state established,related accept;
-        #  DNS 
-        tcp dport 53 counter accept 
-        udp dport 53 counter accept 
-        #  Multicast DNS 
-        tcp dport 5353 counter accept
-        # RFC 6092 - Simple Security in IPv6 Gateway CPE
-        # recommends that the DEFAULT
-        #   operating mode for residential IPv6 simple security be to treat
-        #   Generic Packet Tunneling [RFC2473] and similar protocols as opaque
-        #   transport layers, i.e., inbound tunnel initiations are denied and
-        #   outbound tunnel initiations are accepted.
-
-        # To facilitate the use of IPsec in support of IPv6
-        # mobility, the Internet Key Exchange (IKE) protocol [RFC5996] and the
-        # Host Identity Protocol (HIP) [RFC5201] should also be permitted in
-        # the DEFAULT operating mode.
-
-        #  Workstation
-        icmp type {
-            destination-unreachable, 
-            time-exceeded, 
-            parameter-problem
-        } counter accept
-
-        # Router/Gateway
-        icmp type {
-            destination-unreachable, 
-            redirect, 
-            time-exceeded, 
-            parameter-problem, 
-            router-advertisement, 
-            router-solicitation
-            } counter accept
-
-        # All ICMP
-        icmp type {
-            echo-reply, 
-            destination-unreachable, 
-            source-quench, redirect, 
-            echo-request, 
-            time-exceeded, 
-            parameter-problem, 
-            timestamp-request, 
-            timestamp-reply, 
-            info-request, 
-            info-reply, 
-            address-mask-request, 
-            address-mask-reply, 
-            router-advertisement, 
-            router-solicitation
-            } counter accept
-
-        tcp dport 25 counter accept    # smtp
-        tcp dport 465 counter accept   # submission
-        # SSH server
-        tcp dport ssh counter accept 
-        
-        tcp dport 514 counter accept    # syslog
-        tcp dport 6514 counter accept   # secured syslog
-
-        tcp dport 80 counter accept 
-        tcp dport 443 counter accept 
-
-        # IP-specific
-        # meta ip goto workstation_inet_filter_input_ip
-        # meta ip6 goto workstation_inet_filter_input_ip6
-        # meta vlan goto workstation_inet_filter_input_vlan
-        # meta arp goto workstation_inet_filter_input_arp
-
-        # Just in case that someone screws up our 'policy drop'
-
-        # multi-family reject, using the icmpx keyword
-        counter log reject with icmpx type admin-prohibited
-    };
-    # ARP filter input
-    chain workstation_arp_filter_input {
-        counter log reject
-    }
-    # ARP filter output
-    chain workstation_arp_filter_output {
-        #  Multicast DNS 
-        tcp dport 5353 counter accept
-        #  DNS 
-        tcp dport 53 counter accept 
-        udp dport 53 counter accept 
-
-        #  Workstation
-        icmp type {
-            destination-unreachable, 
-            time-exceeded, 
-            parameter-problem
-            } counter accept
-
-        # Router/Gateway
-        icmp type {
-            destination-unreachable, 
-            redirect, 
-            time-exceeded, 
-            parameter-problem, 
-            router-advertisement, 
-            router-solicitation
-            } counter accept
-
-        # All ICMP
-        icmp type {
-            echo-reply, 
-            destination-unreachable, 
-            source-quench, redirect, 
-            echo-request, 
-            time-exceeded, 
-            parameter-problem, 
-            timestamp-request, 
-            timestamp-reply, 
-            info-request, 
-            info-reply, 
-            address-mask-request, 
-            address-mask-reply, 
-            router-advertisement, 
-            router-solicitation
-            } counter accept
-
-        tcp dport 25 counter accept    # smtp
-        tcp dport 465 counter accept   # submission
-        # SSH server
-        tcp dport ssh counter accept 
-
-        tcp dport 514 counter accept    # syslog
-        tcp dport 6514 counter accept   # secured syslog
-
-        tcp dport 80 counter accept 
-        tcp dport 443 counter accept 
-
-        counter log reject
-    }
-    #IPv6 filtering
-    chain workstation_ip6_filter_input {
-        counter log reject
-    }
-    #IPv6 filtering
-    chain workstation_inet_filter_input_ip6 {
-        counter log reject
-    }
-    #IPv6 filtering
-    chain workstation_inet_filter_input_ip6 {
-        counter log reject
-    }
-}
-
-table ip workstn_ip_nat {
-    chain workstn_ip_nat_postrouting {
-        type nat hook postrouting priority 0;
-        #Likewise, in iptables NAT (source NAT):
-        # % iptables -t nat -A POSTROUTING -s 192.168.1.1 -j SNAT --to-source 1.1.1.1
-        # % iptables -t nat -A POSTROUTING -s 192.168.2.2 -j SNAT --to-source 2.2.2.2
-        # % iptables -t nat -A POSTROUTING -s 192.168.3.3 -j SNAT --to-source 3.3.3.3
-
-        # Translated to a nftables one-liner:
-
-        # snat ip saddr map { 
-        #     192.168.1.1 : 1.1.1.1, 
-        #     192.168.2.2 : 2.2.2.2, 
-        #     192.168.3.3 : 3.3.3.3 
-       #  }
-    }
-}
-
-
-# ct mark set meta mark
-
-table inet raw {
     chain prerouting {
-        type filter hook prerouting priority -300;
+        type filter hook prerouting priority filter;
+        tcp dport 21 ct helper set "ftp-standard"
+    }
+}
+
+table inet raw {  # nftables manpage
+    chain prerouting {
+        type filter hook prerouting priority raw;
         ct zone set iif map { "eth1" : 1, "veth1" : 2 }
     }
     chain output {
-        type filter hook output priority -300;
+        type filter hook output priority raw;
         ct zone set oif map { "eth1" : 1, "veth1" : 2 }
     }
 }
+ct event set new,related,destroy  # nftables manpage
+table ip x {
+    chain z {
+        type filter hook input priority filter; policy accept;
+        ct state invalid, untracked synproxy mss 1460 wscale 9 timestamp sack-perm
+        ct state invalid drop
+    }
+}
 
-table inet filter {
+table inet filter {  # nftables manpage
     chain input {
-        type filter hook input priority 0; policy accept;
+        type filter hook input priority filter; policy accept;
         ct state established,related accept # handle 4
         ip saddr 10.1.1.1 tcp dport ssh accept # handle 5
     }
 }
-table ip my_filter_table {
-    set my_connlimit {
-        type ipv4_addr
-        size 65535
-        flags dynamic
-    }
-
-    chain my_output_chain {
-        type filter hook output priority filter; policy accept;
-        ct state new add @my_connlimit { ip daddr ct count over 20 } counter packets 0 bytes 0 drop
-   }
-}
-
-table ip filter {
-    set myset {
-        type inet_service
-        flags timeout
-        elements = { http expires 9s}
-    }
-
-    chain input {
-        type filter hook input priority 0; policy accept;
-        update @myset { tcp dport timeout 1m }
-    }
-}
-
-table ip filter {
-    set myset {
-        type ipv4_addr
-        elements = { 1.1.1.1 }
-    }
-
-    chain input {
-        type filter hook input priority 0; policy accept;
-        add @myset { ip saddr }
-    }
-}
-
-table inet myfilter {
-    set myset {
-        type ipv4_addr
-        flags timeout
-        elements = { 10.0.0.1 timeout 10s expires 8s}
-    }
-}
-
-# fw.basic
-table ip filter {
-    chain input {
-        type filter hook input priority 0;
-        # accept traffic originated from us
-        ct state established,related accept
-        # accept any localhost traffic
-        iif lo accept
-        # count and drop any other traffic
-        counter drop
-    }
-}
-
-# fw6.basic
-table ip6 filter {
-    chain input {
-        type filter hook input priority 0;
-        # accept any localhost traffic
-        iif lo accept
-        # accept traffic originated from us
-        ct state established,related accept
-        # accept neighbour discovery otherwise connectivity breaks
-        icmpv6 type { nd-neighbor-solicit, echo-request, nd-router-advert, nd-neighbor-advert } accept
-        # count and drop any other traffic
-        counter drop
-    }
-}
-
-# fw.inet.basic
-table inet filter {
-    chain input {
-        type filter hook input priority 0;
-        # accept any localhost traffic
-        iif lo accept
-        # accept traffic originated from us
-        ct state established,related accept
-        # accept neighbour discovery otherwise connectivity breaks
-        ip6 nexthdr icmpv6 icmpv6 type { nd-neighbor-solicit, echo-request, nd-router-advert, nd-neighbor-advert } accept
-        # count and drop any other traffic
-        counter drop
-    }
-}
-
-table inet filter {
-    chain global {
-        ct state established,related accept
-        ct state invalid drop
-        ip protocol icmp accept
-        ip6 nexthdr icmpv6 accept
-        udp dport 53 accept
-    }
-    set myset_ipv4 {
-        type ipv4_addr;
-        elements = { $server1_ipv4 , $workstation1_ipv4 }
-    }
-    set myset_ipv6 {
-        type ipv6_addr;
-        elements = { $server1_ipv6 , $workstation1_ipv6 }
-    }
-    chain dmz_in {
-        # your rules for traffic to your dmz servers
-        ip saddr @myset_ipv4
-        ip6 saddr @myset_ipv6
-    }
-    chain dmz_out {
-        # your rules for traffic from the dmz to internet
-    }
-    chain lan_in {
-        # your rules for traffic to your LAN nodes
-    }
-    chain lan_out {
-        # your rules for traffic from the LAN to the internet
-    }
-    chain forward {
-        type filter hook forward priority 0; policy drop;
-        jump global
-        oifname vmap { $nic_dmz : jump dmz_in , $nic_lan : jump lan_in }
-        oifname $nic_inet iifname vmap { $nic_dmz : jump dmz_out , $nic_lan : jump lan_out }
-    }
-    chain input {
-        type filter hook input priority 0 ; policy drop;
-        jump global
-        # your rules for traffic to the firewall here
-    }
-    chain output {
-        type filter hook output priority 0 ; policy drop;
-        jump global
-        # your rules for traffic originated from the firewall itself here
-    }
-}
-
-# Port Knocking Example #1
-table inet portknock {
-    set clients_ipv4 {
-        type ipv4_addr
-        flags timeout
-    }
-    set clients_ipv6 {
-        type ipv6_addr
-        flags timeout
-    }
-    set candidates_ipv4 {
-        type ipv4_addr . inet_service
-        flags timeout
-    }
-    set candidates_ipv6 {
-        type ipv6_addr . inet_service
-        flags timeout
-    }
-    chain input {
-        type filter hook input priority -10; policy accept;
-
-        iifname "lo" return
-
-        tcp dport 123 add @candidates_ipv4 {ip  saddr . 234 timeout 1s}
-        tcp dport 123 add @candidates_ipv6 {ip6 saddr . 234 timeout 1s}
-        tcp dport 234 ip  saddr . tcp dport @candidates_ipv4 add @candidates_ipv4 {ip  saddr . 345 timeout 1s}
-        tcp dport 234 ip6 saddr . tcp dport @candidates_ipv6 add @candidates_ipv6 {ip6 saddr . 345 timeout 1s}
-        tcp dport 345 ip  saddr . tcp dport @candidates_ipv4 add @candidates_ipv4 {ip  saddr . 456 timeout 1s}
-        tcp dport 345 ip6 saddr . tcp dport @candidates_ipv6 add @candidates_ipv6 {ip6 saddr . 456 timeout 1s}
-        tcp dport 456 ip  saddr . tcp dport @candidates_ipv4 add @clients_ipv4 {ip  saddr timeout 10s} log prefix "Successful portknock: "
-        tcp dport 456 ip6 saddr . tcp dport @candidates_ipv6 add @clients_ipv6 {ip6 saddr timeout 10s} log prefix "Successful portknock: "
-        tcp dport $guarded_ports ip  saddr @clients_ipv4 counter accept
-        tcp dport $guarded_ports ip6 saddr @clients_ipv6 counter accept
-        tcp dport $guarded_ports ct state established,related counter accept
-        tcp dport $guarded_ports counter reject with tcp reset
-    }
-}
-
-# Port Knocking Example #2
-table ip Inet4 {
-    set Knocked_1 {
-        type ipv4_addr
-        flags timeout
-        timeout 10s
-        gc-interval 4s
-    }
-    set Knocked_2 {
-        type ipv4_addr
-        flags timeout
-        timeout 10s
-        gc-interval 4s
-    }
-    set Knocked_3 {
-        type ipv4_addr
-        flags timeout
-        timeout 10s
-        gc-interval 4s
-    }
-    set Knocked_4 {
-        type ipv4_addr
-        flags timeout
-        timeout 2m
-        gc-interval 4s
-    }
-
-    chain Knock_1 {
-        set add ip saddr @Knocked_1
-    }
-    chain Unknock_1 {
-        set update ip saddr timeout 0s @Knocked_1
-    }
-    chain Knock_2 {
-        set update ip saddr timeout 0s @Knocked_1
-        set add ip saddr @Knocked_2
-    }
-    chain Unknock_2 {
-        set update ip saddr timeout 0s @Knocked_2
-    }
-    chain Knock_3 {
-        set update ip saddr timeout 0s @Knocked_2
-        set add ip saddr @Knocked_3
-    }
-    chain Unknock_3 {
-        set update ip saddr timeout 0s @Knocked_3
-    }
-    chain Knock_4 {
-        set update ip saddr timeout 0s @Knocked_3
-        set add ip saddr @Knocked_4 log prefix "Port-Knock accepted: "
-    }
-    chain RefreshKnock {
-        set update ip saddr timeout 2m @Knocked_4
-    }
-    chain PortKnock {
-        ct state new ip saddr @Knocked_4 goto RefreshKnock
-        tcp dport 456 ct state new ip saddr @Knocked_3 goto Knock_4
-        tcp dport 345 ct state new ip saddr @Knocked_3 return
-        ip saddr @Knocked_3 ct state new goto Unknock_3
-        tcp dport 345 ct state new ip saddr @Knocked_2 goto Knock_3
-        tcp dport 234 ct state new ip saddr @Knocked_2 return
-        ip saddr @Knocked_2 ct state new goto Unknock_2
-        tcp dport 234 ct state new ip saddr @Knocked_1 goto Knock_2
-        tcp dport 123 ct state new ip saddr @Knocked_1 return
-        ip saddr @Knocked_1 ct state new goto Unknock_1
-        tcp dport 123 ct state new goto Knock_1
-    }
-    chain FilterIn {
-        type filter hook input priority 0
-        policy drop
-
-        # allow established/related connections
-        ct state established,related accept
-
-        # early drop of invalid connections
-        ct state invalid drop
-
-        # allow from loopback
-        meta iif lo accept
-
-        # allow icmp
-        ip protocol icmp accept
-
-        # port-knocking
-        jump PortKnock
-
-        # misc. filtering
-        # ...
-    }
-
-    chain FilterOut {
-        type filter hook output priority 0
-        policy accept
-    }
-}
-
-# Classification to tc structure
-table ip filter {
-   map subnet_map {
-       type ipv4_addr : verdict
-       flags interval
-       elements = { 10.20.255.48/29 : goto group_114, 10.20.255.88/29 : goto group_114,
-                    10.20.255.128/29 : goto group_114 }
-   }
-   set priority_set {
-       type ipv4_addr
-       flags interval
-       elements = { 8.8.8.8, 8.8.4.4 }
-   }   
-   map group_114 {
-       type ipv4_addr : classid
-       flags interval
-       elements = { 10.20.255.50 : 1:ffd8, 10.20.255.90 : 1:ffd5,
-                     10.20.255.130 : 1:ffd2 }
-   }
-   map group_114_prio {
-       type ipv4_addr : classid
-       flags interval
-       elements = { 10.20.255.50 : 1:ffd9, 10.20.255.90 : 1:ffd6,
-                     10.20.255.130 : 1:ffd3 }
-   }   
-   chain forward {
-       type filter hook forward priority filter; policy accept;
-       meta priority none ip daddr vmap @subnet_map counter packets 0 bytes 0
-       meta priority none ip saddr vmap @subnet_map counter packets 0 bytes 0
-       ip daddr 192.168.0.0/16 meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "total - "
-       ip saddr 192.168.0.0/16 meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "total - "
-       ip daddr 10.0.0.0/8 meta priority none meta priority set 1:ffff counter packets 38931 bytes 2926076 log prefix "total - "
-       ip saddr 10.0.0.0/8 meta priority none meta priority set 1:ffff counter packets 14 bytes 1064 log prefix "total - "
-       meta priority none meta priority set 1:2 counter packets 0 bytes 0 log prefix "non_shaped - "
-   }
-   chain input {
-       type filter hook input priority filter; policy accept;
-       meta priority none meta priority set 1:2 counter packets 419381 bytes 45041195
-   }
-   chain output {
-       type filter hook output priority filter; policy accept;
-       meta priority none meta priority set 1:2 counter packets 507779 bytes 51809859
-   }
-   chain group_114 {
-       meta priority none ip saddr @priority_set meta priority set ip daddr map @group_114_prio counter packets 0 bytes 0
-       meta priority none ip daddr @priority_set meta priority set ip saddr map @group_114_prio counter packets 0 bytes 0
-       meta priority none meta priority set ip daddr map @group_114 counter packets 0 bytes 0
-       meta priority none meta priority set ip saddr map @group_114 counter packets 0 bytes 0
-       meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "group_114 - "
-   }
-}
-
-# Will count all udp port 5060 packets towards the 
-# quota and drop all packets once the quota hits 
-# its "over 100 mbytes" threshold.
-table inet foo {
-    quota example { over 100 mbytes used 0 bytes }
-
-    chain dropafterquota {
-        type filter hook postrouting priority 0; policy accept;
-        udp port 5060 quota name "example" drop
-    }
-}
-table ip x {
-    chain c {
-        ct timeout set saddr map {
-            192.168.0.14 :"policy1"
-        }
-    }
-    ct timeout "policy1" {
-        protocol tcp
-        timeouts = {
-            established: 120s
-            fin_wait: 30;
-        }
-    }
-}
-
-table firewall {
-  chain incoming {
-    type filter hook input priority 0; policy drop;
-
-    # established/related connections
-    ct state established,related accept
-
-    # loopback interface
-    iifname lo accept
-
-    # icmp
-    icmp type echo-request accept
-
-    # open tcp ports: sshd (22), httpd (80)
-    tcp dport { ssh, http } accept
-  }
-}
-
-table ip6 firewall {
-  chain firewall incoming {
-    type filter hook input priority 0; policy drop;
-
-    # established/related connections
-    ct state established,related accept
-
-    # invalid connections
-    ct state invalid drop
-
-    # loopback interface
-    iifname lo accept
-
-    # icmp
-    # routers may also want: mld-listener-query, nd-router-solicit
-    icmpv6 type { echo-request, nd-neighbor-solicit } accept
-
-    # open tcp ports: sshd (22), httpd (80)
-    tcp dport { ssh, http } accept
-  }
-}
-
-#  No error syntaxes here
-#  See error-syntaxes.nft for actual errors in Vim/NeoVim syntax error
-
-# Bison: SET set_spec 
-set myTable mySetName 
-set ip myTable mySetName 
-set ip6 myTable mySetName 
-set inet myTable mySetName 
-set arp myTable mySetName 
-set bridge myTable mySetName 
-set netdev myTable mySetName 
-list sets table table_name chain_name   # extraneous chain_name
-list sets table ip table_name chain_name  # extraneous chain_name
-list sets table ip6 table_name chain_name  # extraneous chain_name
-list sets table inet table_name chain_name  # extraneous chain_name
-list sets table arp table_name chain_name  # extraneous chain_name
-list sets table bridge table_name chain_name
-list sets table netdev table_name chain_name
-reset quota ip
-reset quota ip6
-reset quota inet
-reset quota arp
-reset quota bridge
-reset quota netdev
-reset quota ip myIpFilter https-quota
-reset quota ip6 myIp6Filter https-quota
-reset quota inet myInetFilter https-quota
-reset quota arp myArpFilter https-quota
-reset quota bridge myBridgeFilter https-quota
-reset quota netdev myBridgeFilter https-quota
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
+
+# add_cmd with the 'add'
+# add ct helper <obj_spec> '{' ct_helper_block '}'
+ct helper table_id { };
+add ct helper table_id { };
+add rule ct helper table_id { };
+add ct helper table_id { ; }
+add ct helper table_id { ; };
+add ct helper table_id { type "sip" protocol tcp; l3proto ip; }
+add ct helper ip table_id cth { type "sip" protocol tcp; l3proto ip; }
+# add ct timeout obj_spec ct_obj_alloc '{' ct_timeout_block '}' close_scope_ct
+# Bison: ADD CT timeout myTimeout '{' .... '}'
+# Bison: ADD CT TIMEOUT obj_spec ct_obj_alloc '{' ct_timeout_block '}' close_scope_ct
+add ct timeout table_id ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout netdev myNetdevTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout bridge myBridgeTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout arp myArpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout ip table_id ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout ip6 myIp6Table ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+add ct timeout inet myInetTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+
+add ct expectation table_id e_pgsql {
+        protocol tcp
+        dport 5432
+        timeout 1h
+        size 12
+        l3proto ip
+    }
 
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
@@ -2159,3 +775,17 @@ reset quota netdev myBridgeFilter https-quota
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
 
+ct helper  # premature EOS
+ct timeout  # premature EOS
+ct expectation  # premature EOS
+
+add ct helper  # premature EOS
+add ct timeout  # premature EOS
+add ct expectation  # premature EOS
+
+create ct helper  # premature EOS
+create ct timeout  # premature EOS
+create ct expectation  # premature EOS
+
+list table ct  # premature EOS
+list ct helpers table 

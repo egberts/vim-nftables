@@ -125,18 +125,25 @@ add chain inet T C { type filter hook input priority 0 }
  add chain inet T C { type filter hook input priority 0 }
 
 table inet base_table {
-        chain input_filter {
-                 type filter hook input priority 0;
-                 flags offload;
-                 devices = { br0,eth0 };
-                 comment "A nice long comment line"
-                 iifname "lo" accept # handle 3
-                 ct state established,related accept # handle 2
-                 ip protocol icmp accept # handle 4
-                 drop # handle 5
-        }
+  chain input_filter {
+    type filter hook input priority 0;
+    flags offload;
+    devices = $MYVARIABLE;
+    devices = $MYVARIABLE;   
+    comment "A nice long comment line"
+    iifname "lo" accept  # handle 3
+    ct state established,related accept  # handle 2
+    ip protocol icmp accept  # handle 4
+    drop  # handle 5
+    devices = { "quoted_string", $MYVAR, string }  ;
+    devices = { $MYVARIABLE } ;;;;;    ;
+    devices = { MYVARIABLE } ;;;;;    ;
+    devices = { br0 };
+    devices = { "wlan1" };
+    devices = { "br0", $MYVARIABLE, eth0 };
+    devices = { br0,eth0 };
+  }
 }
-list chain inet base_table input_filter
 
 table inet base_filter {
 	chain input_filter {
@@ -576,6 +583,7 @@ element filter blackhole { 10.2.3.4, 10.23.1.42 }
 
 # flowtable <flowtable_spec> { <flowtable_block> }  # without the 'add' keyword
 # Bison: FLOWTABLE flowtable_spec flowtable_block_alloc { flowtable_block } 
+flowtable myIpTable chain_id { devices = $MYDEVICE ; }
 flowtable myIpTable chain_id { devices = { eth0, eth1 } ; }
 flowtable myIpTable myIpFT { devices = { eth0, eth1 } ; }
 # Bison: FLOWTABLE flowtable_spec flowtable_block_alloc { HOOK type PRIORITY NUM; flowtable_block } 
@@ -832,6 +840,8 @@ add rule myIpTable myIpChain handle 51 accept
 #    add rule <table_id> <chain_id> index 123 ...
 
 #    add rule <family> <table_id> <chain_id> ...
+add rule myIpTable myIpChain log ip dscp cs1
+add rule myIpTable myIpChain log ip dscp cs1
 add rule myIpTable myIpChain ip dscp cs1
 add rule myIpTable myIpChain ip dscp != cs1
 add rule myIpTable myIpChain ip dscp 0x38
@@ -1519,6 +1529,7 @@ add element ip myIpTable myTestMap { 10.11.1.15 : jump test_1_15 }
 add element filter blackhole { 10.2.3.4, 10.23.1.42 };
 
 # add flowtable <flowtable_spec> { <flowtable_block> }
+add flowtable myIpTable myIpFT { hook input priority 0; devices = $MYDEVICE ; }
 add flowtable myIpTable myIpFT { hook input priority 0; devices = { eth1, eth0 } ; }
 add flowtable ip myIpTable myIpFT { hook input priority 0; devices = { eth0, eth1 } ; }
 add flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { eth1, eth0 } ; }
@@ -2233,14 +2244,6 @@ list synproxys table inet myTable
 list synproxys table arp myTable
 list synproxys table bridge myTable
 list synproxys table netdev myTable
-
-list ruleset
-list ruleset ip
-list ruleset ip6
-list ruleset netdev
-list ruleset arp
-list ruleset bridge
-list ruleset netdev
 
 list flow tables 
 list flow tables ip

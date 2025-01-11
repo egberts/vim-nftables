@@ -164,7 +164,8 @@ table T { chain C { type filter hook ingress device $MY_DEVICE ; }; };
 table T { chain C { type filter hook ingress device $MY_DEVICE ; }; };
 table T { chain C { type filter hook ingress devices = $MY_DEVICE ; }; };
 table T { chain C { type filter hook ingress devices = $MY_DEVICE }; };
-table T { chain C { type filter hook ingress devices = { a }; };
+table T { chain C { type filter hook ingress devices = { a }; }; };
+table T { chain C { type filter hook ingress devices = { $a }; }; };
 table ip MyTable { chain C { type filter hook ingress devices = { a }; };
 table T { chain C { type filter hook ingress device eth0 priority 256 }; };
 table T { chain C { type filter hook ingress device eth0 priority 1; } };
@@ -180,8 +181,8 @@ table T { chain C { rule define = 1; comment "asdf" ;  }; };
 table T { chain C { devices=$MYDEVICE;  }; };
 table T { chain C { devices =$MYDEVICE;  }; };
 table T { chain C { devices= $MYDEVICE;  }; };
-table T { chain C { devices =    $eth0;  }; };
 table T { chain C { xxx devices = $MYDEVICE;  }; };
+table T { chain C { xxx devices = { $MYDEVICE,$SECONDDEVICE,"br0" }  }; };
 
 table myIpTable { flags dormant; }
 table netdev myNetdev { flags dormant; }
@@ -215,7 +216,7 @@ table xxxx { chain last {
 table arp A0b_._/RP_TABLE {
     chain ARP_INPUT_FILTER {
         define a = 123;
-        type filter hook input priority 0;
+        type filter hook input priority table_id;
         policy drop;
         counter log drop
     }
@@ -270,8 +271,8 @@ table netdev NETDEV_TABLE {
 table bridge workstation_bridge {
     chain workstn_bridge_filter_input {
         type filter hook input priority -200;
-        policy accept;
         ct state established,related accept # handle 4
+        policy accept;
         ct helper ftp-standard {
             type "ftp" protocol tcp
         }
@@ -470,7 +471,7 @@ table inet raw {
     chain prerouting {
         type filter hook prerouting priority -300;
         ct zone set iif map { "eth1" : 1, "veth1" : 2 }
-    }
+    };
     chain output {
         type filter hook output priority -300;
         ct zone set oif map { "eth1" : 1, "veth1" : 2 }
@@ -909,6 +910,12 @@ table T { chain C { type filter hook ingress devices = ; }; };  # incomplete
 
 table T { chain C { type filter hook ingress device eth0 priority ; }; };  # incomplete
 
+table T { chain C { devices =    $eth0,$ABC,$DEF;  }; };
+table T { chain C { devices ={ $MYVARIABLE; } } }
+table T { chain C { devices ={ MYVARIABLE } } }
+table T { chain C { devices = MYVARIABLE } }
+table T { chain C { devices = $MYVARIABLE } }
+
 table A!error
 
 
@@ -926,8 +933,14 @@ table ip6 xxxx { flags , a, b };  " oopsie
 table xxxx { chain 'MyIpNet' { chain }; };
 table xxxx { chain "MyIpNet" { chain }; };
 
-table T { chain C { devices = eth0  } }
+table T { chain C { devices =$eth0,$DEV1  } }
+table T { chain C { devices =x$eth0  } }
+table T { chain C { devices = x$eth0  } }
+table T { chain C { devices      =     not_a_variable  } }
+table T { chain C { devices      =     x$eth0  } }
+table T { chain C { devices =eth0  } }
 table T { chain C { devices = eth0;  } }
+table T { chain C { devices = { eth0; }  } }
 
 table T { chain C { devices = { eth0 } # comment
     }  # comment

@@ -11,6 +11,15 @@
 
 # base_cmd add_cmd 'rule'
 
+T C handle 2
+ip  T      C     position  1
+ip6 filter input handle 2
+arp T C index 3
+inet T C position 4
+bridge T C position 55555
+netdev T C position 6
+ netdev Tabcdef Charger position 6
+
 rule T C handle 2
 rule ip  T      C     position  1
 rule ip6 filter input handle 2
@@ -68,6 +77,104 @@ add rule ip6 myTable myChain position 1 ct reply packets set ip6 myIpTable myCTH
 add rule ip6 myTable myChain position 1 ct reply avgpkt set ip6 myIpTable myCTHchain { };
 add rule ip6 myTable myChain position 1 ct reply zone set ip6 myIpTable myCTHchain { };
 
+rule table_id chain_id log
+add rule table_id chain_id log
+
+# verdict_stmt->stmt
+tableid chainid vmap 
+table_id chain_id vmap
+table_id chain_id vmap { }
+table_id chain_id vmap at ABC
+
+# match_stmt->stmt
+tableid chainid match 
+
+# meter_stmt->stmt
+tableid chainid meter 
+
+# ip_hdr_spec->payload_stmt->stmt
+tableid chainid ip hdrlength
+
+# stateful_stmt->stmt
+tableid chainid counter bytes 512
+tableid chainid counter packets 3
+tableid chainid limit rate
+tableid chainid quota  
+tableid chainid ct count 1
+tableid chainid ct count over 15
+tableid chainid last
+add rule tableid chainid last
+tableid chainid last used
+tableid chainid last used never
+tableid chainid last used 1h
+
+# meta_stmt->stmt
+
+# log_stmt->stmt
+tableid chainid log
+tableId chainId log prefix
+tableId chainId log group 15
+tableId chainId log snaplen 512
+tableId chainId log queue-threshold 5
+tableId chainId log level log_string
+tableId chainId log flags tcp seq
+tableId chainId log flags tcp seq,options
+tableId chainId log flags tcp options,seq
+tableId chainId log flags tcp options
+tableId chainId log flags ip options
+tableId chainId log flags skuid
+tableId chainId log flags ether
+tableId chainId log flags all
+
+# reject_stmt->stmt
+tableId chainId reject 
+
+# nat_stmt->stmt
+tableId chainId snat 
+tableId chainId dnat 
+
+# masq_stmt->stmt
+tableId chainId masq 
+
+# redir_stmt->stmt
+tableId chainId redir 
+
+# tproxy_stmt->stmt
+tableId chainId tproxy 
+
+# queue_stmt->stmt
+tableId chainId queue 
+
+# ct_stmt->stmt
+tableId chainId ct 
+
+# dup_stmt->stmt
+tableId chainId dup 
+
+# fwd_stmt->stmt
+tableId chainId fwd 
+
+# set_stmt->stmt
+tableId chainId set 
+
+# map_stmt->stmt
+tableId chainId map 
+
+# synproxy_stmt->stmt
+tableId chainId synproxy 
+
+# chain_stmt->stmt
+tableId chainId chain 
+
+# optstrip_stmt->stmt
+tableId chainId optstrip 
+
+# xt_stmt->stmt
+tableId chainId xt 
+
+# objref_stmt->stmt
+tableId chainId counter name
+tableid chainid limit name
 
 
 ##################################################################################

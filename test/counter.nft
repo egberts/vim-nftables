@@ -1,41 +1,34 @@
 #!/usr/sbin/nft -f
-# File: log.nft
-# Description: A test NFT file to exercise 'log' Vim syntax highlightings.
+# File: counter.nft
+# Description: A test NFT file to exercise 'counter' Vim syntax highlightings.
 #
-# base_cmd log_cmd
-# nft_line/nft_base_cmd/nft_base_cmd_log
+# bison symbol:   counter_stmt
+# syntax pathway: counter_stmt->stateful_stmt->(stmt|stateful_stmt_list)
 #
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 
-# base_cmd log_cmd
 
-rule table_id chain_id log 
-add rule table_id chain_id log 
+# counter_stmt->stateful_stmt->stateful_stmt_list->set_spec
+# counter_stmt->stateful_stmt->(stmt|stateful_stmt_list)
 
-tableid chainid log 
-tableId chainId log prefix 
-tableId chainId log group 15
-tableId chainId log snaplen 512
-tableId chainId log queue-threshold 5
-tableId chainId log level log_string
-tableId chainId log flags tcp seq
-tableId chainId log flags tcp seq,options
-tableId chainId log flags tcp options,seq
-tableId chainId log flags tcp options
-tableId chainId log flags ip options
-tableId chainId log flags skuid
-tableId chainId log flags ether 
-tableId chainId log flags all
+add set T S { counter }
+add set T S { counter bytes 2048 }
+add set T S { counter packets 3 }
+
+# repeated stateful_stmt
+add set T S { counter packets 3 counter packets 3 }
 
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
 
-tableId chainId log flags ip 
-
+add set T S { counter marshmellows }
+add set T S { counter bytes mss }
+add set T S { counter packets once }
+add rule table_id chain_id set add { counter at  }
 
 
 ##################################################################################
@@ -46,26 +39,4 @@ tableId chainId log flags ip
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
-
-set T
-
-set ip S
-
-add set 
-
-
-
-add set T C 
-
-
-
-
-# nesting "stmt"
-tableid chainid log log
-
-
-
-
-
-
 
