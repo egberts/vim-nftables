@@ -24,12 +24,19 @@ add flowtable  bridge S F
 add  flowtable arp S F
  add flowtable arp S F
 
-add flowtable ip T F { hook b };
-add flowtable T F { devices = eth0 };
+add flowtable ip T F { hook b }
+add flowtable T F { devices = eth0 }
 add flowtable T F { hook "handler" 123; }
 add flowtable T F { flags offload ;}
-add flowtable T F { flags offload ; };
+add flowtable T F { flags offload ; }
 add flowtable T F { counter flags offload devices = eth0 }
+
+ add flowtable ip T F { hook b };
+add  flowtable T F { devices = eth0 };
+add flowtable  T F { hook "handler" 123; };
+add flowtable T  F { flags offload ;};
+add flowtable T F  { flags offload ; };
+add flowtable T F {  counter flags offload devices = eth0 };
 
 # ->flowtable_spec->'flowtable'->'delete'->delete_cmd->base_cmd
 delete flowtable table_id flowtable_id 

@@ -2,107 +2,175 @@
 # File: limit.nft
 # Description: A test NFT file to exercise '[add] limit' Vim syntax highlightings.
 #
-# base_cmd add_cmd 'limit' 
-# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_limit
+# Supports following syntaxes:
+#
+#   [ [ 'add' ] 'rule' ] 'limit' obj_spec limit_obj limit_config close_scope_limit
+#   [ [ 'add' ] 'rule' ] 'limit' obj_spec limit_obj '{' limit_block '}' close_scope_limit
+#   'create' 'limit' obj_spec limit_obj limit_config close_scope_limit
+#   'delete' 'limit' obj_spec
+#   'delete' 'limit' objid_spec
+#   'delete' 'limit' ( obj_spec | objid_spec ) 
+#   [ [ 'add' ] 'rule' ] 'limit'
+#   [ [ 'add' ] 'rule' ] 'limit' 'table' table_spec
+#
 #
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 
-# TODO add limit <family>
+# limit_rate_pkts->obj_spec->'limit'->add_cmd->base_cmd
+# limit_rate_pkts->identifier->table_spec->'limit'->add_cmd->base_cmd
+limit myIp6Table myIp6Limit rate 1 / week
 
-add limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
-add limit inet myInetTable myInetLimit rate 1/second
-add limit ip6 myIp6Table myIp6Limit rate 1 / week
-add limit ip myIpTable myIpLimit rate 1/ day
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->add_cmd->base_cmd
+limit myIpTable myIpLimit rate over 3600000/ day
+limit myInetTable myInetLimit rate until 1/second
+
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->add_cmd->base_cmd
+limit myNetdevTable myNetdevLimit rate 1/minute burst 5 packets
+limit myBridgeTable myBridgeLimit rate 1 /hour 
+
+# limit_config->obj_spec->'limit'->add_cmd->base_cmd
+# limit_config->identifier->family_spec->table_spec->'limit'->add_cmd->base_cmd
+limit ip6 myIp6Table myIp6Limit rate 1 / week
+limit ip myIpTable myIpLimit rate 1/ day
+limit inet myInetTable myInetLimit rate 1/second
+limit netdev myNetdevTable myNetdevLimit rate 1/minute 
+limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
+limit arp myBridgeTable myBridgeLimit rate 1 /hour 
+
+# limit_burst_pkts->limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'add'->add_cmd->base_cmd
 add limit myIpTable myIpLimit rate 1/second 
 add limit myIpTable myIpLimit rate 1/second burst 1514 bytes
 add limit myIpTable myIpLimit rate 1/second burst 15 packets
-add limit netdev myNetdevTable myNetdevLimit rate 1/minute 
-add rule myTable myChain limit rate 1023000 mbytes/second
-add rule myTable myChain limit rate 1025000 mbytes/second burst 1023 mbytes
-add rule myTable myChain limit rate 1025 bytes/second burst 512 bytes
-add rule myTable myChain limit rate 1025 kbytes/second
-add rule myTable myChain limit rate 1025 kbytes/second burst 1023 kbytes
-add rule myTable myChain limit rate 1025 mbytes/second burst 1025 kbytes
-add rule myTable myChain limit rate 400/hour
-add rule myTable myChain limit rate 400/minute
-add rule myTable myChain limit rate over 1023/second burst 10 packets
-add rule myTable myChain limit rate over 400/week
-add rule myTable myChain limit rate over 40/day
+
+# limit_burst_pkts->limit_rate_pkts->limit_config->identifier->family_spec->table_spec->'limit'->'add'->add_cmd->base_cmd
+add limit ip6 myIp6Table myIp6Limit rate 1 / week burst 1 packets
+add limit ip myIpTable myIpLimit rate 1/ day burst 1M bytes
+add limit inet myInetTable myInetLimit rate 1/second burst 1G bytes
+add limit netdev myNetdevTable myNetdevLimit rate 1/minute burst 1k bytes
+add limit bridge myBridgeTable myBridgeLimit rate 1 /hour burst 1T bytes
+add limit arp myBridgeTable myBridgeLimit rate 1 /hour burst 1000000 bytes
+
+# limit_rate_pkts->obj_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
+# limit_rate_pkts->identifier->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
+add rule limit myIp6Table myIp6Limit rate 1 / week
+
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
+add rule limit myIpTable myIpLimit rate over 3600000/ day
+add rule limit myInetTable myInetLimit rate until 1/second
+
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
+add rule limit myNetdevTable myNetdevLimit rate 1/minute burst 5 packets
+add rule limit myBridgeTable myBridgeLimit rate 1 /hour 
+
+# limit_config->obj_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
+# limit_config->identifier->family_spec->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
+add rule limit ip6 myIp6Table myIp6Limit rate 1 / week
+add rule limit ip myIpTable myIpLimit rate 1/ day
+add rule limit inet myInetTable myInetLimit rate 1/second
+add rule limit netdev myNetdevTable myNetdevLimit rate 1/minute 
+add rule limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
+add rule limit arp myBridgeTable myBridgeLimit rate 1 /hour 
+
+# [ add rule ] limit obj_spec limit_obj { limit_config } close_scope_limit
+# limit_block->'{'->identifier->family_spec->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
+limit myTable lim_400ppm { rate 400/minute ; comment "use to limit incoming icmp" ; }
+limit myTable lim_1kbps  { rate over 1024 bytes/second burst 512 bytes ; comment "use to limit incoming smtp" ; }
+
+# limit obj_spec limit_obj { stmt_separator } close_scope_limit
+limit myTable lim_400ppm { ; }
+
+# limit obj_spec limit_obj { comment_spec } close_scope_limit
+limit myTable lim_400ppm { comment "comments here"; }
+
+# limit obj_spec limit_obj { common_block } close_scope_limit
+limit myTable lim_400ppm { 
+    include "rate-limit.nft"
+    rate 400/minute ; comment "use to limit incoming icmp" ; 
+}
 
 # TODO create limit
-create limit bridge myBridgeTable myBridgeLimit rate 1/hour
+# limit_rate_pkts->limit_config->obj_spec->'limit'->'create'->add_cmd->base_cmd
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'create'->create_cmd->base_cmd
+create limit myIp6Table myIp6Limit rate 1 / week
+
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'create'->create_cmd->base_cmd
+create limit myIpTable myIpLimit rate over 3600000/ day
+create limit myInetTable myInetLimit rate until 1/second
+
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'create'->create_cmd->base_cmd
+create limit myNetdevTable myNetdevLimit rate 1/minute burst 5 packets
+create limit myBridgeTable myBridgeLimit rate 1 /hour 
+
+# limit_config->obj_spec->'limit'->'create'->add_cmd->base_cmd
+# limit_config->identifier->family_spec->table_spec->'limit'->'create'->create_cmd->base_cmd
+create limit ip6 myIp6Table myIp6Limit rate 1 / week
+create limit ip myIpTable myIpLimit rate 1/ day
 create limit inet myInetTable myInetLimit rate 1/second
-create limit ip6 myIp6Table myIp6Limit rate 1/week
-create limit ip myIpTable myIpLimit rate 1/day
-create limit myIpTable myIpLimit rate 1/second
-create limit myIpTable myIpLimit rate 1/second burst 1514 bytes
-create limit myIpTable myIpLimit rate 1/second burst 15 packets
-create limit netdev myNetdevTable myNetdevLimit rate 1/minute
-create limit <obj_spec> <limit_obj> <limit_config>
+create limit netdev myNetdevTable myNetdevLimit rate 1/minute 
+create limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
+create limit arp myBridgeTable myBridgeLimit rate 1 /hour 
 
 # TODO delete limit
-delete limit arp table_name handle 15
-delete limit arp table_name limit_name
-delete limit bridge table_name handle 15
-delete limit bridge table_name limit_name
-delete limit inet table_name handle 15
-delete limit inet table_name limit_name
-delete limit ip6 table_name handle 15
-delete limit ip6 table_name limit_name
-delete limit ip table_name handle 15
-delete limit ip table_name limit_name
-delete limit netdev table_name handle 15
-delete limit netdev table_name limit_name
-delete limit table_name handle 15
-delete limit table_name limit_name 
+# limit_rate_pkts->limit_config->obj_spec->'limit'->'delete'->add_cmd->base_cmd
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'delete'->delete_cmd->base_cmd
+delete limit myIp6Table myIp6Limit rate 1 / week
 
-# TODO limit <family_spec>
-limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
-limit inet myInetTable myInetLimit rate 1/second
-limit ip6 myIp6Table myIp6Limit rate 1 / week
-limit ip myIpTable myIpLimit rate 1/ day
-limit myIpTable myIpLimit rate 1/second 
-limit myIpTable myIpLimit rate 1/second burst 1514 bytes
-limit myIpTable myIpLimit rate 1/second burst 15 packets
-limit myTable lim_1kbps  { rate over 1024 bytes/second burst 512 bytes ; comment "use to limit incoming smtp" ; }
-limit myTable lim_400ppm { rate 400/minute ; comment "use to limit incoming icmp" ; }
-limit netdev myNetdevTable myNetdevLimit rate 1/minute 
-limit obj_spec limit_obj { limit_block } close_scope_limit
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'delete'->delete_cmd->base_cmd
+delete limit myIpTable myIpLimit rate over 3600000/ day
+delete limit myInetTable myInetLimit rate until 1/second
+
+# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'delete'->delete_cmd->base_cmd
+delete limit myNetdevTable myNetdevLimit rate 1/minute burst 5 packets
+delete limit myBridgeTable myBridgeLimit rate 1 /hour 
+
+# limit_config->obj_spec->'limit'->'delete'->add_cmd->base_cmd
+# limit_config->identifier->family_spec->table_spec->'limit'->'delete'->delete_cmd->base_cmd
+delete limit ip6 myIp6Table myIp6Limit rate 1 / week
+delete limit ip myIpTable myIpLimit rate 1/ day
+delete limit inet myInetTable myInetLimit rate 1/second
+delete limit netdev myNetdevTable myNetdevLimit rate 1/minute 
+delete limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
+delete limit arp myBridgeTable myBridgeLimit rate 1 /hour 
+
+
+# Syntax:  delete limit objid_spec
+delete limit table_id handle 15
+delete limit ip table_id handle 15
+delete limit ip6 table_id handle 15
+delete limit inet table_id handle 15
+delete limit netdev table_id handle 15
+delete limit bridge table_id handle 15
+delete limit arp table_id handle 15
+
 
 # TODO list limit
-list limit arp myTable limit_name
-list limit bridge myTable limit_name
-list limit inet myTable limit_name
-list limit ip6 myTable limit_name
-list limit ip myArpTable myArpChain
-list limit ip myBridgeTable myBridgeChain
-list limit ip myInetTable myInetChain
-list limit ip myIp6Table myIp6Chain
-list limit ip myIpTable myIpChain
-list limit ip myTable limit_name
-list limit limit_name
-list limit myIpTable myIpChain
-list limit myTable limit_name
-list limit netdev myNetdevTable myNetdevChain
-list limit netdev myTable limit_name
-list limits
-list limits arp
-list limits bridge
-list limits inet
-list limits ip
-list limits ip6
-list limits netdev
-list limits table arp table_name
-list limits table bridge table_name
-list limits table inet table_name
-list limits table ip6 table_name
-list limits table ip table_name
-list limits table netdev table_name
-list limits table ruleset_spec
-list limits table table_name
+# obj_spec->'limit'->list_cmd->base_cmd
+list limit table_id limit_id
+list limit ip table_id limit_id
+list limit ip6 table_id limit_id
+list limit inet table_id limit_id
+list limit netdev table_id limit_id
+list limit bridge table_id limit_id
+list limit arp table_id limit_id
 
+# ruleset_spec->'limits'->'list'->list_cmd->base_cmd
+list limits ip 
+list limits ip6
+list limits inet 
+list limits netdev 
+list limits bridge 
+list limits arp 
+
+# 'table'->'limits'->'list'->list_cmd->base_cmd
+list limits table table_id
+list limits table ip table_id
+list limits table ip6 table_id
+list limits table inet table_id
+list limits table netdev table_id
+list limits table bridge table_id
+list limits table arp table_id
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
@@ -113,8 +181,25 @@ list limits table table_name
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
 
+add rule limit myTable myChain limit rate 1023000 mbytes/second
+add rule limit myTable myChain limit rate 1025000 mbytes/second burst 1023 mbytes
+add rule limit myTable myChain limit rate 1025 bytes/second burst 512 bytes
+add rule limit myTable myChain limit rate 1025 kbytes/second
+add rule limit myTable myChain limit rate 1025 kbytes/second burst 1023 kbytes
+add rule limit myTable myChain limit rate 1025 mbytes/second burst 1025 kbytes
+add rule limit myTable myChain limit rate 400/hour
+add rule limit myTable myChain limit rate 400/minute
+add rule limit myTable myChain limit rate over 1023/second burst 10 packets
+add rule limit myTable myChain limit rate over 400/week
+add rule limit myTable myChain limit rate over 40/day
+
 
 ##################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
 
+limit myIp6Table myIp6Limit rate 1  # premature EOS
+limit myIp6Table myIp6Limit rate 1 /  # premature EOS
+limit myIpTable myIpLimit rate over 3600000/  # premature EOS
+limit myInetTable myInetLimit rate until 1  # premature EOS
+limit myBridgeTable myBridgeLimit rate 1 /hour burst 11  # premature EOS

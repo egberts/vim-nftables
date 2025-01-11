@@ -62,15 +62,15 @@ include "Filespec" extra stuff oppsie  # intentional syntax error
 include "Filespec"  oopsie  # intentional syntax error
 include "Filespec"  oopsie  ;  # intentional syntax error
 
+include '/home/device/Filespec"  # mismatched quotes
+include '/home/device/Filespec"  # mismatched quotes
+include "/home/device/Filespec'  # mismatched quotes
+include "/home/device/Filespec'  # mismatched quotes
+
 
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
 ##################################################################################
-
-include '/home/device/Filespec"  # mismatched quotes
-include '/home/device/Filespec"  # mismatched quotes
-include "/home/device/Filespec'  # mismatched quotes
-include "/home/device/Filespec'  # mismatched quotes
 
 
 ##################################################################################

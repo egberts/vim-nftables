@@ -9,15 +9,45 @@
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 
+define int_ifs={}
 define int_ifs = {}
 define int_if2 = { }
 define MYPOLICY= -1
 
+define int_ifs = {} ;
+define int_if2 = {   } ;
+define MYPOLICY= -1 ;
+
+redefine int_ifs={}
+redefine int_ifs = {}
+redefine int_if2 = { }
+redefine MYPOLICY= -1
+
+redefine int_ifs = {} ;
+redefine int_if2 = {   } ;
+redefine MYPOLICY= -1 ;
+
+undefine int_ifs
+undefine int_if2
+undefine MYPOLICY  
+
+undefine int_ifs;
+undefine int_if2 ;
+undefine MYPOLICY  ;  
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
+undefine int_ifs ?
+undefine int_if2 {
+undefine   
+   MYPOLICY  
+
+undefine int_ifs *;
+undefine int_ifs $;
+
 define int_if3 = { virbr0, $int_if2, virbr1 }
+define int_if3 = { virbr0, $int_if2, virbr1 } ;
 
 
 ##################################################################################
