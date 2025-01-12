@@ -9,6 +9,7 @@
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 
+# common_block->line
 define int_ifs={}
 define int_ifs = {}
 define int_if2 = { }
@@ -34,6 +35,74 @@ undefine MYPOLICY
 undefine int_ifs;
 undefine int_if2 ;
 undefine MYPOLICY  ;  
+
+# table_block->'table'->add_cmd->base_cmd->line
+table T { define my_var };
+table T { define my_var; };
+table T { define my_var ; };
+table T { define my_var ; } ; 
+
+# chain_block->'chain'->table_block->'table'->add_cmd->base_cmd->line
+table T { chain C { define my_var }; };
+# >table_block->'table'->add_cmd->base_cmd->line
+table T { define xyz = 1 ; define xyz = 1; };
+
+# common_block->flowtable_block->'{'->'flowtable'->add_cmd->'add'->base_cmd->line
+add flowtable T FT { define my_var; };
+# common_block->limit_block->'{'->'limit'->add_cmd->'add'->base_cmd->line
+add limit T L { define my_var; };
+# common_block->set_block->'{'->'set'->add_cmd->'add'->base_cmd->line
+add set T S { define my_var; };
+# common_block->map_block->'{'->'map'->add_cmd->'add'->base_cmd->line
+add map T M { define my_var; };
+# common_block->quota_block->'{'->'quota'->add_cmd->'add'->base_cmd->line
+add quota T Q { define my_var; };
+# common_block->secmark_block->'{'->'secmark'->add_cmd->'add'->base_cmd->line
+add secmark T SM { define my_var; };
+# common_block->secmark_block->'{'->'secmark'->add_cmd->'add'->base_cmd->line
+add synproxy T SP { define my_var; };
+
+# common_block->counter_block->'{'->'counter'->create_cmd->'create'->base_cmd->line
+create counter T CT { define my_var; };
+# common_block->ct_expect_block->'{'->'ct expectation'->create_cmd->'create'->base_cmd->line
+create ct expectation T CT { define my_var; };
+# common_block->ct_helper_block->'{'->'ct helper'->create_cmd->'create'->base_cmd->line
+create ct helper T CT { define my_var; };
+# common_block->ct_timeout_block->'{'->'ct timeout'->create_cmd->'create'->base_cmd->line
+create ct timeout T CT { define my_var; };
+# common_block->flowtable_block->'{'->'flowtable'->create_cmd->'create'->base_cmd->line
+create flowtable T FT { define my_var; };
+# common_block->map_block->'{'->'map'->create_cmd->'create'->base_cmd->line
+create map T M { define my_var; };
+# common_block->set_block->'{'->'set'->create_cmd->'create'->base_cmd->line
+create set T S { define my_var; };
+
+# common_block->chain_block->'{'->'chain'->delete_cmd->'delete'->base_cmd->line
+delete chain T C { define my_var; };
+# common_block->flowtable_block->'{'->'flowtable'->delete_cmd->'delete'->base_cmd->line
+delete flowtable T FT { define my_var; };
+
+# common_block->flowtable_block->'{'->'flowtable'->destroy_cmd->'destroy'->base_cmd->line
+destroy flowtable T FT { define my_var; };
+
+#  Multiline
+add counter T C { 
+    define my_var 
+};
+add ct expectation T CT { 
+    define my_var; 
+}
+add ct helper T CT { 
+    define my_var; 
+}
+add ct timeout T CT { 
+    define my_var; 
+}
+table T { 
+    define my_var; 
+};
+
+
 
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)

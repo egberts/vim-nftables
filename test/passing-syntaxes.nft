@@ -9,6 +9,7 @@
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
 table_id chain_id 
+ip6 table_id chain_id 
 
 reset map
 # <common_block>
@@ -34,7 +35,7 @@ define workstation1_ipv6 = fe00:2::2
 define my_public_wan = eth2
 define int_if1 = eth0
 define int_if2 = $my_public_wan
-define int_ifs = { virbr0, $int_if2, virbr1 }
+define int_ifs = { "virbr0", $int_if2, "virbr1" }
 redefine my_public_wan = eth2
 redefine int_if1 = eth0
 redefine int_if2 = $my_public_wan

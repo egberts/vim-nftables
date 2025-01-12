@@ -11,13 +11,12 @@
 
 # base_cmd add_cmd 'set'
 
-add set T C x
 add set T C { counter }
 add set T C { counter bytes 2048 }
 add set T C { counter packets 3 }
 add set T C { counter packets 3 counter packets 3 }
 
-set ip T S { typeof b };
+set ip T S { typeof b } ;
 set T S { typeof a.b.c.d.e.f };
 set T S { flags constant }
 set T S { flags interval; }

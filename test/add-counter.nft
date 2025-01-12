@@ -19,6 +19,7 @@
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
+# TODO
 
 # base_cmd add_cmd 'counter'
 
@@ -55,13 +56,14 @@ counter arp T C  ;
 counter T C { packet 123 bytes 12345 }
 counter T C { packet 123 bytes 12345 }
 counter T last { packet 123 bytes 12345 };
-counter ip T C { packet 123 bytes 123 };
+counter ip T C { packet 123 bytes 123; packet 123 bytes 123; };
 counter ip T C { 
     include "include_counters_file.nft";
     packet 123 bytes 123 
 };
 
-add counter T/T C
+# TODO  well?
+add counter T/T C    # TODO well?
 add counter T C0
 add counter T C_
 add counter T C\
@@ -69,7 +71,11 @@ add counter T C ;
 add counter T last;
 add counter T last packet 123 bytes 12345;
 add counter T C { packet 123 bytes 12345 };
-add counter T C { packet 123 bytes 12345 };
+add counter T C { packet 123 bytes 12345; packet 321 bytes 4321; };
+add counter T C { 
+    packet 123 bytes 12345; 
+    packet 321 bytes 4321; 
+};
 add counter T C ;
 add counter ip T C { packet 123 bytes 123 };
 counter T last;
@@ -81,7 +87,7 @@ add counter filter http
 add counter filter https
 
 add rule filter input tcp dport 80 counter name \"http\"  # nftables manpage
-add rule filter input counter name tcp dport map { 80 : "http", 443 : "https" }  # nftables manpage
+add rule filter input name tcp dport map { 80 : "http", 443 : "https" }  # nftables manpage
 
 delete counter table_id counter_id
 delete counter table_id counter_id handle handle_id
@@ -102,7 +108,7 @@ reset counter table_id counter_id index index_id
 
 table inet x {  # from nftables manpage
     chain y {
-        type filter hook input priority filter; policy accept;
+        type filter hook input priority filter; policy accept; ;;;;
         socket cgroupv2 level 1 "user.slice" counter
     }
 }
