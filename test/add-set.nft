@@ -152,7 +152,6 @@ set T C ;
 # false positive test (looks highlighted correctly; has bad content; oops)
 ##################################################################################
 
-# TODO: introduce 'forbidden reserved words' regex into here
 set
 
 set T

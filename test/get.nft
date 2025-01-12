@@ -46,6 +46,7 @@ get element T S { comment single-word }
 ##################################################################################
 # true negative test (properly hightlighted wrongly to show an error; so far, so good)
 ##################################################################################
+get element T S variable_id
 
 ##################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)

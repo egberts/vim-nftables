@@ -19,7 +19,6 @@
 ##################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
 ##################################################################################
-# TODO
 
 # base_cmd add_cmd 'counter'
 
@@ -62,8 +61,7 @@ counter ip T C {
     packet 123 bytes 123 
 };
 
-# TODO  well?
-add counter T/T C    # TODO well?
+add counter T/T C
 add counter T C0
 add counter T C_
 add counter T C\
