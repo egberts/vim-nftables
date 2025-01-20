@@ -1,3 +1,8 @@
+
+if ! exists('b:nftables_delimiter') || ! b:nftables_delimiter
+  finish
+endif
+
 " Only load this indent file when no other was loaded.
 if exists('b:did_indent')
   finish

@@ -887,6 +887,7 @@ add rule myIpTable myIpChain ip saddr & 0xff == 1
 add rule myIpTable myIpChain ip saddr & 0.0.0.255 < 0.0.0.127
 add rule myIpTable myIpChain ip daddr 192.168.0.1
 add rule myIpTable myIpChain ip daddr != 192.168.0.1
+add rule m f ip daddr
 add rule myIpTable myIpChain ip daddr 192.168.0.1-192.168.0.250
 add rule myIpTable myIpChain ip daddr 10.0.0.0-10.255.255.255
 add rule myIpTable myIpChain ip daddr 172.16.0.0-172.31.255.255
