@@ -46,10 +46,6 @@
 "  - relocate inner_inet_expr to after th_hdr_expr?
 "
 
-if ! exists('b:nftables_delimiter') || ! b:nftables_delimiter
-  finish
-endif
-
 " quit if terminal is a black and white
 if &t_Co <= 1
   finish
@@ -58,43 +54,34 @@ endif
 " This syntax does not change background setting
 " BUT it may later ASSUME a specific background setting
 
-" quit when a syntax file was already loaded
-if version < 600
-  finish
-elseif !exists('main_syntax')
-  if exists('b:current_syntax')
-    finish
-  endif
-  let main_syntax='nftables'
-endif
+" For version 5.x: Clear all syntax items
+" For version 6.x: Quit when a syntax file was already loaded
+" if !exists("main_syntax")
+"   if version < 600
+"     syntax clear
+"   elseif exists("b:current_syntax")
+"     finish
+"   endif
+"   let main_syntax = 'nftables'
+" endif
 
-if exists('g:nft_background')
-  echom printf('g:nft_background: %s', g:nft_background)
-else
-  echom printf('g:nft_background is not defined yet')
-endif
+echo "Use `:messages` for log details"
 
 try
     colorscheme nftables
-    echom "Successfully loaded nftables colorscheme"
+    echomsg "Successfully loaded nftables colorscheme"
 catch /^Vim\%((\a\+)\)\=:E185/
-    echom "nftables colorscheme is missing"
+    echomsg "nftables colorscheme is missing"
     " deal with it
 endtry
-
-if exists('g:nft_background')
-  echom printf('g:nft_background (after colorscheme): %s', g:nft_background)
-else
-  echom printf('g:nft_background  (after colorscheme)is not defined yet')
-endif
 
 
 if !exists('&background') || empty(&background)
   " if you want to get value of background, use `&background ==# dark` example
   let nft_obtained_background = 'no'
-  echom "Did not obtain &background"
+  echomsg "Did not obtain &background"
 else
-  echom printf("obtained &background: %s", &background)
+  echomsg printf("obtained &background: %s", &background)
   let nft_obtained_background = 'yes'
 endif
 
@@ -104,31 +91,32 @@ if !empty($TERM)
     if !empty($COLORTERM)
       if $COLORTERM == "truecolor" || $COLORTERM == "24bit"
         let nft_truecolor = "yes"
-        " echom "\$COLORTERM is 'truecolor'"
-      " else
-        " echom "\$COLORTERM is not 'truecolor'"
+        echomsg "\$COLORTERM is 'truecolor'"
+      else
+        echomsg "\$COLORTERM is not 'truecolor'"
       endif
-    " else
-      " echom "\$COLORTERM is empty"
+    else
+      echomsg "\$COLORTERM is empty"
     endif
-  " else
-    " echom "\$TERM does not have xterm-256color"
+  else
+    echomsg "\$TERM does not have xterm-256color"
   endif
-" else
-  " echom \$TERM is empty
+else
+  echomsg \$TERM is empty
 endif
 
 if exists(&background)
-  echom printf("&background is defined and is: '%s'.",  &background)
+  echomsg printf("&background is defined and is: '%s'.",  &background)
+  let nft_obtained_background=execute(':set &background')
 endif
 
-echom printf('nft_obtained_background: %s', nft_obtained_background)
-echom printf('nft_truecolor: %s', nft_truecolor)
+echomsg printf('nft_obtained_background: %s', nft_obtained_background)
+echomsg printf('nft_truecolor: %s', nft_truecolor)
 
 if exists('g:saved_nft_t_Co')
-  echom printf('saved t_Co %d', g:saved_nft_t_Co)
+  echomsg printf('saved t_Co %d', g:saved_nft_t_Co)
 else
-  echom printf('t_Co %d', &t_Co)
+  echomsg printf('t_Co %d', &t_Co)
 endif
 
 syn case match
@@ -149,7 +137,7 @@ syn sync fromstart
 let s:save_cpo = &cpoptions
 set cpoptions-=C
 
-" echom printf('nft_truecolor %s  nft_obtained_background %s', g:nft_truecolor, g:nft_obtained_background)
+echomsg printf('nft_truecolor %s  nft_obtained_background %s', g:nft_truecolor, g:nft_obtained_background)
 hi link nftHL_Include     Include
 hi link nftHL_ToDo        Todo
 hi link nftHL_Identifier  Identifier
@@ -187,7 +175,7 @@ hi link nftHL_BlockDelimiters  Normal
 
 hi nftHL_String      guifg=LightMagenta guibg=Black ctermbg=Black cterm=NONE  " String is too DarkMagenta
 hi nftHL_Variable    guifg=LightBlue guibg=Black cterm=NONE  " Variable doesn't work, stuck on dark cyan
-hi nftHL_Comment     ctermfg=Blue ctermbg=NONE guifg=#00eeee guibg=Black cterm=NONE
+hi nftHL_Comment     ctermfg=Blue ctermbg=NONE guifg=#00eeee guibg=NONE cterm=NONE
 hi nftHL_BlockDelimitersTable  ctermfg=LightRed ctermbg=Black cterm=NONE
 hi nftHL_BlockDelimitersChain  ctermfg=LightGreen ctermbg=Black cterm=NONE
 hi nftHL_BlockDelimitersSet  ctermfg=LightBlue ctermbg=Black cterm=NONE
@@ -7163,15 +7151,14 @@ hi Normal guibg=NONE ctermbg=NONE
 
 """""""""""""""""""""" END OF SYNTAX """"""""""""""""""""""""""""
 
-
 let b:current_syntax = 'nftables'
 
 let &cpoptions = s:save_cpo
 unlet s:save_cpo
 
-if main_syntax ==# 'nftables'
-  unlet main_syntax
-endif
+" if main_syntax ==# 'nftables'
+  " unlet main_syntax
+" endif
 
 " syntax_on is passed only inside Vim's shell command for 2nd Vim to observe current syntax scenarios
 let g:syntax_on = 1
