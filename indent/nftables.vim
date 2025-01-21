@@ -1,5 +1,16 @@
+" Vim indent configuration file for nftables
+" Language:     nftables indent in Vimscript
+" Maintainer:   egberts <egberts@github.com>
+" Revision:     1.0
+" Initial Date: 2020-04-24
+" Last Change:  2025-01-19
+" Filenames:    nftables.conf, *.nft
+" Location:     https://github.com/egberts/vim-nftables
+" License:      MIT license
+" Remarks:
+" Bug Report:   https://github.com/egberts/vim-nftables/issues
 
-if ! exists('b:nftables_delimiter') || ! b:nftables_delimiter
+if ! exists('b:nftables_disable') || ! b:nftables_disable
   finish
 endif
 

@@ -10,10 +10,6 @@
 " Remarks:
 " Bug Report:   https://github.com/egberts/vim-nftables/issues
 
-if ! exists('b:nftables_delimiter') || ! b:nftables_delimiter
-  finish
-endif
-
 if exists('b:did_ftplugin')
     finish
 endif

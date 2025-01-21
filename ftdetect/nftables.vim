@@ -10,10 +10,6 @@
 " Remarks:
 " Bug Report:   https://github.com/egberts/vim-nftables/issues
 
-if ! exists('b:nftables_delimiter') || ! b:nftables_delimiter
-  finish
-endif
-
 " Detect file type by use of shebang
 function! s:DetectFiletype()
     if getline(1) =~ '^#!\s*\%\(/\S\+\)\?/\%\(s\)\?bin/\%\(env\s\+\)\?nft\>'
