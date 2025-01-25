@@ -45,6 +45,20 @@
 " Developer Notes:
 "  - relocate inner_inet_expr to after th_hdr_expr?
 "
+" syntax/nftables.vim is called before colors/nftables.vim
+" syntax/nftables.vim is called before ftdetect/nftables.vim
+" syntax/nftables.vim is called before ftplugin/nftables.vim
+" syntax/nftables.vim is called before indent/nftables.vim
+
+if exists('nft_debug') && nft_debug == 1
+  echomsg "syntax/nftables-new.vim: called."
+  echomsg printf("&background: '%s'", &background)
+endif
+
+"if exists('g:loaded_syntax_nftables')
+"    finish
+"endif
+"let g:loaded_syntax_nftables = 1
 
 " quit if terminal is a black and white
 if &t_Co <= 1
@@ -55,33 +69,48 @@ endif
 " BUT it may later ASSUME a specific background setting
 
 " For version 5.x: Clear all syntax items
+if version > 580
+  hi clear
+  if exists("syntax_on")
+    syntax reset
+  endif
+endif
 " For version 6.x: Quit when a syntax file was already loaded
-" if !exists("main_syntax")
-"   if version < 600
-"     syntax clear
-"   elseif exists("b:current_syntax")
-"     finish
-"   endif
-"   let main_syntax = 'nftables'
-" endif
+if !exists("main_syntax")
+  if version < 600
+    syntax clear
+  elseif exists("b:current_syntax")
+    finish
+  endif
+  let main_syntax = 'nftables'
+endif
 
-echo "Use `:messages` for log details"
+if exists('g:nft_debug') && g:nft_debug == 1
+  echo "Use `:messages` for log details"
+endif
 
-try
+" experiment with loading companion colorscheme
+if exists('nft_colorscheme') && nft_colorscheme == 1
+  try
+    if exists('g:nft_debug') && nft_debug == 1
+      echomsg "Loaded 'nftables' colorscheme."
+    endif
     colorscheme nftables
-    echomsg "Successfully loaded nftables colorscheme"
-catch /^Vim\%((\a\+)\)\=:E185/
-    echomsg "nftables colorscheme is missing"
+  catch /^Vim\%((\a\+)\)\=:E185/
+    echomsg "WARNING: nftables colorscheme is missing"
     " deal with it
-endtry
+  endtry
+else
+  if exists('g:nft_debug') && nft_debug == 1
+    echomsg "No nftables colorscheme loaded."
+  endif
+endif
 
 
 if !exists('&background') || empty(&background)
   " if you want to get value of background, use `&background ==# dark` example
   let nft_obtained_background = 'no'
-  echomsg "Did not obtain &background"
 else
-  echomsg printf("obtained &background: %s", &background)
   let nft_obtained_background = 'yes'
 endif
 
@@ -99,24 +128,26 @@ if !empty($TERM)
       echomsg "\$COLORTERM is empty"
     endif
   else
-    echomsg "\$TERM does not have xterm-256color"
+    if exists('g:nft_debug') && nft_debug == 1
+      echomsg "\$TERM does not have xterm-256color"
+    endif
   endif
 else
   echomsg \$TERM is empty
 endif
 
 if exists(&background)
-  echomsg printf("&background is defined and is: '%s'.",  &background)
   let nft_obtained_background=execute(':set &background')
 endif
 
-echomsg printf('nft_obtained_background: %s', nft_obtained_background)
-echomsg printf('nft_truecolor: %s', nft_truecolor)
-
-if exists('g:saved_nft_t_Co')
-  echomsg printf('saved t_Co %d', g:saved_nft_t_Co)
-else
-  echomsg printf('t_Co %d', &t_Co)
+if exists('nft_debug') && nft_debug == 1
+  echomsg printf('nft_obtained_background: %s', nft_obtained_background)
+  echomsg printf('nft_truecolor: %s', nft_truecolor)
+  if exists('g:saved_nft_t_Co')
+    echomsg printf('saved t_Co %d', g:saved_nft_t_Co)
+  else
+    echomsg printf('t_Co %d', &t_Co)
+  endif
 endif
 
 syn case match
@@ -137,59 +168,59 @@ syn sync fromstart
 let s:save_cpo = &cpoptions
 set cpoptions-=C
 
-echomsg printf('nft_truecolor %s  nft_obtained_background %s', g:nft_truecolor, g:nft_obtained_background)
-hi link nftHL_Include     Include
-hi link nftHL_ToDo        Todo
-hi link nftHL_Identifier  Identifier
-hi link nftHL_Number      Number
-hi link nftHL_Option      Label     " could use a 2nd color here
-hi link nftHL_Operator    Conditional
-hi link nftHL_Underlined  Underlined
-hi link nftHL_Error       Error
-hi link nftHL_Constant    Constant
+hi def link nftHL_String      String
+hi def link nftHL_Variable    Variable
+hi def link nftHL_Comment     Uncomment
 
-hi link nftHL_Command     Command
-hi link nftHL_Statement   Statement
-hi link nftHL_Expression  Conditional
-hi link nftHL_Type        Type
+hi def link nftHL_Include     Include
+hi def link nftHL_ToDo        Todo
+hi def link nftHL_Identifier  Identifier
+hi def link nftHL_Number      Number
+hi def link nftHL_Option      Label     " could use a 2nd color here
+hi def link nftHL_Operator    Conditional
+hi def link nftHL_Underlined  Underlined
+hi def link nftHL_Error       Error
+hi def link nftHL_Constant    Constant
 
-hi link nftHL_Family      Underlined   " doesn't work, stuck on dark cyan
-hi link nftHL_Table       Identifier
-hi link nftHL_Chain       Identifier
-hi link nftHL_Rule        Identifier
-hi link nftHL_Map         Identifier
-hi link nftHL_Set         Identifier
-hi link nftHL_Element     Identifier
-hi link nftHL_Quota       Identifier
-hi link nftHL_Position    Number
-hi link nftHL_Limit       Number
-hi link nftHL_Handle      Number
-hi link nftHL_Flowtable   Identifier
-hi link nftHL_Device      Identifier
-hi link nftHL_Member      Identifier
+hi def link nftHL_Command     Command
+hi def link nftHL_Statement   Statement
+hi def link nftHL_Expression  Conditional
+hi def link nftHL_Type        Type
 
-hi link nftHL_Verdict     Underlined
-hi link nftHL_Hook        Type
-hi link nftHL_Action      Special
-hi link nftHL_BlockDelimiters  Normal
+hi def link nftHL_Family      Underlined   " doesn't work, stuck on dark cyan
+hi def link nftHL_Table       Identifier
+hi def link nftHL_Chain       Identifier
+hi def link nftHL_Rule        Identifier
+hi def link nftHL_Map         Identifier
+hi def link nftHL_Set         Identifier
+hi def link nftHL_Element     Identifier
+hi def link nftHL_Quota       Identifier
+hi def link nftHL_Position    Number
+hi def link nftHL_Limit       Number
+hi def link nftHL_Handle      Number
+hi def link nftHL_Flowtable   Identifier
+hi def link nftHL_Device      Identifier
+hi def link nftHL_Member      Identifier
 
-hi nftHL_String      guifg=LightMagenta guibg=Black ctermbg=Black cterm=NONE  " String is too DarkMagenta
-hi nftHL_Variable    guifg=LightBlue guibg=Black cterm=NONE  " Variable doesn't work, stuck on dark cyan
-hi nftHL_Comment     ctermfg=Blue ctermbg=NONE guifg=#00eeee guibg=NONE cterm=NONE
-hi nftHL_BlockDelimitersTable  ctermfg=LightRed ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersChain  ctermfg=LightGreen ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersSet  ctermfg=LightBlue ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersMap  ctermfg=LightCyan ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersFlowTable  ctermfg=LightMagenta ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersCounter  ctermfg=LightYellow ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersQuota  ctermfg=DarkGrey ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersCT  ctermfg=Red ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersLimit  ctermfg=Red ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersSecMark  ctermfg=Red ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersSynProxy  ctermfg=Red ctermbg=Black cterm=NONE
-hi nftHL_BlockDelimitersMeter  ctermfg=Red ctermbg=Black cterm=NONE
+hi def link nftHL_Verdict     Underlined
+hi def link nftHL_Hook        Type
+hi def link nftHL_Action      Special
+hi def link nftHL_BlockDelimiters  Normal
 
+hi def nftHL_BlockDelimitersTable  ctermfg=LightRed ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersChain  ctermfg=LightGreen ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersSet  ctermfg=LightBlue ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersMap  ctermfg=LightCyan ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersFlowTable  ctermfg=LightMagenta ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersCounter  ctermfg=LightYellow ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersQuota  ctermfg=DarkGrey ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersCT  ctermfg=Red ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersLimit  ctermfg=Red ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersSecMark  ctermfg=Red ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersSynProxy  ctermfg=Red ctermbg=Black cterm=NONE
+hi def nftHL_BlockDelimitersMeter  ctermfg=Red ctermbg=Black cterm=NONE
 
+""""""""""
 hi link nft_ToDo nftHL_ToDo
 syn keyword nft_ToDo xxx contained XXX FIXME TODO TODO: FIXME: TBS TBD TBA
 \ containedby=nft_InlineComment

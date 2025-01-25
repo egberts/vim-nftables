@@ -9,6 +9,14 @@
 " License:      MIT license
 " Remarks:
 " Bug Report:   https://github.com/egberts/vim-nftables/issues
+"
+" ftplugin/nftables.vim is called after syntax/nftables.vim
+" ftplugin/nftables.vim is called after colors/nftables.vim
+" ftplugin/nftables.vim is called after ftdetect/nftables.vim
+"
+" ftplugin/nftables.vim is called before indent/nftables.vim
+
+echomsg "ftplugin/nftables.vim: called."
 
 if exists('b:did_ftplugin')
     finish

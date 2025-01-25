@@ -9,6 +9,13 @@
 " License:      MIT license
 " Remarks:
 " Bug Report:   https://github.com/egberts/vim-nftables/issues
+"
+" indent/nftables.vim is called after syntax/nftables.vim
+" indent/nftables.vim is called after color/nftables.vim
+" indent/nftables.vim is called after ftdetect/nftables.vim
+" indent/nftables.vim is called after ftplugin/nftables.vim
+
+echomsg "indent/nftables.vim: called."
 
 if ! exists('b:nftables_disable') || ! b:nftables_disable
   finish
