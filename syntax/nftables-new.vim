@@ -207,6 +207,19 @@ hi def link nftHL_Hook        Type
 hi def link nftHL_Action      Special
 hi def link nftHL_BlockDelimiters  Normal
 
+hi def link nftHL_BlockDelimitersTable  Delimiter
+hi def link nftHL_BlockDelimitersChain  Delimiter
+hi def link nftHL_BlockDelimitersSet    Delimiter
+hi def link nftHL_BlockDelimitersMap    Delimiter
+hi def link nftHL_BlockDelimitersFlowTable    Delimiter
+hi def link nftHL_BlockDelimitersCounter Delimiter
+hi def link nftHL_BlockDelimitersQuota  Delimiter
+hi def link nftHL_BlockDelimitersCT     Delimiter
+hi def link nftHL_BlockDelimitersLimit  Delimiter
+hi def link nftHL_BlockDelimitersSecMark Delimiter
+hi def link nftHL_BlockDelimitersSynProxy Delimiter
+hi def link nftHL_BlockDelimitersMeter  Delimiter
+if exists('not_yet')
 hi def nftHL_BlockDelimitersTable  ctermfg=LightRed ctermbg=Black cterm=NONE
 hi def nftHL_BlockDelimitersChain  ctermfg=LightGreen ctermbg=Black cterm=NONE
 hi def nftHL_BlockDelimitersSet  ctermfg=LightBlue ctermbg=Black cterm=NONE
@@ -219,6 +232,7 @@ hi def nftHL_BlockDelimitersLimit  ctermfg=Red ctermbg=Black cterm=NONE
 hi def nftHL_BlockDelimitersSecMark  ctermfg=Red ctermbg=Black cterm=NONE
 hi def nftHL_BlockDelimitersSynProxy  ctermfg=Red ctermbg=Black cterm=NONE
 hi def nftHL_BlockDelimitersMeter  ctermfg=Red ctermbg=Black cterm=NONE
+endif
 
 """"""""""
 hi link nft_ToDo nftHL_ToDo
