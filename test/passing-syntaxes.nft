@@ -16,6 +16,8 @@ reset map
 # INCLUDE done in a separate include-syntaxes.nft test file
 
 # interfaces
+define empty = { }
+define empty = -1
 define nic_inet = bond0
 define nic2_inet = bond0 # comment
  define nic_dmz = bond1
@@ -187,7 +189,9 @@ table inet filter {
     policy drop;
     counter jump input_hook
     counter jump base_filter
+    log prefix Dropped counter drop
     log prefix "Dropped input traffic: " counter drop
+    log prefix 'Dropped input traffic: ' counter drop
   }
   chain input_hook {
   }
@@ -3448,3 +3452,72 @@ reset quota inet myInetFilter https-quota
 reset quota arp myArpFilter https-quota
 reset quota bridge myBridgeFilter https-quota
 reset quota netdev myBridgeFilter https-quota
+
+# stmt
+add rule myTable myChain ct mark 
+add rule myTable myChain vmap MyMeter
+# add rule myTable myChain meter MyMeter size 1250 { };
+# add rule myTable myChain meter MyMeter { };
+
+# stmt->payload_stmt
+add rule myTable myChain icmp 15
+add rule myTable myChain ether 15
+add rule myTable myChain vlan 15
+add rule myTable myChain arp 15
+add rule myTable myChain ip 15
+add rule myTable myChain igmp 15
+add rule myTable myChain ip6 15
+add rule myTable myChain icmp6 15
+add rule myTable myChain auth 15
+add rule myTable myChain esp 15
+add rule myTable myChain comp 15
+add rule myTable myChain udp 15
+add rule myTable myChain udplite 15
+add rule myTable myChain tcp 15
+add rule myTable myChain dccp 15
+add rule myTable myChain sctp 15
+add rule myTable myChain th 15
+add rule myTable myChain vxlan 15
+add rule myTable myChain geneve 15
+add rule myTable myChain gre 15
+add rule myTable myChain gretap 15
+
+# stmt->stateful_stmt
+#
+#    @nft_c_reject_stmt,
+add rule T C reject with icmp
+add rule T C reject with icmp6 type 3
+add rule T C reject with icmp6 type echo-request
+add rule T C reject with icmpx
+add rule T C reject with tcp reset
+
+#    nft_log_stmt,
+add rule T C log prefix "LOG:
+add rule T C log group 11 
+add rule T C log snaplen 15
+add rule T C log queue-threshold 15
+add rule T C log level 7
+add rule T C log flags all
+add rule T C log flags tcp seq
+add rule T C log flags tcp options
+add rule T C log flags tcp seq,options
+add rule T C log flags tcp options,seq
+add rule T C log flags ip options
+add rule T C log flags skuid
+add rule T C log flags ether
+add rule T C log flags all
+#    nft_nat_stmt,
+#    @nft_c_meta_stmt,
+#    nft_masq_stmt,
+#    @nft_c_redir_stmt,
+#    nft_tproxy_stmt,
+#    @nft_c_queue_stmt,
+#    nft_dup_stmt,
+#    nft_fwd_stmt,
+#    @nft_c_set_stmt,
+#    @nft_c_map_stmt,
+#    nft_optstrip_stmt,
+#    nft_xt_stmt,
+#    nft_objref_stmt,
+#    nft_synproxy_stmt,
+#    @nft_c_chain_stmt

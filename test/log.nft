@@ -15,7 +15,9 @@ rule table_id chain_id log
 add rule table_id chain_id log 
 
 tableid chainid log 
-tableId chainId log prefix 
+tableId chainId log prefix *LOG:*
+tableId chainId log prefix 'LOG:'
+tableId chainId log prefix "LOG:"
 tableId chainId log group 15
 tableId chainId log snaplen 512
 tableId chainId log queue-threshold 5

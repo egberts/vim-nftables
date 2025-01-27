@@ -161,12 +161,15 @@ set cpo&vim  " Line continuation '\' at EOL is used here
 
 syn sync clear
 syn sync maxlines=1000
-" syn sync match nftablesSync grouphere NONE \"^(table|chain|set)\"
+syn sync match nftablesSync grouphere NONE \"^(add rule|table|chain|set)\"
 " syn sync fromstart "^(monitor|table|set)"
-syn sync fromstart
+" syn sync fromstart
 
 let s:save_cpo = &cpoptions
 set cpoptions-=C
+
+hi link Variable              String
+hi link Command               Statement
 
 hi def link nftHL_String      String
 hi def link nftHL_Variable    Variable
@@ -219,19 +222,20 @@ hi def link nftHL_BlockDelimitersLimit  Delimiter
 hi def link nftHL_BlockDelimitersSecMark Delimiter
 hi def link nftHL_BlockDelimitersSynProxy Delimiter
 hi def link nftHL_BlockDelimitersMeter  Delimiter
-if exists('not_yet')
-hi def nftHL_BlockDelimitersTable  ctermfg=LightRed ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersChain  ctermfg=LightGreen ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersSet  ctermfg=LightBlue ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersMap  ctermfg=LightCyan ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersFlowTable  ctermfg=LightMagenta ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersCounter  ctermfg=LightYellow ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersQuota  ctermfg=DarkGrey ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersCT  ctermfg=Red ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersLimit  ctermfg=Red ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersSecMark  ctermfg=Red ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersSynProxy  ctermfg=Red ctermbg=Black cterm=NONE
-hi def nftHL_BlockDelimitersMeter  ctermfg=Red ctermbg=Black cterm=NONE
+
+if exists('g:nft_colorscheme')
+hi nftHL_BlockDelimitersTable  ctermfg=LightRed ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersChain  ctermfg=LightGreen ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersSet  ctermfg=LightBlue ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersMap  ctermfg=LightCyan ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersFlowTable  ctermfg=LightMagenta ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersCounter  ctermfg=LightYellow ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersQuota  ctermfg=DarkGrey ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersCT  ctermfg=Red ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersLimit  ctermfg=Red ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersSecMark  ctermfg=Red ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersSynProxy  ctermfg=Red ctermbg=Black cterm=NONE
+hi nftHL_BlockDelimitersMeter  ctermfg=Red ctermbg=Black cterm=NONE
 endif
 
 """"""""""
@@ -360,11 +364,11 @@ hi link nft_string_sans_single_quote nftHL_String
 syn match nft_string_sans_single_quote "\v[a-zA-Z0-9\/\\\[\]\']{1,64}" keepend contained
 
 hi link    nft_string_single nftHL_String
-syn region nft_string_single start="'" skip="\\\'" end="'" keepend contained
+syn region nft_string_single start="'" skip="\\\'" end="'" keepend oneline contained
 \ contains=nft_string_sans_single_quote
 
 hi link    nft_string_double nftHL_String
-syn region nft_string_double start="\"" skip="\\\"" end="\"" keepend contained
+syn region nft_string_double start="\"" skip="\\\"" end="\"" keepend oneline contained
 \ contains=nft_string_sans_double_quote
 
 syn cluster nft_c_quoted_string
@@ -373,7 +377,7 @@ syn cluster nft_c_quoted_string
 \    nft_string_double
 
 hi link    nft_asterisk_string nftHL_String
-syn region nft_asterisk_string start="\*" skip="\\\*" end="\*" keepend contained
+syn region nft_asterisk_string start="\*" skip="\\\*" end="\*" keepend oneline contained
 \ contains=nft_string_unquoted
 
 hi link nft_c_string nftHL_String
@@ -1351,7 +1355,7 @@ syn match nft_payload_base_spec_via_payload_expr_set "\vll|nh|th|string" skipwhi
 
 " payload_raw_expr (via payload_expr)
 hi link nft_payload_raw_expr nftHL_Statement
-syn match nft_payload_raw_expr "\vat" skipwhite contained
+syn match nft_payload_raw_expr "\v \zsat\ze " skipwhite contained
 \ nextgroup=@nft_c_payload_base_spec
 
 hi link  nft_payload_raw_expr_via_payload_expr_set nftHL_Action
@@ -1784,11 +1788,11 @@ hi link nft_meta_stmt_at_string_sans_single_quote nftHL_String
 syn match nft_meta_stmt_at_string_sans_single_quote "\v[a-zA-Z0-9\/\\\[\]\']{1,64}" keepend contained
 
 hi link nft_meta_stmt_at_string_single nftHL_String
-syn region nft_meta_stmt_at_string_single start="'" skip="\\\'" end="'" keepend contained
+syn region nft_meta_stmt_at_string_single start="'" skip="\\\'" end="'" keepend oneline contained
 \ contains=nft_meta_stmt_at_string_sans_single_quote
 
 hi link nft_meta_stmt_at_string_double nftHL_String
-syn region nft_meta_stmt_at_string_double start="\"" skip="\\\"" end="\"" keepend contained
+syn region nft_meta_stmt_at_string_double start="\"" skip="\\\"" end="\"" keepend oneline contained
 \ contains=nft_meta_stmt_at_string_sans_double_quote
 
 syn cluster nft_c_meta_stmt_at_quoted_string
@@ -2145,7 +2149,7 @@ syn match nft_ct_helper_config_protocol "protocol" skipwhite contained
 
 " <quoted_string>->ct_helper_config->ct_helper_block
 hi link nft_ct_helper_config_type_string_quoted nftHL_String
-syn region nft_ct_helper_config_type_string_quoted start="\"" skip="\\\"" end="\"" skipwhite contained
+syn region nft_ct_helper_config_type_string_quoted start="\"" skip="\\\"" end="\"" skipwhite oneline contained
 \ nextgroup=nft_ct_helper_config_protocol
 
 " 'type'->ct_helper_config->ct_helper_block
@@ -2195,12 +2199,12 @@ syn match nft_secmark_config_string_sans_single_quote "\v[a-zA-Z][a-zA-Z0-9\\\/_
 
 " single_string->secmark_config->(add_cmd|create_cmd|secmark_block)
 hi link nft_secmark_config_string_single nftHL_String
-syn region nft_secmark_config_string_single start="'" skip="\\\'" end="'" keepend contained
+syn region nft_secmark_config_string_single start="'" skip="\\\'" end="'" keepend oneline contained
 \ contains=nft_secmark_config_string_sans_single_quote
 
 " double_string->secmark_config->(add_cmd|create_cmd|secmark_block)
 hi link nft_secmark_config_string_double nftHL_String
-syn region nft_secmark_config_string_double start="\"" skip="\\\"" end="\"" keepend contained
+syn region nft_secmark_config_string_double start="\"" skip="\\\"" end="\"" keepend oneline contained
 \ contains=nft_secmark_config_string_sans_double_quote
 
 " quoted_string->secmark_config->(add_cmd|create_cmd|secmark_block)
@@ -2685,7 +2689,7 @@ syn match nft_meter_stmt_alloc_size "size" skipwhite contained
 " <identifier> meter_stmt_alloc->meter_stmt
 " meter_stmt_alloc->meter_stmt
 " 'meter' <identifier>
-hi link nft_meter_stmt_alloc_identifier nftHL_Statement
+hi link nft_meter_stmt_alloc_identifier nftHL_Identifier
 syn match nft_meter_stmt_alloc_identifier "\v[A-Za-z][A-Za-z0-9]{0,63}" skipwhite contained
 \ nextgroup=
 \    nft_meter_stmt_alloc_size,
@@ -3369,39 +3373,39 @@ syn match nft_reject_with_expr "type" skipwhite contained
 " 'reject' 'with' 'icmp' 'type'
 " 'reject' 'with' 'icmpv6' 'type'
 " reject_opts->reject_stmt->stmt
-hi link nft_reject_opts_keyword_type nftHL_Command
+hi link nft_reject_opts_keyword_type nftHL_Statement
 syn match nft_reject_opts_keyword_type "type" skipwhite contained
 \ nextgroup=nft_reject_with_expr
 
 " 'reject' 'with' ('icmp'|'icmpv6')
 " reject_opts->reject_stmt->stmt
-hi link nft_reject_opts_keywords_icmp nftHL_Command
-syn match nft_reject_opts_keywords_icmp "\vicmp[6]?" skipwhite contained
+hi link nft_reject_opts_keyword_icmp nftHL_Action
+syn match nft_reject_opts_keyword_icmp "\vicmp[6]?" skipwhite contained
 \ nextgroup=
 \    nft_reject_opts_icmp_keyword_type,
 \    nft_reject_with_expr
 
 " 'reject' 'with' 'icmpx'
 " reject_opts->reject_stmt->stmt
-hi link   nft_reject_opts_icmpx nftHL_Action
-syn match nft_reject_opts_icmpx "icmpx" skipwhite contained
+hi link   nft_reject_opts_keyword_icmpx nftHL_Action
+syn match nft_reject_opts_keyword_icmpx "icmpx" skipwhite contained
 \ nextgroup=
 \    nft_reject_opts_icmp_keyword_type,
 \    nft_reject_with_expr
 
 " 'reject' 'with' 'tcp'
 " reject_opts->reject_stmt->stmt
-hi link   nft_reject_opts_tcp nftHL_Action
-syn match nft_reject_opts_tcp "\vtcp\s{1,15}reset" skipwhite contained
+hi link   nft_reject_opts_keyword_tcp nftHL_Action
+syn match nft_reject_opts_keyword_tcp "\vtcp\s{1,15}reset" skipwhite contained
 
 " 'reject' 'with'
 " reject_opts->reject_stmt->stmt
-hi link nft_reject_opts nftHL_Command
+hi link nft_reject_opts nftHL_Statement
 syn match nft_reject_opts "with" skipwhite contained
 \ nextgroup=
 \    nft_reject_opts_keyword_icmp,
 \    nft_reject_opts_keyword_icmpx,
-\    nft_reject_opts_keyword_tcp,
+\    nft_reject_opts_keyword_tcp
 
 hi link   nft_keyword_string nftHL_Command
 syn match nft_keyword_string "string" skipwhite contained
@@ -3800,9 +3804,21 @@ hi link   nft_log_flags_keyword_all nftHL_Action
 syn match nft_log_flags_keyword_all "all" skipwhite contained
 \ nextgroup=nft_EOS
 
-" 'log' 'prefix' <STRING>
-hi link   nft_log_arg_keyword_prefix_string nftHL_String
-syn match nft_log_arg_keyword_prefix_string "\v\p{1,64}" skipwhite contained
+" 'log' 'prefix' <ASTERISK_STRING>
+hi link   nft_log_arg_keyword_prefix_string_asterisks nftHL_String
+syn region nft_log_arg_keyword_prefix_string_asterisks start="\*" end="\*" skip="\\\*" skipwhite oneline contained
+
+" 'log' 'prefix' <QUOTED_STRING> (single-quoted)
+hi link   nft_log_arg_keyword_prefix_string_quoted_singles nftHL_String
+syn region nft_log_arg_keyword_prefix_string_quoted_singles start="\'" end="\'" skip="\\\'" skipwhite oneline contained
+
+" 'log' 'prefix' <QUOTED_STRING> (double-quoted)
+hi link   nft_log_arg_keyword_prefix_string_quoted_doubles nftHL_String
+syn region nft_log_arg_keyword_prefix_string_quoted_doubles start="\"" end="\"" skip="\\\"" skipwhite oneline contained
+
+" 'log' 'prefix' <STRING>  ; unquoted strings (no whitespace)
+hi link   nft_log_arg_keyword_prefix_string_unquoted nftHL_String
+syn match nft_log_arg_keyword_prefix_string_unquoted "\v[a-zA-Z0-9]{1,64}" skipwhite contained oneline
 \ nextgroup=nft_EOS
 
 " 'log' 'level' <STRING>
@@ -3820,7 +3836,11 @@ syn match nft_log_arg_num "\v\d{1,11}" skipwhite contained
 " nft_log_arg_keyword_prefix
 hi link   nft_log_arg_keyword_prefix nftHL_Statement
 syn match nft_log_arg_keyword_prefix "prefix" skipwhite contained
-\ nextgroup=nft_log_arg_keyword_prefix_string
+\ nextgroup=
+\     nft_log_arg_keyword_prefix_string_quoted_singles,
+\     nft_log_arg_keyword_prefix_string_quoted_doubles,
+\     nft_log_arg_keyword_prefix_string_asterisks,
+\     nft_log_arg_keyword_prefix_string_unquoted
 
 " nft_log_arg_keyword_group
 hi link   nft_log_arg_keyword_group nftHL_Statement
@@ -4201,12 +4221,12 @@ hi link   nft_add_table_table_options_comment_spec_string_sans_single_quote nftH
 syn match nft_add_table_table_options_comment_spec_string_sans_single_quote "\v[a-zA-Z][a-zA-Z0-9\\\/_\[\]\']{0,63}" keepend contained
 
 hi link    nft_add_table_table_options_comment_spec_string_single nftHL_String
-syn region nft_add_table_table_options_comment_spec_string_single start="'" skip="\\\'" end="'" keepend contained
+syn region nft_add_table_table_options_comment_spec_string_single start="'" skip="\\\'" end="'" keepend oneline contained
 \ contains=nft_add_table_table_options_comment_spec_string_sans_double_quote
 
 " add_cmd 'table' table_block table_options comment_spec 'comment' string QUOTED_STRING
 hi link nft_add_table_table_options_comment_spec_string_double nftHL_String
-syn region nft_add_table_table_options_comment_spec_string_double start="\"" skip="\\\"" end="\"" keepend contained
+syn region nft_add_table_table_options_comment_spec_string_double start="\"" skip="\\\"" end="\"" keepend oneline contained
 \ contains=nft_add_table_table_options_comment_spec_string_sans_single_quote
 
 " add_cmd 'table' table_block table_options comment_spec 'comment' string QUOTED_STRING
@@ -4215,7 +4235,7 @@ syn match nft_add_table_table_options_comment_spec_string_sans_asterisk_quote "\
 
 " add_cmd 'table' table_block table_options comment_spec 'comment' string <ASTERISK_STRING>
 hi link    nft_add_table_table_options_comment_spec_string_asterisked nftHL_String
-syn region nft_add_table_table_options_comment_spec_string_asterisked start="\*" skip="\\\*" end="\*" excludenl skipnl skipempty skipwhite keepend contained
+syn region nft_add_table_table_options_comment_spec_string_asterisked start="\*" skip="\\\*" end="\*" excludenl skipnl skipempty skipwhite keepend oneline contained
 \ contains=nft_add_table_table_options_comment_spec_string_sans_asterisk_quote
 
 " add_cmd 'table' table_block table_options comment_spec 'comment' string
@@ -4851,11 +4871,11 @@ hi link   nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_s
 syn match nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_single_quote "\v[a-zA-Z][a-zA-Z0-9\\\/_\[\]\']{0,63}" keepend contained
 
 hi link    nft_add_table_table_block_chain_chain_block_comment_spec_string_single nftHL_String
-syn region nft_add_table_table_block_chain_chain_block_comment_spec_string_single start="'" skip="\\'" end="'" keepend contained
+syn region nft_add_table_table_block_chain_chain_block_comment_spec_string_single start="'" skip="\\'" end="'" keepend oneline contained
 \ contains=nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_double_quote
 
 hi link    nft_add_table_table_block_chain_chain_block_comment_spec_string_double nftHL_String
-syn region nft_add_table_table_block_chain_chain_block_comment_spec_string_double start="\"" skip="\\\"" end="\"" keepend contained
+syn region nft_add_table_table_block_chain_chain_block_comment_spec_string_double start="\"" skip="\\\"" end="\"" keepend oneline contained
 \ contains=nft_add_table_table_block_chain_chain_block_comment_spec_string_sans_single_quote
 
 syn cluster nft_c_add_table_table_block_chain_chain_block_comment_spec_quoted_string
@@ -4864,7 +4884,7 @@ syn cluster nft_c_add_table_table_block_chain_chain_block_comment_spec_quoted_st
 \    nft_add_table_table_block_chain_chain_block_comment_spec_string_double
 
 hi link    nft_add_table_table_block_chain_chain_block_comment_spec_asterisk_string nftHL_String
-syn region nft_add_table_table_block_chain_chain_block_comment_spec_asterisk_string start="\*" skip="\\\*" end="\*" keepend contained
+syn region nft_add_table_table_block_chain_chain_block_comment_spec_asterisk_string start="\*" skip="\\\*" end="\*" keepend oneline contained
 \ contains=nft_add_table_table_block_chain_chain_block_comment_spec_string_unquoted
 
 hi link     nft_c_add_table_table_block_chain_chain_block_comment_spec_string nftHL_Error
@@ -5036,13 +5056,13 @@ syn match nft_add_table_table_block_chain_chain_identifier_string_sans_single_qu
 
 " add_cmd 'table' table_block 'chain' chain_spec table_id chain_id
 hi link    nft_add_table_table_block_chain_chain_identifier_string_single nftHL_Chain
-syn region nft_add_table_table_block_chain_chain_identifier_string_single start="'" skip="\\\'" end="'" keepend skipwhite contained
+syn region nft_add_table_table_block_chain_chain_identifier_string_single start="'" skip="\\\'" end="'" keepend skipwhite oneline contained
 \ contains=nft_add_table_table_block_chain_chain_identifier_string_sans_single_quote
 \ nextgroup=nft_add_table_table_block_chain_chain_block
 
 " add_cmd 'table' table_block 'chain' <DOUBLE_STRING>
 hi link    nft_add_table_table_block_chain_chain_identifier_string_double nftHL_Chain
-syn region nft_add_table_table_block_chain_chain_identifier_string_double start="\"" skip="\\\"" end="\"" keepend skipwhite contained
+syn region nft_add_table_table_block_chain_chain_identifier_string_double start="\"" skip="\\\"" end="\"" keepend skipwhite oneline contained
 \ contains=nft_add_table_table_block_chain_chain_identifier_string_sans_double_quote
 \ nextgroup=nft_add_table_table_block_chain_chain_block
 
@@ -7064,7 +7084,7 @@ hi link   nft_common_block_filespec_sans_single_quote nftHL_String
 syn match nft_common_block_filespec_sans_single_quote "\v[\"_\-\.\;\?a-zA-Z0-9\,\:\+\=\*\&\^\%\$\!`\~\#\@\|\/\\\(\)\{\}\[\]\<\>(\\\')]+" keepend contained
 
 hi link    nft_common_block_filespec_quoted_single nftHL_String
-syn region nft_common_block_filespec_quoted_single start="\'" skip="\\\'" end="\'" skipwhite oneline keepend contained
+syn region nft_common_block_filespec_quoted_single start="\'" skip="\\\'" end="\'" skipwhite keepend oneline contained
 \ contains=nft_common_block_filespec_sans_single_quote
 \ nextgroup=
 \    nft_comment_inline,
@@ -7118,7 +7138,7 @@ syn cluster nft_c_common_block_define_redefine_initializer_expr
 hi link nft_common_block_define_redefine_equal nftHL_Operator
 syn match nft_common_block_define_redefine_equal "=" skipwhite contained
 \ nextgroup=
-\    @nft_c_common_block_define_redefine_initializer_expr,
+\    @nft_c_common_block_define_redefine_initializer_expr
 
 " common_block 'define'/'redefine identifier <STRING>
 hi link nft_common_block_define_redefine_identifier_string nftHL_Identifier
