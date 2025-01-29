@@ -1,60 +1,43 @@
-*autocmd.txt*   For Vim version 9.0.  Last change: 2025 Jan 22
+*nftables.txt*   For Vim version 9.0.  Last change: 2025 Jan 22
 
 
 		  NETFILTER REFERENCE MANUAL    by Steve Egbert
 
 
-Net matic commands				*nftables* *nftables*
+Net matic commands				 *nftables*
 
 For a basic explanation, see section |40.3| in the user manual.
 
-1.  Introduction		|autocmd-intro|
-2.  Defining autocommands	|autocmd-define|
-3.  Removing autocommands	|autocmd-remove|
-4.  Listing autocommands	|autocmd-list|
-5.  Events			|autocmd-events|
-6.  Patterns			|autocmd-patterns|
-7.  Buffer-local autocommands	|autocmd-buflocal|
-8.  Groups			|autocmd-groups|
-9.  Executing autocommands	|autocmd-execute|
-10. Using autocommands		|autocmd-use|
-11. Disabling autocommands	|autocmd-disable|
+1.  Introduction		|nftables-intro|
+2.  Defining autocommands	|nftables-define|
+3.  Removing autocommands	|nftables-remove|
+4.  Listing autocommands	|nftables-list|
+5.  Events			|nftables-events|
+6.  Patterns			|nftables-patterns|
+7.  Buffer-local autocommands	|nftables-buflocal|
+8.  Groups			|nftables-groups|
+9.  Executing autocommands	|nftables-execute|
+10. Using autocommands		|nftables-use|
+11. Disabling autocommands	|nftables-disable|
 
 
 ==============================================================================
-1. Introduction						*autocmd-intro*
+1. Introduction						*nftables-intro*
 
-You can specify commands to be executed automatically when reading or writing
-a file, when entering or leaving a buffer or window, and when exiting Vim.
-For example, you can create an autocommand to set the 'cindent' option for
-files matching *.c.  You can also use autocommands to implement advanced
-features, such as editing compressed files (see |gzip-example|).  The usual
-place to put autocommands is in your .vimrc or .exrc file.
+You can do the following:
 
-				*E203* *E204* *E143* *E855* *E937* *E952*
-WARNING: Using autocommands is very powerful, and may lead to unexpected side
-effects.  Be careful not to destroy your text.
-- It's a good idea to do some testing on an expendable copy of a file first.
-  For example: If you use autocommands to decompress a file when starting to
-  edit it, make sure that the autocommands for compressing when writing work
-  correctly.
-- Be prepared for an error halfway through (e.g., disk full).  Vim will mostly
-  be able to undo the changes to the buffer, but you may have to clean up the
-  changes to other files by hand (e.g., compress a file that has been
-  decompressed).
-- If the BufRead* events allow you to edit a compressed file, the FileRead*
-  events should do the same (this makes recovery possible in some rare cases).
-  It's a good idea to use the same autocommands for the File* and Buf* events
-  when possible.
+*  highlight command, statement, and action
+*  unique color for each nested block denoted by a pair 
+       of brace/bracket/paranthesis.
+*  tab ident by 4
+*  highlight errors
 
-Recommended use:
-- Always use a group, so that it's easy to delete the autocommand.
-- Keep the command itself short, call a function to do more work.
-- Make it so that the script it is defined in can be sourced several times
-  without the autocommand being repeated.
+				*E701*
+WARNING: Using nftables syntax is very powerful, and may lead to unexpected side
+effects.  
 
 Example in Vim9 script: >
-   autocmd_add({replace: true,
+   nftables_add({replace: true,
 		group:   'DemoGroup',
 		event:   'BufEnter',
 		pattern: '*.txt',
@@ -62,7 +45,7 @@ Example in Vim9 script: >
 		})
 
 In legacy script: >
-   call autocmd_add(#{replace: v:true,
+   call nftables_add(#{replace: v:true,
 		    \ group: 'DemoGroup',
 		    \ event: 'BufEnter',
 		    \ pattern: '*.txt',
@@ -70,142 +53,7 @@ In legacy script: >
 		    \ })
 
 ==============================================================================
-2. Defining autocommands				*autocmd-define*
-
-							*:au* *:autocmd*
-:au[tocmd] [group] {event} {aupat} [++once] [++nested] {cmd}
-			Add {cmd} to the list of commands that Vim will
-			execute automatically on {event} for a file matching
-			{aupat} |autocmd-patterns|.
-			Here {event} cannot be "*".  *E1155*
-			Note: A quote character is seen as argument to the
-			:autocmd and won't start a comment.
-			Vim always adds the {cmd} after existing autocommands,
-			so that the autocommands execute in the order in which
-			they were given.
-			See |autocmd-nested| for [++nested].  "nested"
-			(without the ++) can also be used, for backwards
-			compatibility, but not in |Vim9| script. *E1078*
-							*autocmd-once*
-			If [++once] is supplied the command is executed once,
-			then removed ("one shot").
-
-The special pattern <buffer> or <buffer=N> defines a buffer-local autocommand.
-See |autocmd-buflocal|.
-
-If the `:autocmd` is in Vim9 script (a script that starts with `:vim9script`
-and in a `:def` function) then {cmd} will be executed as in Vim9
-script.  Thus this depends on where the autocmd is defined, not where it is
-triggered.
-							*:autocmd-block*
-{cmd} can be a block, like with `:command`, see |:command-repl|.  Example: >
-	au BufReadPost *.xml {
-		  setlocal matchpairs+=<:>
-		  /<start
-		}
-
-The |autocmd_add()| function can be used to add a list of autocmds and autocmd
-groups from a Vim script.  It is preferred if you have anything that would
-require using `:execute` with `:autocmd`.
-
-Note: The ":autocmd" command can only be followed by another command when the
-'|' appears where the pattern is expected.  This works: >
-	:augroup mine | au! BufRead | augroup END
-But this sees "augroup" as part of the defined command: >
-	:augroup mine | au! BufRead * | augroup END
-	:augroup mine | au BufRead * set tw=70 | augroup END
-Instead you can put the group name into the command: >
-	:au! mine BufRead *
-	:au mine BufRead * set tw=70
-Or use `:execute`: >
-	:augroup mine | exe "au! BufRead *" | augroup END
-	:augroup mine | exe "au BufRead * set tw=70" | augroup END
-
-<							*autocmd-expand*
-Note that special characters (e.g., "%", "<cword>") in the ":autocmd"
-arguments are not expanded when the autocommand is defined.  These will be
-expanded when the Event is recognized, and the {cmd} is executed.  The only
-exception is that "<sfile>" is expanded when the autocmd is defined.  Example:
->
-	:au BufNewFile,BufRead *.html so <sfile>:h/html.vim
-
-Here Vim expands <sfile> to the name of the file containing this line.
-
-`:autocmd` adds to the list of autocommands regardless of whether they are
-already present.  When your .vimrc file is sourced twice, the autocommands
-will appear twice.  To avoid this, define your autocommands in a group, so
-that you can easily clear them: >
-
-	augroup vimrc
-	  " Remove all vimrc autocommands
-	  autocmd!
-	  au BufNewFile,BufRead *.html so <sfile>:h/html.vim
-	augroup END
-
-If you don't want to remove all autocommands, you can instead use a variable
-to ensure that Vim includes the autocommands only once: >
-
-	:if !exists("autocommands_loaded")
-	:  let autocommands_loaded = 1
-	:  au ...
-	:endif
-
-When the [group] argument is not given, Vim uses the current group (as defined
-with ":augroup"); otherwise, Vim uses the group defined with [group].  Note
-that [group] must have been defined before.  You cannot define a new group
-with ":au group ..."; use ":augroup" for that.
-
-While testing autocommands, you might find the 'verbose' option to be useful: >
-	:set verbose=9
-This setting makes Vim echo the autocommands as it executes them.
-
-When defining an autocommand in a script, it will be able to call functions
-local to the script and use mappings local to the script.  When the event is
-triggered and the command executed, it will run in the context of the script
-it was defined in.  This matters if |<SID>| is used in a command.
-
-When executing the commands, the message from one command overwrites a
-previous message.  This is different from when executing the commands
-manually.  Mostly the screen will not scroll up, thus there is no hit-enter
-prompt.  When one command outputs two messages this can happen anyway.
-
-==============================================================================
-3. Removing autocommands				*autocmd-remove*
-
-In addition to the below described commands, the |autocmd_delete()| function can
-be used to remove a list of autocmds and autocmd groups from a Vim script.
-
-:au[tocmd]! [group] {event} {aupat} [++once] [++nested] {cmd}
-			Remove all autocommands associated with {event} and
-			{aupat}, and add the command {cmd}.
-			See |autocmd-once| for [++once].
-			See |autocmd-nested| for [++nested].
-
-:au[tocmd]! [group] {event} {aupat}
-			Remove all autocommands associated with {event} and
-			{aupat}.
-
-:au[tocmd]! [group] * {aupat}
-			Remove all autocommands associated with {aupat} for
-			all events.
-
-:au[tocmd]! [group] {event}
-			Remove ALL autocommands for {event}.
-			Warning: You should not do this without a group for
-			|BufRead| and other common events, it can break
-			plugins, syntax highlighting, etc.
-
-:au[tocmd]! [group]	Remove ALL autocommands.
-			Note: a quote will be seen as argument to the :autocmd
-			and won't start a comment.
-			Warning: You should normally not do this without a
-			group, it breaks plugins, syntax highlighting, etc.
-
-When the [group] argument is not given, Vim uses the current group (as defined
-with ":augroup"); otherwise, Vim uses the group defined with [group].
-
-==============================================================================
-4. Listing autocommands					*autocmd-list*
+4. Listing autocommands					*nftables-list*
 
 :au[tocmd] [group] {event} {aupat}
 			Show the autocommands associated with {event} and
@@ -225,16 +73,16 @@ If you provide the [group] argument, Vim lists only the autocommands for
 argument behavior differs from that for defining and removing autocommands.
 
 In order to list buffer-local autocommands, use a pattern in the form <buffer>
-or <buffer=N>.  See |autocmd-buflocal|.
+or <buffer=N>.  See |nftables-buflocal|.
 
-The |autocmd_get()| function can be used from a Vim script to get a list of
-autocmds.
+The |nftables_get()| function can be used from a Vim script to get a list of
+nftabless.
 
-							*:autocmd-verbose*
+							*:nftables-verbose*
 When 'verbose' is non-zero, listing an autocommand will also display where it
 was last defined. Example: >
 
-    :verbose autocmd BufEnter
+    :verbose nftables BufEnter
     FileExplorer  BufEnter
 	*	  call s:LocalBrowse(expand("<amatch>"))
 	    Last set from /usr/share/vim/vim-7.0/plugin/NetrwPlugin.vim
@@ -242,7 +90,7 @@ was last defined. Example: >
 See |:verbose-cmd| for more information.
 
 ==============================================================================
-5. Events					*autocmd-events* *E215* *E216*
+5. Events					*nftables-events* *E215* *E216*
 
 You can specify a comma-separated list of event names.  No white space can be
 used in this list.  The command applies to all the events in the list.
@@ -270,7 +118,7 @@ Vim recognizes the following events.  Vim ignores the case of event names
 (e.g., you can use "BUFread" or "bufread" instead of "BufRead").
 
 First an overview by function with a short explanation.  Then the list
-alphabetically with full explanations |autocmd-events-abc|.
+alphabetically with full explanations |nftables-events-abc|.
 
 Name			triggered by ~
 
@@ -433,13 +281,13 @@ Name			triggered by ~
 |CompleteDone|		after Insert mode completion is done, after clearing
 			info
 
-|User|			to be used in combination with ":doautocmd"
+|User|			to be used in combination with ":donftables"
 |SigUSR1|		after the SIGUSR1 signal has been detected
 
 |WinScrolled|		after scrolling or resizing a window
 
 
-The alphabetical list of autocommand events:		*autocmd-events-abc*
+The alphabetical list of autocommand events:		*nftables-events-abc*
 
 							*BufCreate* *BufAdd*
 BufAdd or BufCreate		Just after creating a new buffer which is
@@ -739,7 +587,7 @@ CursorMoved			After the cursor was moved in Normal or Visual
 				cursor position.
 				For an example see |match-parens|.
 				Note: This can not be skipped with
-				`:noautocmd`.
+				`:nonftables`.
 				Careful: This is triggered very often, don't
 				do anything that the user does not expect or
 				that is slow.
@@ -923,13 +771,13 @@ GUIEnter			After starting the GUI successfully, and after
 				opening the window.  It is triggered before
 				VimEnter when using gvim.  Can be used to
 				position the window from a .gvimrc file: >
-	:autocmd GUIEnter * winpos 100 50
+	:nftables GUIEnter * winpos 100 50
 <							*GUIFailed*
 GUIFailed			After starting the GUI failed.  Vim may
 				continue to run in the terminal, if possible
 				(only on Unix and alikes, when connecting the
 				X server fails).  You may want to quit Vim: >
-	:autocmd GUIFailed * qall
+	:nftables GUIFailed * qall
 <							*InsertChange*
 InsertChange			When typing <Insert> while in Insert or
 				Replace mode.  The |v:insertmode| variable
@@ -1166,7 +1014,7 @@ SwapExists			Detected an existing swap file when starting
 					'q'	quit, don't edit the file
 					'a'	abort, like hitting CTRL-C
 				When set to an empty string the user will be
-				asked, as if there was no SwapExists autocmd.
+				asked, as if there was no SwapExists nftables.
 							*E812*
 				It is not allowed to change to another buffer,
 				change a buffer name or change directory
@@ -1226,7 +1074,7 @@ TextChanged			After a change was made to the text in the
 				Not triggered when there is typeahead or when
 				an operator is pending.
 				Note: This can not be skipped with
-				`:noautocmd`.
+				`:nonftables`.
 				Careful: This is triggered very often, don't
 				do anything that the user does not expect or
 				that is slow.
@@ -1248,7 +1096,7 @@ TextChangedT			After a change was made to the text in the
 TextYankPost			After text has been yanked or deleted in the
 				current buffer.  The following values of
 				|v:event| can be used to determine the operation
-				that triggered this autocmd:
+				that triggered this nftables:
 				   inclusive	TRUE if the motion is
 						|inclusive| else the motion is
 						|exclusive|.
@@ -1273,8 +1121,8 @@ TextYankPost			After text has been yanked or deleted in the
 							*User*
 User				Never executed automatically.  To be used for
 				autocommands that are only executed with
-				":doautocmd".
-				Note that when `:doautocmd User MyEvent` is
+				":donftables".
+				Note that when `:donftables User MyEvent` is
 				used while there are no matching autocommands,
 				you will get an error.  If you don't want
 				that, either check whether an autocommand is
@@ -1282,7 +1130,7 @@ User				Never executed automatically.  To be used for
 				define a dummy autocommand yourself.
 				Example: >
 				    if exists('#User#MyEvent')
-					doautocmd User MyEvent
+					donftables User MyEvent
 				    endif
 <
 							*SigUSR1*
@@ -1323,7 +1171,7 @@ VimLeavePre			Before exiting Vim, just before writing the
 				if there is a match with the name of what
 				happens to be the current buffer when exiting.
 				Mostly useful with a "*" pattern. >
-	:autocmd VimLeavePre * call CleanupStuff()
+	:nftables VimLeavePre * call CleanupStuff()
 <				To detect an abnormal exit use |v:dying|.
 				When v:dying is 2 or more this event is not
 				triggered.
@@ -1338,7 +1186,7 @@ VimResume			When the Vim instance is resumed after being
 				Useful for triggering |:checktime| and ensure
 				the buffers content did not change while Vim
 				was suspended: >
-	:autocmd VimResume * checktime
+	:nftables VimResume * checktime
 <							*VimSuspend*
 VimSuspend			When the Vim instance is suspended.  Only when
 				CTRL-Z was typed inside Vim, or when the SIGTSTP
@@ -1412,14 +1260,14 @@ WinResized			After a window in the current tab page changed
 				pattern, triggering and recursiveness.
 
 ==============================================================================
-6. Patterns					*autocmd-patterns* *{aupat}*
+6. Patterns					*nftables-patterns* *{aupat}*
 
-The {aupat} argument of `:autocmd` can be a comma-separated list.  This works as
+The {aupat} argument of `:nftables` can be a comma-separated list.  This works as
 if the command was given with each pattern separately.  Thus this command: >
-	:autocmd BufRead *.txt,*.info set et
+	:nftables BufRead *.txt,*.info set et
 Is equivalent to: >
-	:autocmd BufRead *.txt set et
-	:autocmd BufRead *.info set et
+	:nftables BufRead *.txt set et
+	:nftables BufRead *.info set et
 
 The file pattern {aupat} is tested for a match against the file name in one of
 two ways:
@@ -1430,23 +1278,23 @@ two ways:
    it to a full path and resolving symbolic links).
 
 The special pattern <buffer> or <buffer=N> is used for buffer-local
-autocommands |autocmd-buflocal|.  This pattern is not matched against the name
+autocommands |nftables-buflocal|.  This pattern is not matched against the name
 of a buffer.
 
 Examples: >
-	:autocmd BufRead *.txt		set et
+	:nftables BufRead *.txt		set et
 Set the 'et' option for all text files. >
 
-	:autocmd BufRead /vim/src/*.c	set cindent
+	:nftables BufRead /vim/src/*.c	set cindent
 Set the 'cindent' option for C files in the /vim/src directory. >
 
-	:autocmd BufRead /tmp/*.c	set ts=5
+	:nftables BufRead /tmp/*.c	set ts=5
 If you have a link from "/tmp/test.c" to "/home/nobody/vim/src/test.c", and
 you start editing "/tmp/test.c", this autocommand will match.
 
 Note:  To match part of a path, but not from the root directory, use a '*' as
 the first character.  Example: >
-	:autocmd BufRead */doc/*.txt	set tw=78
+	:nftables BufRead */doc/*.txt	set tw=78
 This autocommand will for example be executed for "/tmp/doc/xx.txt" and
 "/usr/home/piet/doc/yy.txt".  The number of directories does not matter here.
 
@@ -1462,10 +1310,10 @@ expect.
 
 
 Environment variables can be used in a pattern: >
-	:autocmd BufRead $VIMRUNTIME/doc/*.txt  set expandtab
+	:nftables BufRead $VIMRUNTIME/doc/*.txt  set expandtab
 And ~ can be used for the home directory (if $HOME is defined): >
-	:autocmd BufWritePost ~/.vimrc   so ~/.vimrc
-	:autocmd BufRead ~archive/*      set readonly
+	:nftables BufWritePost ~/.vimrc   so ~/.vimrc
+	:nftables BufRead ~archive/*      set readonly
 The environment variable is expanded when the autocommand is defined, not when
 the autocommand is executed.  This is different from the command!
 
@@ -1495,7 +1343,7 @@ pattern and to make the autocommands portable across different systems.
 It is possible to use |pattern| items, but they may not work as expected,
 because of the translation done for the above.
 
-							*autocmd-changes*
+							*nftables-changes*
 Matching with the pattern is done when an event is triggered.  Changing the
 buffer name in one of the autocommands, or even deleting the buffer, does not
 change which autocommands will be executed.  Example: >
@@ -1514,7 +1362,7 @@ buffer actually still exists (it becomes unlisted), thus the autocommands are
 still executed.
 
 ==============================================================================
-7. Buffer-local autocommands	*autocmd-buflocal* *autocmd-buffer-local*
+7. Buffer-local autocommands	*nftables-buflocal* *nftables-buffer-local*
 					*<buffer=N>* *<buffer=abuf>* *E680*
 
 Buffer-local autocommands are attached to a specific buffer.  They are useful
@@ -1538,7 +1386,7 @@ simply use the special string instead of the pattern.  Examples: >
 				     " current buffer
     :au! * <buffer=33>		     " remove buffer-local autocommands for
 				     " buffer #33
-    :bufdo :au! CursorHold <buffer>  " remove autocmd for given event for all
+    :bufdo :au! CursorHold <buffer>  " remove nftables for given event for all
 				     " buffers
     :au * <buffer>		     " list buffer-local autocommands for
 				     " current buffer
@@ -1563,7 +1411,7 @@ It is not possible to define buffer-local autocommands for a non-existent
 buffer.
 
 ==============================================================================
-8. Groups						*autocmd-groups*
+8. Groups						*nftables-groups*
 
 Autocommands can be put together in a group.  This is useful for removing or
 executing a group of autocommands.  For example, all the autocommands for
@@ -1577,7 +1425,7 @@ for all groups.
 
 Normally, when executing autocommands automatically, Vim uses the autocommands
 for all groups.  The group only matters when executing autocommands with
-":doautocmd" or ":doautoall", or when defining or deleting autocommands.
+":donftables" or ":doautoall", or when defining or deleting autocommands.
 
 The group name can contain any characters except white space.  The group name
 "end" is reserved (also in uppercase).
@@ -1586,15 +1434,15 @@ The group name is case sensitive.  Note that this is different from the event
 name!
 
 							*:aug* *:augroup*
-:aug[roup] {name}		Define the autocmd group name for the
-				following ":autocmd" commands.  The name "end"
+:aug[roup] {name}		Define the nftables group name for the
+				following ":nftables" commands.  The name "end"
 				or "END" selects the default group.
 				To avoid confusion, the name should be
 				different from existing {event} names, as this
 				most likely will not do what you intended.
 
 					*:augroup-delete* *E367* *W19* *E936*
-:aug[roup]! {name}		Delete the autocmd group {name}.  Don't use
+:aug[roup]! {name}		Delete the nftables group {name}.  Don't use
 				this if there is still an autocommand using
 				this group!  You will get a warning if doing
 				it anyway.  When the group is the current
@@ -1623,7 +1471,7 @@ plugin.  This allows you to do: >
 	browse edit
 
 ==============================================================================
-9. Executing autocommands				*autocmd-execute*
+9. Executing autocommands				*nftables-execute*
 
 Vim can also execute Autocommands non-automatically.  This is useful if you
 have changed autocommands, or when Vim has executed the wrong autocommands
@@ -1632,8 +1480,8 @@ have changed autocommands, or when Vim has executed the wrong autocommands
 Note that the 'eventignore' option applies here too.  Events listed in this
 option will not cause any commands to be executed.
 
-				*:do* *:doau* *:doaut* *:doautocmd* *E217*
-:do[autocmd] [<nomodeline>] [group] {event} [fname]
+				*:do* *:doau* *:doaut* *:donftables* *E217*
+:do[nftables] [<nomodeline>] [group] {event} [fname]
 			Apply the autocommands matching [fname] (default:
 			current file name) for {event} to the current buffer.
 			You can use this when the current file name does not
@@ -1645,7 +1493,7 @@ option will not cause any commands to be executed.
 				:au BufEnter *.cpp so ~/.vimrc_cpp
 				:au BufEnter *.cpp doau BufEnter x.c
 <			Be careful to avoid endless loops.  See
-			|autocmd-nested|.
+			|nftables-nested|.
 
 			When the [group] argument is not given, Vim executes
 			the autocommands for all groups.  When the [group]
@@ -1665,14 +1513,14 @@ option will not cause any commands to be executed.
 
 						*:doautoa* *:doautoall*
 :doautoa[ll] [<nomodeline>] [group] {event} [fname]
-			Like ":doautocmd", but apply the autocommands to each
+			Like ":donftables", but apply the autocommands to each
 			loaded buffer.  The current buffer is done last.
 
 			Note that [fname] is used to select the autocommands,
 			not the buffers to which they are applied. Example: >
 				augroup mine
-				  autocmd!
-				  autocmd FileType * echo expand('<amatch>')
+				  nftables!
+				  nftables FileType * echo expand('<amatch>')
 				augroup END
 				doautoall mine FileType Loaded-Buffer
 <			Sourcing this script, you'll see as many
@@ -1685,7 +1533,7 @@ option will not cause any commands to be executed.
 			options, change highlighting, and things like that.
 
 ==============================================================================
-10. Using autocommands					*autocmd-use*
+10. Using autocommands					*nftables-use*
 
 For WRITING FILES there are four possible sets of events.  Vim uses only one
 of these sets for a write command:
@@ -1730,22 +1578,22 @@ work for files without a buffer (e.g., with ":r file").
 							*gzip-example*
 Examples for reading and writing compressed files: >
   :augroup gzip
-  :  autocmd!
-  :  autocmd BufReadPre,FileReadPre	*.gz set bin
-  :  autocmd BufReadPost,FileReadPost	*.gz '[,']!gunzip
-  :  autocmd BufReadPost,FileReadPost	*.gz set nobin
-  :  autocmd BufReadPost,FileReadPost	*.gz execute ":doautocmd BufReadPost " .. expand("%:r")
-  :  autocmd BufWritePost,FileWritePost	*.gz !mv <afile> <afile>:r
-  :  autocmd BufWritePost,FileWritePost	*.gz !gzip <afile>:r
+  :  nftables!
+  :  nftables BufReadPre,FileReadPre	*.gz set bin
+  :  nftables BufReadPost,FileReadPost	*.gz '[,']!gunzip
+  :  nftables BufReadPost,FileReadPost	*.gz set nobin
+  :  nftables BufReadPost,FileReadPost	*.gz execute ":donftables BufReadPost " .. expand("%:r")
+  :  nftables BufWritePost,FileWritePost	*.gz !mv <afile> <afile>:r
+  :  nftables BufWritePost,FileWritePost	*.gz !gzip <afile>:r
 
-  :  autocmd FileAppendPre		*.gz !gunzip <afile>
-  :  autocmd FileAppendPre		*.gz !mv <afile>:r <afile>
-  :  autocmd FileAppendPost		*.gz !mv <afile> <afile>:r
-  :  autocmd FileAppendPost		*.gz !gzip <afile>:r
+  :  nftables FileAppendPre		*.gz !gunzip <afile>
+  :  nftables FileAppendPre		*.gz !mv <afile>:r <afile>
+  :  nftables FileAppendPost		*.gz !mv <afile> <afile>:r
+  :  nftables FileAppendPost		*.gz !gzip <afile>:r
   :augroup END
 
 The "gzip" group is used to be able to delete any existing autocommands with
-":autocmd!", for when the file is sourced twice.
+":nftables!", for when the file is sourced twice.
 
 ("<afile>:r" is the file name without the extension, see |:_%:|)
 
@@ -1766,19 +1614,19 @@ If you want the buffer to be unmodified after changing it, reset the
 'modified' option.  This makes it possible to exit the buffer with ":q"
 instead of ":q!".
 
-							*autocmd-nested* *E218*
+							*nftables-nested* *E218*
 By default, autocommands do not nest.  For example, if you use ":e" or ":w" in
 an autocommand, Vim does not execute the BufRead and BufWrite autocommands for
 those commands.  If you do want this, use the "nested" flag for those commands
 in which you want nesting.  For example: >
-  :autocmd FileChangedShell *.c ++nested e!
+  :nftables FileChangedShell *.c ++nested e!
 The nesting is limited to 10 levels to get out of recursive loops.
 
 It's possible to use the ":au" command in an autocommand.  This can be a
 self-modifying command!  This can be useful for an autocommand that should
 execute only once.
 
-If you want to skip autocommands for one command, use the |:noautocmd| command
+If you want to skip autocommands for one command, use the |:nonftables| command
 modifier or the 'eventignore' option.
 
 Note: When reading a file (with ":read file" or with a filter command) and the
@@ -1790,29 +1638,29 @@ same file as was read, and makes a write command on just filtered lines write
 the same file as was read from the filter.  For example, another way to write
 a compressed file: >
 
-  :autocmd FileWritePre *.gz   set bin|'[,']!gzip
-  :autocmd FileWritePost *.gz  undo|set nobin
+  :nftables FileWritePre *.gz   set bin|'[,']!gzip
+  :nftables FileWritePost *.gz  undo|set nobin
 <
 							*autocommand-pattern*
 You can specify multiple patterns, separated by commas.  Here are some
 examples: >
 
-  :autocmd BufRead   *		set tw=79 nocin ic infercase fo=2croq
-  :autocmd BufRead   .letter	set tw=72 fo=2tcrq
-  :autocmd BufEnter  .letter	set dict=/usr/lib/dict/words
-  :autocmd BufLeave  .letter	set dict=
-  :autocmd BufRead,BufNewFile   *.c,*.h	set tw=0 cin noic
-  :autocmd BufEnter  *.c,*.h	abbr FOR for (i = 0; i < 3; ++i)<CR>{<CR>}<Esc>O
-  :autocmd BufLeave  *.c,*.h	unabbr FOR
+  :nftables BufRead   *		set tw=79 nocin ic infercase fo=2croq
+  :nftables BufRead   .letter	set tw=72 fo=2tcrq
+  :nftables BufEnter  .letter	set dict=/usr/lib/dict/words
+  :nftables BufLeave  .letter	set dict=
+  :nftables BufRead,BufNewFile   *.c,*.h	set tw=0 cin noic
+  :nftables BufEnter  *.c,*.h	abbr FOR for (i = 0; i < 3; ++i)<CR>{<CR>}<Esc>O
+  :nftables BufLeave  *.c,*.h	unabbr FOR
 
 For makefiles (makefile, Makefile, imakefile, makefile.unix, etc.): >
 
-  :autocmd BufEnter  ?akefile*	set include=^s\=include
-  :autocmd BufLeave  ?akefile*	set include&
+  :nftables BufEnter  ?akefile*	set include=^s\=include
+  :nftables BufLeave  ?akefile*	set include&
 
 To always start editing C files at the first function: >
 
-  :autocmd BufRead   *.c,*.h	1;/^{
+  :nftables BufRead   *.c,*.h	1;/^{
 
 Without the "1;" above, the search would start from wherever the file was
 entered, rather than from the start of the file.
@@ -1820,13 +1668,13 @@ entered, rather than from the start of the file.
 						*skeleton* *template*
 To read a skeleton (template) file when opening a new file: >
 
-  :autocmd BufNewFile  *.c	0r ~/vim/skeleton.c
-  :autocmd BufNewFile  *.h	0r ~/vim/skeleton.h
-  :autocmd BufNewFile  *.java	0r ~/vim/skeleton.java
+  :nftables BufNewFile  *.c	0r ~/vim/skeleton.c
+  :nftables BufNewFile  *.h	0r ~/vim/skeleton.h
+  :nftables BufNewFile  *.java	0r ~/vim/skeleton.java
 
 To insert the current date and time in a *.html file when writing it: >
 
-  :autocmd BufWritePre,FileWritePre *.html   ks|call LastMod()|'s
+  :nftables BufWritePre,FileWritePre *.html   ks|call LastMod()|'s
   :fun LastMod()
   :  if line("$") > 20
   :    let l = 20
@@ -1850,7 +1698,7 @@ current one.  The ":execute" command is used to be able to use an expression
 for the ":g" and ":s" commands.  The date is obtained with the strftime()
 function.  You can change its argument to get another date string.
 
-When entering :autocmd on the command-line, completion of events and command
+When entering :nftables on the command-line, completion of events and command
 names may be done (with <Tab>, CTRL-D, etc.) where appropriate.
 
 Vim executes all matching autocommands in the order that you specify them.
@@ -1862,7 +1710,7 @@ your default settings are recovered (if entering this file from another for
 which autocommands did match).  Note that "*" will also match files starting
 with ".", unlike Unix shells.
 
-						    *autocmd-searchpat*
+						    *nftables-searchpat*
 Autocommands do not change the current search patterns.  Vim saves the current
 search patterns before executing autocommands then restores them after the
 autocommands finish.  This means that autocommands do not affect the strings
@@ -1898,18 +1746,18 @@ used, zero otherwise.
 See the $VIMRUNTIME/plugin/netrwPlugin.vim for examples.
 
 ==============================================================================
-11. Disabling autocommands				*autocmd-disable*
+11. Disabling autocommands				*nftables-disable*
 
 To disable autocommands for some time use the 'eventignore' option.  Note that
 this may cause unexpected behavior, make sure you restore 'eventignore'
 afterwards, using a |:try| block with |:finally|.
 
-							*:noautocmd* *:noa*
-To disable autocommands for just one command use the ":noautocmd" command
+							*:nonftables* *:noa*
+To disable autocommands for just one command use the ":nonftables" command
 modifier.  This will set 'eventignore' to "all" for the duration of the
 following command.  Example: >
 
-	:noautocmd w fname.gz
+	:nonftables w fname.gz
 
 This will write the file without triggering the autocommands defined by the
 gzip plugin.

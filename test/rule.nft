@@ -1,13 +1,13 @@
 #!/usr/sbin/nft -f
 # File: rule
-# Description: A test NFT file to exercise '[add] rule' Vim syntax highlightings.
+# Description: Test NFT file to exercise '[add] rule' Vim syntax highlightings.
 #
 # base_cmd add_cmd 'rule' 
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_rule
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 # base_cmd add_cmd 'rule'
 
@@ -176,27 +176,33 @@ tableId chainId xt
 tableId chainId counter name
 tableid chainid limit name
 
+# https://wiki.nftables.org/wiki-nftables/index.php/Simple_rule_management
+add rule filter output ip daddr
+add rule filter output position 8 ip daddr 127.0.0.8 drop
+insert rule filter output position 8 ip daddr 127.0.0.8 drop
+delete rule filter output handle 5
+delete rule filter output ip saddr 192.168.1.1 counter  # not implemented yet
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 
 add rule T C index 1 comment "a comment quote"
 add rule T C index 1 comment "a comment quote"
 add rule      ip      T      C      position      1 comment "oh well"
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
 T C position 12 comment "yet another comment"
 T C handle 12
 T C index 12
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

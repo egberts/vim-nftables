@@ -1,13 +1,13 @@
 #!/usr/sbin/nft -f
 # File: all-flowtable.nft
-# Description: A test NFT file to exercise '[add] flowtable' Vim syntax highlightings.
+# Description: Test NFT file exercises '[add] flowtable' Vim syntax highlightings.
 #
 # base_cmd add_cmd 'flowtable' 
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_flowtable
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect.
+################################################################################
 
 # base_cmd add_cmd 'flowtable'
 flowtable T 
@@ -122,9 +122,10 @@ flush flow table bridge table_id flow_id
 flush flow table arp table_id flow_id
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good)
+################################################################################
 
 list flow table netdev table_id synproxy_id
 list flow table bridge table_id synproxy_id
@@ -136,12 +137,11 @@ list flowtables netdev
 list flowtables bridge
 list flowtables arp
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

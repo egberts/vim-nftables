@@ -1,0 +1,95 @@
+#!/usr/sbin/nft -f
+# File: chain-type
+# Description: A test NFT file to exercise 'chain-type' Vim syntax highlighting
+#
+#
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
+
+# Note that only jump and goto actions to regular chains are allowed. 
+
+chain T C { ip protocol jump C2 }
+
+add chain T C { ip protocol jump C2 }
+
+table T {
+    chain C {
+        ip protocol jump C2
+    }
+}
+
+################################################################################
+# true negative test: properly hightlighted to show an error; so far, so good
+################################################################################
+
+
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
+
+add rule ip T C jump tcp-chain
+add rule ip T C ip protocol udp jump tcp-chain
+add rule ip T C ip option ssrr tcp sport jump tcp-chain
+add rule ip T C tcp option sack0   jump tcp-chain
+add rule ip T C tcp option sack1   jump tcp-chain
+add rule ip T C tcp option sack-permitted   jump tcp-chain
+
+# https://wiki.nftables.org/wiki-nftables/index.php/Jumping_to_chain
+add rule ip filter input tcp sport jump tcp-chain
+
+# https://wiki.nftables.org/wiki-nftables/index.php/Jumping_to_chain
+table ip filter {
+        chain input {
+                 type filter hook input priority 0;
+                 ip protocol tcp jump tcp-chain
+        }
+
+        chain tcp-chain {
+                 counter packets 8 bytes 2020
+        }
+}
+
+# https://wiki.nftables.org/wiki-nftables/index.php/Jumping_to_chain
+table ip filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        # this is the 1º matching rule
+        ip saddr 1.1.1.1 ip daddr 2.2.2.2 tcp sport 111 tcp dport 222 jump other-chain
+        # this is the 3º matching rule
+        ip saddr 1.1.1.1 ip daddr 2.2.2.2 tcp sport 111 tcp dport 222 accept
+    }
+
+    chain other-chain {
+        # this is the 2º matching rule
+        counter packets 8 bytes 2020
+    }
+}
+
+# https://wiki.nftables.org/wiki-nftables/index.php/Jumping_to_chain
+table ip filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        # this is the 1º matching rule
+        # default policy 'accept' will be applied after other-chain ends processing
+        ip saddr 1.1.1.1 ip daddr 2.2.2.2 tcp sport 111 tcp dport 222 goto other-chain
+        # this rule will never be reached by this packet!
+        ip saddr 1.1.1.1 ip daddr 2.2.2.2 tcp sport 111 tcp dport 222 accept
+    }
+
+    chain other-chain {
+        # this is the 2º matching rule
+        counter packets 8 bytes 2020
+    }
+}
+
+
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
+
+# this is not a regular chain, so 'jump'/'goto' won't work
+chain C {
+    ip protocol jump C2
+}
+

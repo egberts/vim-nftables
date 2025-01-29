@@ -3,9 +3,10 @@
 # Description: A test NFT file to exercise Vim syntax highlightings for 'line' syntax group.
 #
 
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
+
 # line
 #
 # line common_block 'include' <QUOTED_STRING>
@@ -27,18 +28,16 @@ undefine ABC
 undefine A
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
-
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

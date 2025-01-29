@@ -5,9 +5,9 @@
 # base_cmd add_cmd 'reset' 
 # nft_line/nft_base_cmd/nft_base_cmd_reset
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 # 'reset counters' <ruleset_spec>
 reset counters 
@@ -92,9 +92,11 @@ reset rule bridge
 reset rule arp
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
+
 # 'reset' 'element' set_spec set_block_expr
 # 'reset' 'element' table_spec set_id set_block_expr
 # 'reset' 'element' family_spec table_id set_id set_block_expr
@@ -156,18 +158,15 @@ reset map bridge table_id set_id handle 123
 reset map arp table_id set_id handle 123
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

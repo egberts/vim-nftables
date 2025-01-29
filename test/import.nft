@@ -1,35 +1,34 @@
 #!/usr/sbin/nft -f
 # File: import.nft
-# Description: A test NFT file to exercise 'import' command's Vim syntax highlightings.
+# Description: Test NFT file to exercise 'import' Vim syntax highlightings.
 #
 # base_cmd  import_cmd
 #
 
-table ip6 MyIptable  ### sanity test
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
 import ruleset xml
 import ruleset vm json
 import ruleset json
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
+
 import ruleset json vm
 import ruleset vm xml
 import ruleset vm
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

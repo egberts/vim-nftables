@@ -5,9 +5,9 @@
 # nftables syntax name: last_stmt
 # syntax pathway: last_stmt->stateful_stmt->stmt
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 # 'last'->last_stmt->stateful_stmt->stmt->rule_alloc->rule->add_cmd->base_cmd->line
 last
@@ -51,20 +51,21 @@ replace T C handle 1 last
 replace T C handle 2 last never
 replace ip6 T C handle 3 last used
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good
+################################################################################
 
 last new 
 last used always
 last used never again
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

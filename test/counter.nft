@@ -5,9 +5,9 @@
 # bison symbol:   counter_stmt
 # syntax pathway: counter_stmt->stateful_stmt->(stmt|stateful_stmt_list)
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 add counter table_id counter_id   
 add counter table_id counter_id ;
@@ -30,9 +30,10 @@ add set T S { counter packets 3 }
 add set T S { counter packets 3 counter packets 3 }
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 
 add set T S { counter marshmellows }
 add set T S { counter bytes mss }
@@ -40,12 +41,11 @@ add set T S { counter packets once }
 add rule table_id chain_id set add { counter at  }
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

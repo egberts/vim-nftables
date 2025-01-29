@@ -1,11 +1,11 @@
 #!/usr/sbin/nft -f
 # File: meter.nft
-# Description: A test NFT file to exercise 'meter_stmt' in Vim syntax highlightings.
+# Description: Test NFT file to exercise 'meter_stmt' Vim syntax highlightings.
 #
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 add rule ip filter input tcp flags syn tcp dport ssh meter flood size 128000 { ip saddr timeout 10s limit rate over 10/second} add @blackhole { ip saddr timeout 1m } drop
 
@@ -22,18 +22,20 @@ flush meter netdev myNetdevTable mySet
 flush meter bridge myBridgeTable mySet
 flush meter arp myArpTable mySet
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good.
+################################################################################
 
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
 list meter  # premature EOS
 flush meter  # premature EOS
+

@@ -1,6 +1,6 @@
 #!/usr/sbin/nft -f
 # File: monitor.nft
-# Description: A test NFT file to exercise 'monitor' command's Vim syntax highlightings.
+# Description: Test NFT file to exercise 'monitor' Vim syntax highlightings.
 #
 # base_cmd  monitor_cmd
 # monitor [new | destroy] [tables | chains | sets | rules | elements] [xml | json]
@@ -9,9 +9,9 @@
 table ip6 MyIptable  ### sanity test
 monitor   ### sanity test
 
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 # monitor <monitor_event> 
 monitor new  # monitor 'ANY'
@@ -58,19 +58,19 @@ monitor destroy elements
 monitor destroy trace 
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good.
+################################################################################
+
 monitor wierd
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

@@ -1,13 +1,13 @@
 #!/usr/sbin/nft -f
 # File: rule-position
-# Description: A test NFT file to exercise wildcard/identifier Vim syntax highlightings.
+# Description: Test NFT file to exercise wildcard Vim syntax highlightings.
 #
 # base_cmd add_cmd ['rule'] rule_position
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_c_add_cmd_rule
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 ip table_identifier chain_identifier
 ip6 table_identifier chain_identifier
@@ -55,15 +55,15 @@ tableId chainId log flags skuid
 tableId chainId log flags ether 
 tableId chainId log flags all
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 tableid chainid log log
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
 table_identifier   
 

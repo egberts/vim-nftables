@@ -1,5 +1,5 @@
 #!/usr/sbin/nft -f
-# File: all-syntaxes.nft
+# File: all-tables.nft
 # Description: A test NFT file to exercise 'add table' Vim syntax highlightings.
 #
 # Identifiers begin with an alphabetic character (a-z,A-Z), 
@@ -13,9 +13,9 @@
 # base_cmd add_cmd 'table' 
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_table/nft_add_table_chain_block policy_spec
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect
+################################################################################
 
 table A
 table Z
@@ -886,9 +886,10 @@ table ip6 firewall {
 table xxxx { undefine abc; chain last { chain last; undefine abc; }; };  # oopsie
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 table ip
 table ip6   
 table inet  #
@@ -919,9 +920,9 @@ table T { chain C { devices = $MYVARIABLE } }
 table A!error
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
 table "*weirdname"  # allowable '*' but only inside double quote???
 table "$weirdname"  # allowable '$' but only inside double quote???
@@ -951,9 +952,9 @@ table T { chain C { devices = { eth0 } ; # comment
 table T { chain C { devices = { eth0 } }; };
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
 table T { chain C { type filter ; }; };  # incomplete
 

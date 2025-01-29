@@ -1,6 +1,6 @@
 #!/usr/sbin/nft -f
 # File: all-counter.nft
-# Description: A test NFT file to exercise '[add] counter' Vim syntax highlightings.
+# Description: Test file to exercise '[add] counter' Vim syntax highlightings.
 #
 # nftables manpage shows:
 #
@@ -16,9 +16,9 @@
 # base_cmd add_cmd 'counter' 
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_counter
 #
-##################################################################################
+################################################################################
 # true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
 
 # base_cmd add_cmd 'counter'
 
@@ -112,11 +112,10 @@ table inet x {  # from nftables manpage
 }
 
 
-
-
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good)
+################################################################################
 
 counter 
 
@@ -184,14 +183,14 @@ add counter T
 add counter T C X
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
 add counter
 

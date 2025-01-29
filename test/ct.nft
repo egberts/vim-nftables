@@ -325,9 +325,9 @@
 #   Syntax '*_stmt' is the statement, almost always after the 'add rule', 
 #       'rule' or alone by itself on a line.
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 # Lexical: [ [ 'add' ] 'rule' ] ct_stmt
 # add_cmd without the 'add'
@@ -551,10 +551,7 @@ destroy ct helper table_id {}
 destroy ct helper table_id { };
 
 
-
-############################################################################################
 # ct_expr
-############################################################################################
 table_id myChain position 1 ct helper set ip6 table_id myCTHchain { };
 table_id myChain position 1 ct original set ip table_id myCTHchain { };
 table_id myChain position 1 ct reply set inet table_id myCTHchain { };
@@ -643,7 +640,8 @@ add rule table_id myChain ct original l3proto ipv4
 add rule table_id myChain ct original protocol 6
 add rule table_id myChain ct original proto-dst 22
 add rule table_id myChain ct reply proto-src 53
-add rule table_id myChain ct count over 2
+add rule table_id myChain ct count 2
+add rule table_id myChain ct count over 4
 
 # delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
 delete ct timeout table_id ctt
@@ -734,9 +732,10 @@ table inet filter {  # nftables manpage
     }
 }
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 
 # add_cmd with the 'add'
 # add ct helper <obj_spec> '{' ct_helper_block '}'
@@ -766,14 +765,13 @@ add ct expectation table_id e_pgsql {
         l3proto ip
     }
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
 ct helper  # premature EOS
 ct timeout  # premature EOS
@@ -789,3 +787,4 @@ create ct expectation  # premature EOS
 
 list table ct  # premature EOS
 list ct helpers table 
+

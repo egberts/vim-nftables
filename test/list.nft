@@ -5,9 +5,9 @@
 # base_cmd list_cmd
 #
 
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 # chain_spec->'chain'->'list'->list_cmd->base_cmd
 list chain table_id chain_id
@@ -355,24 +355,13 @@ list tables netdev
 list tables bridge 
 list tables arp 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
 
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
-
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good.
+################################################################################
 
 list table MyTable InvalidChain  # extra chain_id identifier
 list table ip MyTable InvalidChain  # extra chain_id identifier
@@ -418,9 +407,9 @@ list flow table MyFlow MyChain ExtraIdentifier
 list meter arp MyTable MyChain ExtraIdentifier
 
 
-##################################################################################
+################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
 
 add rule limit myTable myChain limit rate 1023000 mbytes/second
 add rule limit myTable myChain limit rate 1025000 mbytes/second burst 1023 mbytes
@@ -435,10 +424,9 @@ add rule limit myTable myChain limit rate over 400/week
 add rule limit myTable myChain limit rate over 40/day
 
 
-
-##################################################################################
+################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
 
 list table  # premature EOS
 

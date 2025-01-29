@@ -14,9 +14,9 @@
 #   [ [ 'add' ] 'rule' ] 'limit' 'table' table_spec
 #
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 # limit_rate_pkts->obj_spec->'limit'->add_cmd->base_cmd
 # limit_rate_pkts->identifier->table_spec->'limit'->add_cmd->base_cmd
@@ -172,14 +172,16 @@ list limits table netdev table_id
 list limits table bridge table_id
 list limits table arp table_id
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
 add rule limit myTable myChain limit rate 1023000 mbytes/second
 add rule limit myTable myChain limit rate 1025000 mbytes/second burst 1023 mbytes
@@ -194,12 +196,13 @@ add rule limit myTable myChain limit rate over 400/week
 add rule limit myTable myChain limit rate over 40/day
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
 limit myIp6Table myIp6Limit rate 1  # premature EOS
 limit myIp6Table myIp6Limit rate 1 /  # premature EOS
 limit myIpTable myIpLimit rate over 3600000/  # premature EOS
 limit myInetTable myInetLimit rate until 1  # premature EOS
 limit myBridgeTable myBridgeLimit rate 1 /hour burst 11  # premature EOS
+

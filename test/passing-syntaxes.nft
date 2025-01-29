@@ -5,9 +5,10 @@
 # base_cmd *
 # nft_line/*
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
+
 table_id chain_id 
 ip6 table_id chain_id 
 

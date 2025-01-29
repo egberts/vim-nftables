@@ -5,9 +5,9 @@
 # nftables syntax name: nat_stmt
 # nftables patyhway:    nat_stmt->stmt
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 tableid chainid dnat
 rule tableid chainid dnat
@@ -51,15 +51,17 @@ tableid chainid snat ip to original : last persistent
 tableid chainid snat ip to original : last persistent,random
 tableid chainid snat ip to original : last persistent,random,fully-random
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good.
+################################################################################
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
+
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

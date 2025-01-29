@@ -6,10 +6,9 @@
 # base_cmd 'get' get_cmd
 # base_cmd 'get' 'element' set_spec set_block_expr
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
-
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 get element table_id set_id
 get element ip T S
@@ -42,25 +41,26 @@ get element T S { comment 'A comment string' }
 get element T S { comment single-word }
 
 
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good.
+################################################################################
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
 get element T S variable_id
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
 get element T S { automerge }
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
 get element T C
 get element ip S
 get element T C ;
-
 

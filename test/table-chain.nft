@@ -5,9 +5,9 @@
 # base_cmd table_spec '{' '}'
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_set
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted; has good content; perfect.
+################################################################################
 
 table T {
     chain C {
@@ -23,9 +23,51 @@ table T {
     } ;
 }
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+table T {
+    chain C {
+        type filter hook input priority 0; policy DROP
+    }
+    chain C1 {
+        type filter hook input priority $MY_PRIORITY; policy DROP
+    }
+    chain C2 {
+        type filter hook input device $MYDEV priority -100; policy ACCEPT
+    }
+    chain C3 {
+        type filter hook input device eth0 priority $MY_PRIORITY; policy $MY_POLICY
+    }
+    chain C4 {
+        type filter hook input device eth0 priority 0; policy $MY_POLICY
+    }
+    chain C5 {
+        type filter hook input device eth0 priority 0; policy $MY_POLICY
+    }
+    chain C6 {
+        type filter hook input devices = $MY_DEVICES_SET priority 0;
+        policy $MY_POLICY
+    }
+    chain C11 {
+        type filter hook input devices = { "asdf" } priority 0;
+        policy $MY_POLICY
+    }
+    chain C12 {
+        type filter hook input devices = { 'asdf' } priority 0; policy $MY_POLICY
+    }
+    chain C13 {
+        type filter hook input devices = { $WAN_DEV } priority 0; policy $MY_POLICY
+    }
+    chain C14 {
+        type filter hook input devices = { abc } priority 0; policy $MY_POLICY
+    }
+    chain C15 {
+        type filter hook input devices = { "asdf", 'asdf', abc, $WAN_DEV, $LAN_DEV, $DMZ_DEV } priority 0; policy $MY_POLICY
+    }
+}
+
+################################################################################
+# true negative test (properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 
 set T 
 set ip S
@@ -37,13 +79,18 @@ set T C S $a  ;  z
 set T C S { };
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
+table T {
+    chain C2 {
+        # 'priority out 5' is a valid setting
+        type filter hook input device eth0 priority out 5; policy $MY_POLICY
+    }
+}
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

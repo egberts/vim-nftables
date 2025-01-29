@@ -1,10 +1,10 @@
 #!/usr/sbin/nft -f
 # File: error-syntax.nft
-# Description: A test NFT file to exercise 'list' command Vim syntax highlightings.
+# Description: Test NFT file to exercise 'list' command Vim syntax highlightings
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 list set myIpTable MySet
 list set inet myIpTable MySet
@@ -12,9 +12,10 @@ list flowtable myIpTable MySet
 list flowtable inet myIpTable MySet
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 
 list oopsie  # intentional invalid syntax
 list oopsie ;  # intentional invalid syntax
@@ -38,15 +39,15 @@ list flowtables bridge  # intentional invalid; flowtable do not support BRIDGE
 list flowtables netdev  # intentional invalid; flowtable do not support NETDEV
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
 # list ct <ct_obj_type> <obj_spec>
 list ct timeout 15
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

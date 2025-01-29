@@ -5,9 +5,9 @@
 # base_cmd 'describe' 
 # nft_line/nft_base_cmd/nft_base_cmd_describe
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted; has good content; perfect
+################################################################################
 
 # base_cmd 'describe'
 
@@ -114,33 +114,63 @@ describe rt4 sid[1]
 
 # base_cmd 'describe' ct_expr
 
-# TODO:  base_cmd 'describe' numgen_expr
-# TODO:  base_cmd 'describe' hash_expr
-# TODO:  base_cmd 'describe' fib_expr
-# TODO:  base_cmd 'describe' osf_expr
-# TODO:  base_cmd 'describe' xfrm_expr
+# base_cmd 'describe' numgen_expr
+describe numgen inc mod 256
+describe numgen random mod 16
+# base_cmd 'describe' hash_expr
+describe jhash
+describe symhash mod 1
+describe symhash mod 1 offset 8
+# base_cmd 'describe' fib_expr
+describe saddr
+describe daddr
+describe mark
+describe iif
+describe oif
+# base_cmd 'describe' osf_expr
+describe osf name
+describe osf version
+describe osf ttl loose name
+describe osf ttl skip name
+describe osf ttl loose version
+describe osf ttl skip version
+# base_cmd 'describe' xfrm_expr
+describe ipsec in ip saddr
+describe ipsec in ip6 saddr
+describe ipsec in spi
+describe ipsec in reqid
+describe ipsec out ip daddr
+describe ipsec out ip6 daddr
+describe ipsec out spi
+describe ipsec out reqid
 # TODO:  base_cmd 'describe' '{' basic_expr '}'
+#
+#
  
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
+
 describe rt0 addr [   ]
 describe rt0 addr []
 describe rt0 addr [ abcdefghi ]  # oopsie
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
+
 describe 1   # has inline comment
 describe rt2 addr 
 describe rt4 flags     ;
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
+
 # nft_line/nft_base_cmd_describe/nft_c_integer_expr
 ( describe 1; );
 
@@ -151,5 +181,4 @@ describe rt4 sid[a]  # oopsie
 describe exthdr flag # oopsie
 describe tcp flag # oopsie
 describe hbh # oopsie
-
 

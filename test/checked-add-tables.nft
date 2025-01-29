@@ -5,9 +5,9 @@
 # base_cmd add_cmd 'table'
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_table
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 add table inet INET_TABLE
 
@@ -170,21 +170,22 @@ table inet INET_TABLE {
 }
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
 
 add chain inet INET_TABLE workstation_inet_filter_input;
 add chain inet INET_TABLE workstation_arp_filter_input ;
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 
 

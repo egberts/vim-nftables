@@ -5,9 +5,9 @@
 # base_cmd define_cmd
 # nft_line/nft_base_cmd/nft_base_cmd_define
 #
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 # common_block->line
 define int_ifs={}
@@ -104,9 +104,11 @@ table T {
 
 
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good.
+################################################################################
+
 undefine int_ifs ?
 undefine int_if2 {
 undefine   
@@ -119,10 +121,11 @@ define int_if3 = { virbr0, $int_if2, virbr1 }
 define int_if3 = { virbr0, $int_if2, virbr1 } ;
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
 # TODO: Needs work
-##################################################################################
+################################################################################
+
 define nic_inet = bond0
 define nic_dmz = bond1
 define nic_lan = bond2
@@ -142,8 +145,7 @@ define int_if1 = eth0
 define int_if4 = $my_public_wan
 
 
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

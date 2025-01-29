@@ -26,7 +26,11 @@ setlocal isident=.,48-58,A-Z,a-z,\_,\/,-
 set cpo&vim  " Line continuation '\' at EOL is used here
 
 " syn sync match nftablesSync grouphere NONE \"^(table|chain|set)\"
-syn sync fromstart
+syntax clear
+syntax reset
+syntax off
+syntax on
+syntax sync fromstart
 
 let s:save_cpo = &cpoptions
 set cpoptions-=C

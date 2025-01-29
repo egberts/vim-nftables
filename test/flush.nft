@@ -1,13 +1,13 @@
 #!/usr/sbin/nft -f
 # File: flush.nft
-# Description: A test NFT file to exercise 'flush' command's Vim syntax highlightings.
+# Description: Test NFT file to exercise 'flush' Vim syntax highlightings.
 #
 # base_cmd  flush_cmd
 #
 
-##################################################################################
-# true positive test (properly hightlighted correctly; has good content; perfect)
-##################################################################################
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
 
 flush table MyTable
 flush table ip MyTable
@@ -68,9 +68,12 @@ flush set netdev table_id set_id
 flush set bridge table_id set_id
 flush set arp table_id set_id
 
-##################################################################################
-# true negative test (properly hightlighted wrongly to show an error; so far, so good)
-##################################################################################
+
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good.
+################################################################################
+
 flush table MyTable InvalidChain  # intentional invalid
 flush table ip MyTable InvalidChain  # intentional invalid
 flush table arp MyTable InvalidChain  # intentional invalid
@@ -97,13 +100,11 @@ flush ruleset bridge  # intentional invalid; bridge is not a flushable
 flush ruleset arp  # intentional invalid; arp is not a flushable
 
 
-##################################################################################
-# false negative test (highlighted wrongly; still has good content; oops)
-##################################################################################
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
-
-##################################################################################
-# false positive test (looks highlighted correctly; has bad content; oops)
-##################################################################################
-
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
 

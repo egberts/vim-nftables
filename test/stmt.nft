@@ -1,32 +1,55 @@
 #!/usr/sbin/nft -f
-# File: verdict.nft
-# Description: A test NFT file to exercise 'verdict' Vim syntax highlightings.
+# File: stmt.vim
+# Description: A test NFT file to exercise 'stmt' Vim syntax highlightings.
 #
 #
 ################################################################################
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
 
-# verdict_expr
-tableid chainid accept 
-tableid chainid accept 
-tableid chainid drop 
-tableid chainid continue 
-tableid chainid jump myChainId
-tableid chainid jump last
-tableid chainid jump $MY_ACTION
-tableid chainid goto hisChainId
-tableid chainid goto last
-tableid chainid goto $MY_ACTION
-tableid chainid return 
+# 'add' 'rule' stmt
+# nft_ct_stmt
 
-# verdict_map_stmt
-rule table_id chain_id vmap { }
-add rule table_id chain_id vmap 
+# ct_key_dir_optional->'ct'->stmt
+add rule T C ct bytes #
+add rule T C ct packets #
+add rule T C ct avgpkt #
+add rule T C ct zone #
 
-add rule table_id chain_id vmap { }
-add rule table_id chain_id vmap { }
-add rule table_id chain_id vmap at ABC
+# ct_dir->'ct'->stmt
+add rule T C ct original
+add rule T C ct reply
+
+# ct_key->'ct'->stmt
+add rule T C ct l3proto
+add rule T C ct proto
+add rule T C ct mark
+add rule T C ct state
+add rule T C ct direction
+add rule T C ct status
+add rule T C ct expiration
+add rule T C ct helper
+add rule T C ct saddr
+add rule T C ct daddr
+add rule T C ct proto-src
+add rule T C ct proto-dst
+add rule T C ct label
+add rule T C ct event
+add rule T C ct secmark
+add rule T C ct id
+
+# @nft_c_verdict_stmt
+# @nft_c_match_stmt
+# @nft_c_meter_stmt
+# @nft_c_payload_stmt
+# @nft_c_stateful_stmt
+# @nft_c_reject_stmt
+# nft_log_stmt
+# nft_nat_stmt
+# @nft_c_meta_stmt
+# nft_masq_stmt
+# @nft_c_redir_stmt
+# nft_tproxy_stmt
 
 
 ################################################################################
@@ -34,13 +57,12 @@ add rule table_id chain_id vmap at ABC
 # so far, so good.
 ################################################################################
 
-add rule table_id chain_id vmap at 
+add rule T C ct 
 
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.
 ################################################################################
-
 
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.
