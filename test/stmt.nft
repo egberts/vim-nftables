@@ -41,7 +41,10 @@ add rule T C ct id
 # @nft_c_verdict_stmt
 # @nft_c_match_stmt
 # @nft_c_meter_stmt
+
 # @nft_c_payload_stmt
+add rule T C ip protocol ip protocol hdr  asdf
+
 # @nft_c_stateful_stmt
 # @nft_c_reject_stmt
 # nft_log_stmt
@@ -50,6 +53,8 @@ add rule T C ct id
 # nft_masq_stmt
 # @nft_c_redir_stmt
 # nft_tproxy_stmt
+
+# stmt*
 
 
 ################################################################################

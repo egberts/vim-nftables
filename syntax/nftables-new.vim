@@ -1,7 +1,7 @@
 " Vim syntax file for nftables configuration file
 " Language:     nftables configuration file
 " Maintainer:   egberts <egberts@github.com>
-" Revision:     1.0
+" Revision:     1.1
 " Initial Date: 2020-04-24
 " Last Change:  2025-01-19
 " Filenames:    nftables.conf, *.nft
@@ -9,25 +9,34 @@
 " License:      MIT license
 " Remarks:
 " Bug Report:   https://github.com/egberts/vim-nftables/issues
+"
+"
+"  ~/.vimrc flags used:
+"
+"      g:nftables_syntax_disabled, if exist then entirety of this file gets skipped
+"      g:nftables_debug, extra outputs
+"      g:nftables_colorscheme, if exist, then 'nftables.vim' colorscheme is used
 ""
 "  This syntax supports both ANSI 256color and ANSI TrueColor (16M colors)
 "
-"  For ANSI 256-color, before starting terminal emulated app (vim/gvim):
-"  - ensure that `$TERM=xterm-256color` (or `xterm+256color` in macos) at command prompt
-"  - ensure that `$COLORTERM` is set to `color`, empty or undefined
 "  For ANSI 16M TrueColor:
 "  - ensure that `$COLORTERM=truecolor` (or `=24bit`) at command prompt
 "  - ensure that `$TERM=xterm-256color` (or `xterm+256color` in macos) at command prompt
+"  - ensure that `$TERM=screen-256color` (or `screen+256color` in macos) at command prompt
+"  For ANSI 256-color, before starting terminal emulated app (vim/gvim):
+"  - ensure that `$TERM=xterm-256color` (or `xterm+256color` in macos) at command prompt
+"  - ensure that `$COLORTERM` is set to `color`, empty or undefined
 "
 " Vimscript Limitation:
-" - background setting does not change here, but if undefined ...
+" - background setting does not change here, but if left undefined ... it's unchanged.
+" - colorscheme setting does not change here, but if left undefined ... it's unchanged.
 " - Vim 7+ attempts to guess the `background` based on term-emulation of ASNI OSC52 behavior
 " - If background remains indeterminate, we guess 'light' here, unless pre-declared in ~/.vimrc
 " - nftables variable name can go to 256 characters,
-"   but in vim-nftables here, the variable name however is 64 chars maximum."
+"       but in vim-nftables here, the variable name however is 64 chars maximum."
 " - nftables time_spec have no limit to its string length,
-"   but in vim-nftables here, time_spec limit is 11 (should be at least 23)
-"   because '365d52w24h60m60s1000ms'.  Might shoot for 32.
+"       but in vim-nftables here, time_spec limit is 11 (should be at least 23)
+"       because '365d52w24h60m60s1000ms'.  Might shoot for 32.
 
 " TIPS:
 " - always add '\v' to any OR-combo list like '\v(opt1|opt2|opt3)' in `syntax match`
@@ -53,6 +62,7 @@
 if exists('nft_debug') && nft_debug == 1
   echomsg "syntax/nftables-new.vim: called."
   echomsg printf("&background: '%s'", &background)
+  echomsg printf("colorscheme: '%s'", execute(':colorscheme')[1:])
 endif
 
 "if exists('g:loaded_syntax_nftables')
@@ -65,34 +75,22 @@ if &t_Co <= 1
   finish
 endif
 
+" .vimrc variable to disable html highlighting
+if exists('g:nftables_syntax_disabled')
+  finish
+endif
+
 " This syntax does not change background setting
 " BUT it may later ASSUME a specific background setting
-
-" For version 5.x: Clear all syntax items
-if version > 580
-  hi clear
-  if exists("syntax_on")
-    syntax reset
-  endif
-endif
-" For version 6.x: Quit when a syntax file was already loaded
-if !exists("main_syntax")
-  if version < 600
-    syntax clear
-  elseif exists("b:current_syntax")
-    finish
-  endif
-  let main_syntax = 'nftables'
-endif
 
 if exists('g:nft_debug') && g:nft_debug == 1
   echo "Use `:messages` for log details"
 endif
 
 " experiment with loading companion colorscheme
-if exists('nft_colorscheme') && nft_colorscheme == 1
+if exists('nft_colorscheme') && g:nft_colorscheme == 1
   try
-    if exists('g:nft_debug') && nft_debug == 1
+    if exists('g:nft_debug') && g:nft_debug == 1
       echomsg "Loaded 'nftables' colorscheme."
     endif
     colorscheme nftables
@@ -140,6 +138,17 @@ if exists(&background)
   let nft_obtained_background=execute(':set &background')
 endif
 
+" For version 6.x: Quit when a syntax file was already loaded
+if !exists("main_syntax")
+  if version < 600
+    syntax clear
+  elseif exists("b:current_syntax")
+   " Quit when a (custom) syntax file was already loaded
+    finish
+  endif
+  let main_syntax = 'nftables'
+endif
+
 if exists('nft_debug') && nft_debug == 1
   echomsg printf('nft_obtained_background: %s', nft_obtained_background)
   echomsg printf('nft_truecolor: %s', nft_truecolor)
@@ -148,9 +157,41 @@ if exists('nft_debug') && nft_debug == 1
   else
     echomsg printf('t_Co %d', &t_Co)
   endif
+"  if has('termguicolors')
+"    if &termguicolors == v:true
+"      echom('Using guifg= and guibg=')
+"    else
+"      echom('Using ctermfg= and ctermbg=')
+"    endif
+"  endif
 endif
 
 syn case match
+
+if version >= 508 || !exists("did_nftables_syn_inits")
+  if version < 508
+    let did_nftables_syn_inits = 1
+    command -nargs=+ HiLink hi link <args>
+  else
+    command -nargs=+ HiLink hi def link <args>
+  endif
+
+  HiLink nftHL_Type         Type
+  HiLink nftHL_Command      Command
+  HiLink nftHL_Statement    Statement
+  HiLink nftHL_Number       Number
+  HiLink nftHL_Comment      Comment
+  HiLink nftHL_String       String
+  HiLink nftHL_Label        Label
+  HiLink nftHL_Keyword      Keyword
+  HiLink nftHL_Boolean      Boolean
+  HiLink nftHL_Float        Float
+  HiLink nftHL_Identifier   Identifier
+  HiLink nftHL_Constant     Constant
+  HiLink nftHL_SpecialComment SpecialComment
+  HiLink nftHL_Error        Error
+endif
+
 
 " iskeyword severly impacts '\<' and '\>' atoms
 " setlocal iskeyword=.,48-58,A-Z,a-z,\_,\/,-
@@ -158,6 +199,7 @@ setlocal isident=.,48-58,A-Z,a-z,\_,\/,-
 
 let s:cpo_save = &cpo
 set cpo&vim  " Line continuation '\' at EOL is used here
+set cpoptions-=C
 
 syn sync clear
 syn sync maxlines=1000
@@ -165,8 +207,6 @@ syn sync match nftablesSync grouphere NONE \"^(add rule|table|chain|set)\"
 " syn sync fromstart "^(monitor|table|set)"
 " syn sync fromstart
 
-let s:save_cpo = &cpoptions
-set cpoptions-=C
 
 hi link Variable              String
 hi link Command               Statement
@@ -971,9 +1011,46 @@ syn cluster nft_c_tcp_hdr_option_kind_and_field
 \    nft_tcp_hdr_option_type_kaf,
 \    nft_tcp_hdr_option_kaf_mptcp
 
+" 'tcp' '.*' [ 'accept' / 'drop' ]
+hi link nft_tcp_hdr_field_keyword_action nftHL_Action
+syn match nft_tcp_hdr_field_keyword_action "\v(accept|drop)" skipwhite contained
+\ nextgroup=
+\    nft_EOS
+
+" 'tcp' 'sport'
+" tcp_hdr_field (via tcp_hdr_expr) (outside of Bison/Yacc)
+hi link nft_tcp_hdr_field_keyword_sport nftHL_Action
+syn match nft_tcp_hdr_field_keyword_sport "\v(sport|dport|sequence|ackseq|doff|reserved|flags|window|checksum|urgptr)" skipwhite contained
+\ nextgroup=
+\    nft_tcp_hdr_field_keyword_sport_dport_doff_window_checksum_sequence_num_or_numrange,
+\    nft_tcp_hdr_field_keyword_sport_dport_doff_window_checksum_sequence_block_delimiter,
+\    nft_tcp_hdr_field_keyword_sport_dport_doff_window_checksum_sequence_operator_negative,
+\    nft_tcp_hdr_field_keyword_urgptr_num_or_numrange_action,
+\    nft_tcp_hdr_field_keyword_sport_dport_sequence_vmap,
+\    nft_EOS,
+\    nft_Error
+
+" 'tcp' 'sport' <NUM> [ '-' <NUM> ]
+" tcp_hdr_field (via tcp_hdr_expr) (outside of Bison/Yacc)
+hi  link nft_tcp_hdr_field_num_or_numrange_5digit nftHL_Number
+syn match nft_tcp_hdr_field_num_or_numrange_5digit "\v[0-9]{1,5}(\-[0-9]{1,5})?" skipwhite contained
+
+" 'tcp' 'sport'
+" tcp_hdr_field (via tcp_hdr_expr) (outside of Bison/Yacc)
+hi link nft_tcp_hdr_field_keyword_sport nftHL_Action
+syn match nft_tcp_hdr_field_keyword_sport "sport" skipwhite contained
+\ nextgroup=
+\    nft_tcp_hdr_field_num_or_numrange_5digit,
+\    nft_tcp_hdr_field_block_delimiter,
+\    nft_tcp_hdr_field_sequence_operator_negative,
+\    nft_tcp_hdr_field_vmap,
+\    nft_EOS,
+\    nft_Error
+
 " tcp_hdr_field (via tcp_hdr_expr)
-hi link nft_tcp_hdr_field_keywords nftHL_Action
-syn match nft_tcp_hdr_field_keywords "\v(sport|dport|seq|ackseq|doff|reserved|flags|window|checksum|urgptr)" skipwhite contained
+syn cluster nft_c_tcp_hdr_field_keywords
+\ contains=
+\    nft_tcp_hdr_field_keyword_sport
 
 " optstrip_stmt (via stmt)
 hi link nft_optstrip_stmt nftHL_Action
@@ -1315,7 +1392,7 @@ syn match nft_tcp_hdr_expr_option "\voption" skipwhite contained
 hi link nft_tcp_hdr_expr nftHL_Statement
 syn match nft_tcp_hdr_expr "\vtcp" skipwhite contained
 \ nextgroup=
-\    nft_tcp_hdr_field_keywords,
+\    @nft_c_tcp_hdr_field_keywords,
 \    nft_tcp_hdr_expr_option
 
 hi link nft_payload_raw_len nftHL_Number
@@ -7309,14 +7386,18 @@ hi Normal guibg=NONE ctermbg=NONE
 
 """""""""""""""""""""" END OF SYNTAX """"""""""""""""""""""""""""
 
+if version >= 508 || !exists("did_nftables_syn_inits")
+  delcommand HiLink
+endif
+
 let b:current_syntax = 'nftables'
 
-let &cpoptions = s:save_cpo
-unlet s:save_cpo
+let &cpoptions = s:cpo_save
+unlet s:cpo_save
 
-" if main_syntax ==# 'nftables'
-  " unlet main_syntax
-" endif
+if main_syntax ==# 'nftables'
+  unlet main_syntax
+endif
 
 " syntax_on is passed only inside Vim's shell command for 2nd Vim to observe current syntax scenarios
 let g:syntax_on = 1

@@ -7,7 +7,7 @@ digraph "parser_bison.y"
   node [fontname = courier, shape = box, colorscheme = paired6]
   edge [fontname = courier]
 
-  0 [label="State 0\n\l  0 $accept: • input \"end of file\"\l"]
+  0 [label="State 0\n\l  0 $accept: • input endfile]
   0 -> 1 [style=dashed label="input"]
   0 -> "0R1" [style=solid]
  "0R1" [label="R1", fillcolor=3, shape=diamond, style=filled]

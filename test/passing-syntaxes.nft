@@ -943,6 +943,7 @@ add rule myInetTable myTcpChain tcp dport { telnet, http, https }
 add rule myInetTable myTcpChain tcp dport vmap { 22 : accept, 23 : drop }
 add rule myInetTable myTcpChain tcp dport vmap { 25:accept, 28:drop }
 add rule myInetTable myTcpChain tcp sport 22
+add rule myInetTable myTcpChain tcp sport 22-65535 tcp sport sport 1
 add rule myInetTable myTcpChain tcp sport != 33-45
 add rule myInetTable myTcpChain tcp sport { 33, 55, 67, 88 }
 add rule myInetTable myTcpChain tcp sport { 33-55 }
@@ -3522,3 +3523,4 @@ add rule T C log flags all
 #    nft_objref_stmt,
 #    nft_synproxy_stmt,
 #    @nft_c_chain_stmt
+#

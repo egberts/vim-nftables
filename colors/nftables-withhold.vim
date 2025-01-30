@@ -9,6 +9,7 @@
 " License:      MIT license
 " Remarks:
 " Bug Report:   https://github.com/egberts/vim-nftables/issues
+" Requirement:  a ISO-8613-3 compatible terminal.
 "
 " colors/nftables.vim is called after syntax/nftables.vim
 "
@@ -81,6 +82,21 @@ elseif &t_Co <= 16
     hi Underlined     cterm=underline       ctermfg=Black
   endif
 elseif &t_Co <= 88
+    hi Comment        cterm=                ctermfg=Cyan
+    hi Constant       cterm=underline       ctermfg=Magenta
+    hi Error          cterm=reverse         ctermfg=Black
+    hi ErrorMsg       cterm=standout        ctermfg=Red
+    hi Identifier     cterm=underline       ctermfg=Black
+    hi Ignore         cterm=bold            ctermfg=Black
+    hi Number         cterm=underline       ctermfg=Magenta
+    hi PreProc        cterm=underline       ctermfg=Black
+    hi Special        cterm=bold            ctermfg=Black
+    hi Statement      cterm=bold            ctermfg=Black
+    hi String         cterm=underline       ctermfg=Magenta
+    hi Todo           cterm=standout        ctermfg=Yellow
+    hi Type           cterm=underline       ctermfg=Green
+    hi Underlined     cterm=underline       ctermfg=Black
+elseif &t_Co <= 0x100000  " with $TERM=xterm-direct
     hi Comment        cterm=                ctermfg=Cyan
     hi Constant       cterm=underline       ctermfg=Magenta
     hi Error          cterm=reverse         ctermfg=Black
