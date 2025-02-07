@@ -847,11 +847,12 @@ add rule myIpTable myIpChain handle 51 accept
 
 #    add rule <family> <table_id> <chain_id> ...
 add rule myIpTable myIpChain log ip dscp cs1
-add rule myIpTable myIpChain log ip dscp cs1
-add rule myIpTable myIpChain ip dscp cs1
+add rule myIpTable myIpChain ip dscp cs1 ip dscp cs2
 add rule myIpTable myIpChain ip dscp != cs1
+add rule myIpTable myIpChain ip dscp 1
 add rule myIpTable myIpChain ip dscp 0x38
 add rule myIpTable myIpChain ip dscp != 0x20
+add rule myIpTable myIpChain ip dscp { 1, 2, cs2, cs3, cs4, cs5, cs6, cs7, af11, af12, af13, af21, af22, af23, af31, af32, af33, af41, af42, af43, ef }
 add rule myIpTable myIpChain ip dscp { cs0, cs1, cs2, cs3, cs4, cs5, cs6, cs7, af11, af12, af13, af21, af22, af23, af31, af32, af33, af41, af42, af43, ef }
 add rule myIpTable myIpChain ip length 232
 add rule MyIpTable myIpChain ip length != 233
@@ -863,9 +864,9 @@ add rule myIpTable myIpChain ip id != 233
 add rule myIpTable myIpChain ip id 33-45
 add rule myIpTable myIpChain ip id != 33-45
 add rule myIpTable myIpChain ip id { 33, 55, 67, 88 }
-add rule myIpTable myIpChain ip frag-off & 0x1fff != 0 # match fragments
-add rule myIpTable myIpChain ip frag-off & 0x2000 != 0 # match MF flag
-add rule myIpTable myIpChain ip frag-off & 0x4000 != 0 # match DF flag
+add rule myIpTable myIpChain ip frag-off & 0x1fff != 0  # match fragments
+add rule myIpTable myIpChain ip frag-off & 0x2000 != 0  # match MF flag
+add rule myIpTable myIpChain ip frag-off & 0x4000 != 0  # match DF flag
 add rule myIpTable myIpChain ip ttl 0
 add rule myIpTable myIpChain ip ttl 233
 add rule myIpTable myIpChain ip ttl 33-55
@@ -937,8 +938,12 @@ add rule myIp6Table myIp6Chain ip6 daddr 1234:1234:1234:1234:1234:1234:1234:1234
 add rule myIp6Table myIp6Chain ip6 daddr != ::1234:1234:1234:1234:1234:1234:1234-1234:1234::1234:1234:1234:1234:1234
 add rule myIp6Table myIp6Chain ip6 version 6
 add rule myInetTable myTcpChain tcp dport 22
+add rule myInetTable myTcpChain tcp dport 22 v,
+add rule myInetTable myTcpChain tcp dport ppp stuff  # syntax error
+add rule myInetTable myTcpChain tcp dport != telnet 
 add rule myInetTable myTcpChain tcp dport != 33-45
 add rule myInetTable myTcpChain tcp dport { 33-55 }
+add rule myInetTable myTcpChain tcp dport { 33, 55, https }
 add rule myInetTable myTcpChain tcp dport { telnet, http, https }
 add rule myInetTable myTcpChain tcp dport vmap { 22 : accept, 23 : drop }
 add rule myInetTable myTcpChain tcp dport vmap { 25:accept, 28:drop }
@@ -1663,24 +1668,30 @@ replace rule ip myTable myChain handle 1 counter
 # CREATE (create_cmd)
 #  create is similar to the add command, but returns 
 #  an error if the chain already exists.
-create table myIpTable 
-create table my.IpTable
-create table my/IpTable
-create table my_IpTable
-create table my./_IpTable
-create table netdev myNetdev 
-create table bridge myBridge 
-create table arp myArpTable 
-create table ip myIpTable 
-create table ip6 myIp6Table 
-create table inet myInetTable 
-create table myIpTable { flags dormant; }
+create table myIpTable MyChain 
+create table bridge myBridge  
+create table arp myArpTable  
+create table ip myIpTable  
+create table ip6 myIp6Table  
+create table inet myInetTable  
+create table myIpTable { flags dormant; } 
 create table netdev myNetdev { flags dormant; }
 create table bridge myBridge { flags dormant; }
 create table arp myArpTable { flags dormant; }
 create table ip myIpTable { flags dormant; }
 create table ip6 myIp6Table { flags dormant; }
 create table inet myInetTable { flags dormant; }
+
+create table myIpTable  
+create table ipX myIpTable  # incorrect family_spec
+create table ip myIpTable
+create table ip6 myNetdev
+create table inet myNetdev
+create table netdev myNetdev
+create table bridge myNetdev
+create table arp myNetdev
+create table arp ; myNetdev   # premature semicolon
+create table arp myArp
 
 
 # Two kinds of a base chain for syntax handling:
@@ -3456,10 +3467,38 @@ reset quota bridge myBridgeFilter https-quota
 reset quota netdev myBridgeFilter https-quota
 
 # stmt
+# stmt->verdict_stmt
+add rule myTable myChain accept
+add rule myTable myChain drop
+add rule myTable myChain continue
+add rule myTable myChain return
+add rule myTable myChain jump last
+add rule myTable myChain jump $chainvar
+add rule myTable myChain jump AltChain
+add rule myTable myChain goto AltChain
+
 add rule myTable myChain ct mark 
+
 add rule myTable myChain vmap MyMeter
-# add rule myTable myChain meter MyMeter size 1250 { };
-# add rule myTable myChain meter MyMeter { };
+
+# stmt->meter_stmt
+myTable myChain meter MyMeter { ip saddr } 
+rule myTable myChain meter MyMeter { ip saddr } 
+rule myTable myChain meter MyMeter { ip saddr } accept
+rule myTable myChain meter MyMeter { tcp dport . ip saddr limit rate over 200/second } counter drop
+add rule myTable myChain meter MyMeter size 1250 { ip saddr } 
+add rule myTable myChain meter MyMeter size 1250 { ip saddr } accept
+add rule myTable myChain meter MyMeter size 1250 { tcp dport . ip saddr limit rate over 200/second } counter drop
+
+myTable myChain meter   # error: Unexpected EOS
+myTable myChain meter ;  # error: unexpected semicolon
+add rule myTable myChain meter  # error: premature EOS
+add rule myTable myChain meter MyMeter;  # error: premature ';'
+add rule myTable myChain meter MyMeter  # error: premature EOS
+add rule myTable myChain meter MyMeter size  # error: premature EOS
+add rule myTable myChain meter MyMeter size 1250  # error: premature EOS
+add rule myTable myChain meter MyMeter size 1250 ;  # error: premature ';'
+add rule myTable myChain meter MyMeter { ;  };  # error: premature semicolon
 
 # stmt->payload_stmt
 add rule myTable myChain icmp 15
@@ -3521,6 +3560,9 @@ add rule T C log flags all
 #    nft_optstrip_stmt,
 #    nft_xt_stmt,
 #    nft_objref_stmt,
+add rule T C ct expectation   # unexpected EOS
+add rule T C ct timeout   # unexpected EOS
+add rule T C ct   # unexpected EOS
 #    nft_synproxy_stmt,
 #    @nft_c_chain_stmt
 #

@@ -65,31 +65,79 @@ reset quota arp tablename chainname
 
 # 'reset' 'rules' ruleset_spec
 reset rules 
-reset rules ip
-reset rules ip6
-reset rules inet
-reset rules netdev
-reset rules bridge
-reset rules arp
+reset rules;
+reset rules ;
+reset rules ; 
+reset rules  ;  
+
+reset rules ip 
+reset rules ip6 
+reset rules inet 
+reset rules netdev 
+reset rules bridge 
+reset rules arp 
+reset rules ip;
+reset rules ip6 ;
+reset rules inet ; 
+reset rules netdev; 
+reset rules bridge ;
+reset rules arp  ;  
+
+reset rules myTable  # unexpected table_identifier
+reset rules ip myTabl  # unexpected table_identifier
+reset rules ip myTable myChain  # unexpected table_identifier
 
 # 'reset' 'rules' table_spec
-reset rules ip
-reset rules ip myTable myChain
-reset rules myTable
-reset rules table myTable myChain
+reset rules table T
+reset rules table T;
+reset rules table T ;
+reset rules table T; 
+reset rules table T ; 
+reset rules table a  ;
+reset rules table last  
+
+reset rules table  # missing table_id
+reset rules table;  # missing table_id
+reset rules table ;  # missing table_id
+reset rules table ;  # missing table_id
+reset rules table /  ;  # invalid table_id
+reset rules table myTable last # extraneous 'last' keyword
+reset rules table myTable myChain  # extraneous chain_id
 
 # 'reset' 'rules' chain_spec
-reset rules myTable myChain
+reset rules chain  
+reset rules chain;
+reset rules chain ;
+reset rules chain ; 
+reset rules chain  ; 
 reset rules chain myTable myChain
+reset rules chain last myChain
+reset rules chain myTable last
+reset rules chain last last
 
+reset rules chain myTable  # missing chain_identifier
+reset rules chain myTable; # missing chain_identifier
+reset rules chain myTable;  # missing chain_identifier
+reset rules chain myTable ;  # missing chain_identifier
+
+# 'reset' 'rule'
 # 'reset' 'rule' ruleid_spec
-reset rule 
-reset rule ip
-reset rule ip6
-reset rule inet
-reset rule netdev
-reset rule bridge
-reset rule arp
+reset rule ip T C handle 15
+reset rule ip T C index 15
+reset rule ip T C position 15
+
+reset rule  # premature EOS
+reset rule table_id  # premature EOS
+reset rule table_id chain_id # premature EOS
+reset rule ip  # premature EOS
+reset rule ip6  # premature EOS
+reset rule inet  # premature EOS
+reset rule netdev  # premature EOS
+reset rule bridge  # premature EOS
+reset rule arp  # premature EOS
+reset rule ip ipT    # premature EOS
+reset rule ip T C   # premature EOS
+reset rule ip T C offset 15  # wrong handle_spec
 
 
 ################################################################################
