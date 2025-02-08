@@ -405,7 +405,7 @@ set ip myIpTable mySet {   # comment
     flags interval;   # comment
     timeout 30s;   # comment
     gc-interval 2h;   # comment
-    elements = {ip};   # comment
+    elements = { ip };   # comment
     size 1200;   # comment
     policy memory;   # comment
     auto-merge;   # comment
@@ -424,11 +424,19 @@ set my_filter_table my_ssh_meter { type ipv4_addr . inet_service; flags timeout 
 # /* empty */ map <set_spec> map_block_alloc { map_block }  (without the 'add' keyword)
 # Bison: MAP set_spec map_block_alloc { map_block } 
 map set_spec map_block_alloc { map_block }
-map myIpTable myIpMap { type mark : 5; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
+map myIpTable myIpMap { 
+    type mark : 5; 
+    flags interval; 
+    size 1200; 
+    policy performance;
+    elements = { ipv4_addr }; 
+    size 1200; 
+    policy performance;
+}
+map netdev myNetdevTable myNetdevMap { type mark; flags interval; elements = {a}; size 1200; policy performance; }
 map bridge myBridgeTable myBridgeMap { type mark; flags interval; elements = { ether_addr }; size 1200; policy performance; }
 map arp myArpTable myArpMap { type mark; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
-map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements = { ipv4_addr }; size 1200; policy performance; }
+map ip myIpTable myIpMap { type inet_service: ipv4_addr; flags interval; elements={ ipv4_addr }; size 1200; policy performance; }
 map ip6 myIp6Table myIp6Map { type mark; flags interval; elements = { ipv6_addr }; size 1200; policy performance; }
 map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
 map filter whitelist { type ipv4_addr . inet_service : ipv6_addr; }

@@ -9,14 +9,23 @@
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
 
-# chain_spec->'chain'->'list'->list_cmd->base_cmd
-list chain table_id chain_id
-list chain ip table_id chain_id
-list chain ip6 table_id chain_id
-list chain inet table_id chain_id
-list chain netdev table_id chain_id
-list chain bridge table_id chain_id
-list chain arp table_id chain_id
+# 'table'->'list'->list_cmd->base_cmd
+list table table_id
+list table ip table_id
+list table ip6 table_id
+list table inet table_id
+list table netdev table_id
+list table bridge table_id
+list table arp table_id
+
+# 'tables'->'list'->list_cmd->base_cmd
+list tables
+list tables ip 
+list tables ip6
+list tables inet 
+list tables netdev 
+list tables bridge 
+list tables arp 
 
 # 'chains'->'list'->list_cmd->base_cmd
 list chains 
@@ -27,14 +36,68 @@ list chains netdev
 list chains bridge 
 list chains arp 
 
-# obj_spec->'counter'->list_cmd->base_cmd
-list counter table_id counter_id
-list counter ip table_id counter_id
-list counter ip6 table_id counter_id
-list counter inet table_id counter_id
-list counter netdev table_id counter_id
-list counter bridge table_id counter_id
-list counter arp table_id counter_id
+# 'ruleset'->'list'->list_cmd->base_cmd
+list ruleset 
+list ruleset ip 
+list ruleset ip6
+list ruleset inet 
+list ruleset netdev 
+list ruleset bridge 
+list ruleset arp 
+
+# 'meters'->'list'->list_cmd->base_cmd
+list meters 
+list meters ip 
+list meters ip6
+list meters inet 
+list meters netdev 
+list meters bridge 
+list meters arp 
+
+# 'flowtables'->'list'->list_cmd->base_cmd
+list flowtables 
+list flowtables ip 
+list flowtables ip6
+list flowtables inet 
+list flowtables netdev 
+list flowtables bridge 
+list flowtables arp 
+
+# 'maps'->'list'->list_cmd->base_cmd
+list maps 
+list maps ip 
+list maps ip6
+list maps inet 
+list maps netdev 
+list maps bridge 
+list maps arp 
+
+# chain_spec->'chain'->'list'->list_cmd->base_cmd
+list chain table_id chain_id
+list chain ip table_id chain_id
+list chain ip6 table_id chain_id
+list chain inet table_id chain_id
+list chain netdev table_id chain_id
+list chain bridge table_id chain_id
+list chain arp table_id chain_id
+
+# ruleset_spec->'sets'->'list'->list_cmd->base_cmd
+list sets 
+list sets ip 
+list sets ip6
+list sets inet 
+list sets netdev 
+list sets bridge 
+list sets arp 
+
+# 'table'->'sets'->'list'->list_cmd->base_cmd
+list sets table table_id
+list sets table ip table_id
+list sets table ip6 table_id
+list sets table inet table_id
+list sets table netdev table_id
+list sets table bridge table_id
+list sets table arp table_id
 
 # ruleset_spec->'counters'->'list'->list_cmd->base_cmd
 list counters 
@@ -54,24 +117,176 @@ list counters table netdev table_id
 list counters table bridge table_id
 list counters table arp table_id
 
-# obj_spec->'expectation'->ct_obj_type->'ct'->list_cmd->base_cmd
-list ct expectation
-list ct expectation table_id ct_id
-list ct expectation ip table_id ct_id
-list ct expectation ip6 table_id ct_id
-list ct expectation inet table_id ct_id
-list ct expectation netdev table_id ct_id
-list ct expectation bridge table_id ct_id
-list ct expectation arp table_id ct_id
+# ruleset_spec->'quotas'->'list'->list_cmd->base_cmd
+list quotas 
+list quotas ip 
+list quotas ip6
+list quotas inet 
+list quotas netdev 
+list quotas bridge 
+list quotas arp 
 
-# obj_spec->'expectation'->ct_cmd_type->'ct'->list_cmd->base_cmd
-list ct expectation table table_id
-list ct expectation table ip table_id
-list ct expectation table ip6 table_id
-list ct expectation table inet table_id
-list ct expectation table netdev table_id
-list ct expectation table bridge table_id
-list ct expectation table arp table_id
+# 'table'->'quotas'->'list'->list_cmd->base_cmd
+list quotas table table_id
+list quotas table ip table_id
+list quotas table ip6 table_id
+list quotas table inet table_id
+list quotas table netdev table_id
+list quotas table bridge table_id
+list quotas table arp table_id
+
+# ruleset_spec->'limits'->'list'->list_cmd->base_cmd
+list limits 
+list limits ip 
+list limits ip6
+list limits inet 
+list limits netdev 
+list limits bridge 
+list limits arp 
+
+# 'table'->'limits'->'list'->list_cmd->base_cmd
+list limits table table_id
+list limits table ip table_id
+list limits table ip6 table_id
+list limits table inet table_id
+list limits table netdev table_id
+list limits table bridge table_id
+list limits table arp table_id
+
+# ruleset_spec->'secmarks'->'list'->list_cmd->base_cmd
+list secmarks 
+list secmarks ip 
+list secmarks ip6
+list secmarks inet 
+list secmarks netdev 
+list secmarks bridge 
+list secmarks arp 
+
+# 'table'->'secmarks'->'list'->list_cmd->base_cmd
+list secmarks table table_id
+list secmarks table ip table_id
+list secmarks table ip6 table_id
+list secmarks table inet table_id
+list secmarks table netdev table_id
+list secmarks table bridge table_id
+list secmarks table arp table_id
+
+# ruleset_spec->'synproxys'->'list'->list_cmd->base_cmd
+list synproxys 
+list synproxys ip 
+list synproxys ip6
+list synproxys inet 
+list synproxys netdev 
+list synproxys bridge 
+list synproxys arp 
+
+# 'table'->'synproxys'->'list'->list_cmd->base_cmd
+list synproxys table table_id
+list synproxys table ip table_id
+list synproxys table ip6 table_id
+list synproxys table inet table_id
+list synproxys table netdev table_id
+list synproxys table bridge table_id
+list synproxys table arp table_id
+
+# set_spec->'set'->list_cmd->base_cmd
+list set table_id set_id
+list set ip table_id set_id
+list set ip6 table_id set_id
+list set inet table_id set_id
+list set netdev table_id set_id
+list set bridge table_id set_id
+list set arp table_id set_id
+
+# set_spec->'meter'->list_cmd->base_cmd
+list meter table_id meter_id
+list meter ip table_id meter_id
+list meter ip6 table_id meter_id
+list meter inet table_id meter_id
+list meter netdev table_id meter_id
+list meter bridge table_id meter_id
+list meter arp table_id meter_id
+
+# set_spec->'map'->list_cmd->base_cmd
+list map table_id map_id
+list map ip table_id map_id
+list map ip6 table_id map_id
+list map inet table_id map_id
+list map netdev table_id map_id
+list map bridge table_id map_id
+list map arp table_id map_id
+
+# obj_spec->'counter'->list_cmd->base_cmd
+list counter table_id counter_id
+list counter ip table_id counter_id
+list counter ip6 table_id counter_id
+list counter inet table_id counter_id
+list counter netdev table_id counter_id
+list counter bridge table_id counter_id
+list counter arp table_id counter_id
+
+# obj_spec->'quota'->list_cmd->base_cmd
+list quota table_id quota_id
+list quota ip table_id quota_id
+list quota ip6 table_id quota_id
+list quota inet table_id quota_id
+list quota netdev table_id quota_id
+list quota bridge table_id quota_id
+list quota arp table_id quota_id
+
+# obj_spec->'limit'->list_cmd->base_cmd
+list limit table_id limit_id
+list limit ip table_id limit_id
+list limit ip6 table_id limit_id
+list limit inet table_id limit_id
+list limit netdev table_id limit_id
+list limit bridge table_id limit_id
+list limit arp table_id limit_id
+
+# obj_spec->'secmark'->list_cmd->base_cmd
+list secmark table_id secmark_id
+list secmark ip table_id secmark_id
+list secmark ip6 table_id secmark_id
+list secmark inet table_id secmark_id
+list secmark netdev table_id secmark_id
+list secmark bridge table_id secmark_id
+list secmark arp table_id secmark_id
+
+# obj_spec->'synproxy'->list_cmd->base_cmd
+list synproxy table_id synproxy_id
+list synproxy ip table_id synproxy_id
+list synproxy ip6 table_id synproxy_id
+list synproxy inet table_id synproxy_id
+list synproxy netdev table_id synproxy_id
+list synproxy bridge table_id synproxy_id
+list synproxy arp table_id synproxy_id
+
+# ruleset_spec->'tables'->'flow'->list_cmd->base_cmd
+list flow tables 
+list flow tables ip
+list flow tables ip6
+list flow tables inet
+list flow tables netdev
+list flow tables bridge
+list flow tables arp
+
+# set_spec->'table'->'flow'->list_cmd->base_cmd
+list flow table table_id synproxy_id
+list flow table ip table_id synproxy_id
+list flow table ip6 table_id synproxy_id
+list flow table inet table_id synproxy_id
+list flow table netdev table_id synproxy_id
+list flow table bridge table_id synproxy_id
+list flow table arp table_id synproxy_id
+
+# ruleset_spec->'tables'->'flow'->list_cmd->base_cmd
+list flowtable table_id ft_id
+list flowtable ip table_id ft_id
+list flowtable ip6 table_id ft_id
+list flowtable inet table_id ft_id
+list flowtable netdev table_id ft_id
+list flowtable bridge table_id ft_id
+list flowtable arp table_id ft_id
 
 # obj_spec->'helper'->ct_obj_type->'ct'->list_cmd->base_cmd
 list ct helper table_id ct_id
@@ -81,15 +296,6 @@ list ct helper inet table_id ct_id
 list ct helper netdev table_id ct_id
 list ct helper bridge table_id ct_id
 list ct helper arp table_id ct_id
-
-# obj_spec->'helpers'->ct_cmd_type->'ct'->list_cmd->base_cmd
-list ct helpers table table_id 
-list ct helpers table ip table_id
-list ct helpers table ip6 table_id
-list ct helpers table inet table_id
-list ct helpers table netdev table_id
-list ct helpers table bridge table_id
-list ct helpers table arp table_id
 
 # obj_spec->'timeout'->ct_obj_type->'ct'->list_cmd->base_cmd
 list ct timeout
@@ -110,32 +316,33 @@ list ct timeout table netdev table_id
 list ct timeout table bridge table_id
 list ct timeout table arp table_id
 
-# set_spec->'table'->'flow'->list_cmd->base_cmd
-list flow table table_id synproxy_id
-list flow table ip table_id synproxy_id
-list flow table ip6 table_id synproxy_id
-list flow table inet table_id synproxy_id
-list flow table netdev table_id synproxy_id
-list flow table bridge table_id synproxy_id
-list flow table arp table_id synproxy_id
+# obj_spec->'expectation'->ct_obj_type->'ct'->list_cmd->base_cmd
+list ct expectation
+list ct expectation table_id ct_id
+list ct expectation ip table_id ct_id
+list ct expectation ip6 table_id ct_id
+list ct expectation inet table_id ct_id
+list ct expectation netdev table_id ct_id
+list ct expectation bridge table_id ct_id
+list ct expectation arp table_id ct_id
 
-# ruleset_spec->'tables'->'flow'->list_cmd->base_cmd
-list flow tables 
-list flow tables ip
-list flow tables ip6
-list flow tables inet
-list flow tables netdev
-list flow tables bridge
-list flow tables arp
+# obj_spec->'expectation'->ct_cmd_type->'ct'->list_cmd->base_cmd
+list ct expectation table table_id
+list ct expectation table ip table_id
+list ct expectation table ip6 table_id
+list ct expectation table inet table_id
+list ct expectation table netdev table_id
+list ct expectation table bridge table_id
+list ct expectation table arp table_id
 
-# 'flowtables'->'list'->list_cmd->base_cmd
-list flowtables 
-list flowtables ip 
-list flowtables ip6
-list flowtables inet 
-list flowtables netdev 
-list flowtables bridge 
-list flowtables arp 
+# obj_spec->'helpers'->ct_cmd_type->'ct'->list_cmd->base_cmd
+list ct helpers table table_id 
+list ct helpers table ip table_id
+list ct helpers table ip6 table_id
+list ct helpers table inet table_id
+list ct helpers table netdev table_id
+list ct helpers table bridge table_id
+list ct helpers table arp table_id
 
 # basehook_spec->'hooks'->list_cmd->base_cmd
 list hooks 
@@ -156,204 +363,6 @@ list hooks inet device vlan2
 list hooks netdev device net3
 list hooks bridge device br4
 list hooks arp device arp5
-
-# obj_spec->'limit'->list_cmd->base_cmd
-list limit table_id limit_id
-list limit ip table_id limit_id
-list limit ip6 table_id limit_id
-list limit inet table_id limit_id
-list limit netdev table_id limit_id
-list limit bridge table_id limit_id
-list limit arp table_id limit_id
-
-# ruleset_spec->'limits'->'list'->list_cmd->base_cmd
-list limits 
-list limits ip 
-list limits ip6
-list limits inet 
-list limits netdev 
-list limits bridge 
-list limits arp 
-
-# 'table'->'limits'->'list'->list_cmd->base_cmd
-list limits table table_id
-list limits table ip table_id
-list limits table ip6 table_id
-list limits table inet table_id
-list limits table netdev table_id
-list limits table bridge table_id
-list limits table arp table_id
-
-# set_spec->'map'->list_cmd->base_cmd
-list map table_id map_id
-list map ip table_id map_id
-list map ip6 table_id map_id
-list map inet table_id map_id
-list map netdev table_id map_id
-list map bridge table_id map_id
-list map arp table_id map_id
-
-# 'maps'->'list'->list_cmd->base_cmd
-list maps 
-list maps ip 
-list maps ip6
-list maps inet 
-list maps netdev 
-list maps bridge 
-list maps arp 
-
-# set_spec->'meter'->list_cmd->base_cmd
-list meter table_id meter_id
-list meter ip table_id meter_id
-list meter ip6 table_id meter_id
-list meter inet table_id meter_id
-list meter netdev table_id meter_id
-list meter bridge table_id meter_id
-list meter arp table_id meter_id
-
-# 'meters'->'list'->list_cmd->base_cmd
-list meters 
-list meters ip 
-list meters ip6
-list meters inet 
-list meters netdev 
-list meters bridge 
-list meters arp 
-
-# obj_spec->'quota'->list_cmd->base_cmd
-list quota table_id quota_id
-list quota ip table_id quota_id
-list quota ip6 table_id quota_id
-list quota inet table_id quota_id
-list quota netdev table_id quota_id
-list quota bridge table_id quota_id
-list quota arp table_id quota_id
-
-# ruleset_spec->'quotas'->'list'->list_cmd->base_cmd
-list quotas 
-list quotas ip 
-list quotas ip6
-list quotas inet 
-list quotas netdev 
-list quotas bridge 
-list quotas arp 
-
-# 'table'->'quotas'->'list'->list_cmd->base_cmd
-list quotas table table_id
-list quotas table ip table_id
-list quotas table ip6 table_id
-list quotas table inet table_id
-list quotas table netdev table_id
-list quotas table bridge table_id
-list quotas table arp table_id
-
-# 'ruleset'->'list'->list_cmd->base_cmd
-list ruleset 
-list ruleset ip 
-list ruleset ip6
-list ruleset inet 
-list ruleset netdev 
-list ruleset bridge 
-list ruleset arp 
-
-# obj_spec->'secmark'->list_cmd->base_cmd
-list secmark table_id secmark_id
-list secmark ip table_id secmark_id
-list secmark ip6 table_id secmark_id
-list secmark inet table_id secmark_id
-list secmark netdev table_id secmark_id
-list secmark bridge table_id secmark_id
-list secmark arp table_id secmark_id
-
-# ruleset_spec->'secmarks'->'list'->list_cmd->base_cmd
-list secmarks 
-list secmarks ip 
-list secmarks ip6
-list secmarks inet 
-list secmarks netdev 
-list secmarks bridge 
-list secmarks arp 
-
-# 'table'->'secmarks'->'list'->list_cmd->base_cmd
-list secmarks table table_id
-list secmarks table ip table_id
-list secmarks table ip6 table_id
-list secmarks table inet table_id
-list secmarks table netdev table_id
-list secmarks table bridge table_id
-list secmarks table arp table_id
-
-# set_spec->'set'->list_cmd->base_cmd
-list set table_id set_id
-list set ip table_id set_id
-list set ip6 table_id set_id
-list set inet table_id set_id
-list set netdev table_id set_id
-list set bridge table_id set_id
-list set arp table_id set_id
-
-# ruleset_spec->'sets'->'list'->list_cmd->base_cmd
-list sets 
-list sets ip 
-list sets ip6
-list sets inet 
-list sets netdev 
-list sets bridge 
-list sets arp 
-
-# 'table'->'sets'->'list'->list_cmd->base_cmd
-list sets table table_id
-list sets table ip table_id
-list sets table ip6 table_id
-list sets table inet table_id
-list sets table netdev table_id
-list sets table bridge table_id
-list sets table arp table_id
-
-# obj_spec->'synproxy'->list_cmd->base_cmd
-list synproxy table_id synproxy_id
-list synproxy ip table_id synproxy_id
-list synproxy ip6 table_id synproxy_id
-list synproxy inet table_id synproxy_id
-list synproxy netdev table_id synproxy_id
-list synproxy bridge table_id synproxy_id
-list synproxy arp table_id synproxy_id
-
-# ruleset_spec->'synproxys'->'list'->list_cmd->base_cmd
-list synproxys 
-list synproxys ip 
-list synproxys ip6
-list synproxys inet 
-list synproxys netdev 
-list synproxys bridge 
-list synproxys arp 
-
-# 'table'->'synproxys'->'list'->list_cmd->base_cmd
-list synproxys table table_id
-list synproxys table ip table_id
-list synproxys table ip6 table_id
-list synproxys table inet table_id
-list synproxys table netdev table_id
-list synproxys table bridge table_id
-list synproxys table arp table_id
-
-# 'table'->'list'->list_cmd->base_cmd
-list table table_id
-list table ip table_id
-list table ip6 table_id
-list table inet table_id
-list table netdev table_id
-list table bridge table_id
-list table arp table_id
-
-# 'tables'->'list'->list_cmd->base_cmd
-list tables
-list tables ip 
-list tables ip6
-list tables inet 
-list tables netdev 
-list tables bridge 
-list tables arp 
 
 
 

@@ -1,16 +1,41 @@
 
-Wow,  base_cmd add_rule really is a long complex pattern (recursive too).
+This is the `stmt` keyword list. This keyword list got extracted
+from the nftables' Bison file (`parser_bison.y`).
 
-Our Vimscript syntax shall tackle this by doing known patterns firstly, then $variables, then identifiers
+`stmt` is the portion that is found AFTER many commands/statements 
+and often found inside its accompanying code-blocks.
 
-stmt has the following first word patterns:
+Such placement of `stmt` are given in this `nftables` example:
+```
+ip6 TableId ChainName { stmt }
+rule TableId ChainName { stmt }
+add rule bridge TableId ChainName { stmt }
+```
+
+Sidebar: When writing the syntax tree from a parser, repeated 
+encounters of the same keyword by different Vim-syntax must be 
+recouncil together to make the final keyword-specific syntax required 
+by many Parser (and Vim-syntax).
+
+Wow,  `base_cmd` `add_rule` Bison parser really has a long complex 
+pattern (and recursive too).
+
+We want our Vimscript syntax to tackle this by doing the known patterns 
+firstly, then `$variables`, then identifiers lastly.  
+
+First-encounter digit-only character gets ignored.
+
+nftable's Bison `stmt` syntax has the following first-encountered keyword patterns:
 
 Working on
 ===========
+```csv
 ICMP , icmp_hdr_expr -> payload_expr
+```
 
 TODO
 ====
+```csv
 <identifier>, concat_expr, verdict_map_stmt -> verdict_stmt -> stmt (everything you see here)
 <$var>
 <NUM>
@@ -139,3 +164,5 @@ XT, xt_stmt -> stmt
 {}, basic_expr -> primary_expr -> basic_expr -> concat_expr -> expr -> relational_expr -> match_stmt
 {}, concat_expr -> map_expr -> expr -> relational_expr -> match_stmt  (basically everything you see here)
 {}, set_expr -> expr -> relational_expr -> match_stmt
+```
+

@@ -1,0 +1,283 @@
+#!/usr/sbin/nft -f
+# File: destroy.nft
+# Description: A test NFT file to exercise 'destroy' Vim syntax highlightings.
+#
+# base_cmd 'destroy' destroy_cmd 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_set
+#
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
+
+# destroy table <table_spec>
+# 'table'->destroy_cmd->'destroy'->base_cmd->line
+destroy table T
+destroy table last
+destroy table ip T
+destroy table ip6 T
+destroy table inet T
+destroy table netdev T
+destroy table bridge T
+destroy table arp T
+destroy table handle 123
+destroy table ip handle 123
+destroy table ip6 handle 123
+destroy table inet handle 123
+destroy table netdev handle 123
+destroy table bridge handle 123
+destroy table arp handle 123
+
+# destroy chain <chainid_spec>
+# common_block->chain_block->'{'->'chain'->destroy_cmd->'destroy'->base_cmd->line
+destroy chain T C
+destroy chain last C
+destroy chain T last
+destroy chain last last
+destroy chain ip T C
+destroy chain ip6 T C
+destroy chain inet T C
+destroy chain netdev T C
+destroy chain bridge T C
+destroy chain arp T C
+
+destroy chain T C { }
+destroy chain ip T C {  }
+destroy chain ip6 T C {  }
+destroy chain inet T C {  }
+destroy chain netdev T C {  }
+destroy chain bridge T C {  }
+destroy chain arp T C { }
+
+destroy chain T C { define my_var; };
+
+destroy chain T handle 123123
+destroy chain ip T handle 15
+destroy chain inet T handle 15
+destroy chain inet T handle 42  # comment
+destroy chain ip6 T handle 15
+destroy chain bridge T handle 15
+destroy chain arp T handle 15
+destroy chain netdev T handle 15
+
+# destroy counter <obj_spec>
+destroy counter T CounterName
+destroy counter ip T CounterName
+destroy counter ip6 T CounterName
+destroy counter inet T CounterName
+destroy counter netdev T CounterName
+destroy counter bridge T CounterName
+destroy counter arp T CounterName
+
+# destroy counter <objid_spec>
+destroy counter netdev T handle 1
+#destroy counter bridge T position 1  # not yet available
+#destroy counter arp T index 1  # not yet available
+destroy counter T CounterName index index_id
+
+# destroy ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
+destroy ct expectation
+destroy ct expectation T Q 
+destroy ct expectation ip T Q
+destroy ct expectation ip6 T Q
+destroy ct expectation inet T Q
+destroy ct expectation netdev T Q
+destroy ct expectation bridge T Q
+destroy ct expectation arp T Q
+
+destroy ct helper T ct_id
+destroy ct helper ip T ct_id
+destroy ct helper ip6 T ct_id
+destroy ct helper inet T ct_id
+destroy ct helper netdev T ct_id
+destroy ct helper bridge T ct_id
+destroy ct helper arp T ct_id
+destroy ct helper T { };
+destroy ct helper T {}
+
+destroy ct timeout
+destroy ct timeout T ct_id
+destroy ct timeout ip T ct_id
+destroy ct timeout ip6 T ct_id
+destroy ct timeout inet T ct_id
+destroy ct timeout netdev T ct_id
+destroy ct timeout bridge T ct_id
+destroy ct timeout arp T ct_id
+
+# destroy element <set_spec> <set_block_expr>
+destroy element T M { 4.4.4.4 }
+destroy element T M { elements = { element, element }; }
+destroy element ip T M { 4.4.4.4 }
+destroy element ip T M { element, element }
+destroy element ip T M { elements = { element, element } ; }
+destroy element ip6 T M { 4.4.4.4 }
+destroy element ip6 T M { element, element }
+destroy element ip6 T M { elements = { element, element } ; }
+destroy element inet T M { 10.0.0.1 }
+destroy element inet T M { element, element }
+destroy element inet T M { elements = { element, element } ; }
+destroy element netdev T M { 10.0.0.1, 127.0.0.1 }
+destroy element netdev T M { element, element }
+destroy element netdev T M { elements = { element, element } ; }
+destroy element bridge T M { 4.4.4.4 }
+destroy element bridge T M { element, element }
+destroy element bridge T M { elements = { element, element } ; }
+destroy element arp T M { 4.4.4.4 }
+destroy element arp T M { element, element }
+destroy element arp T M { elements = { element, element } ; }
+
+# 'destroy' 'flowtable' <flowtable_spec>
+# common_block->flowtable_block->'{'->'flowtable'->destroy_cmd->'destroy'->base_cmd->line
+destroy flowtable T FT 
+destroy flowtable ip T FT 
+destroy flowtable ip6 T FT 
+destroy flowtable inet T FT 
+destroy flowtable netdev T FT 
+destroy flowtable bridge T FT 
+destroy flowtable arp T FT 
+
+destroy flowtable T FT { define my_var; };
+destroy flowtable T FT { hook input priority 0; devices = { br0, eth0, eth1} ; }
+destroy flowtable ip T FT { hook input priority 0; devices = { eth0, eth1 } ; }
+destroy flowtable ip6 T FT { hook input priority 0; devices = { br0, eth0 } ; }
+destroy flowtable inet T FT { hook input priority 0; devices = { br0, eth1 } ; }
+destroy flowtable netdev T FT { flowtable_block }
+destroy flowtable bridge T FT { hook input priority 0; devices = { br0, eth1 } ; }
+destroy flowtable arp T FT { hook input priority 0; devices = { br0, eth1 } ; }
+
+destroy flowtable T handle 15 
+destroy flowtable ip T handle 15
+destroy flowtable ip6 T handle 15 
+destroy flowtable inet T handle 15 
+destroy flowtable netdev T handle 15 
+destroy flowtable bridge T handle 15 
+destroy flowtable arp T handle 15 
+
+#   'destroy' 'limit' ( obj_spec | objid_spec ) 
+# limit_config->identifier->family_spec->table_spec->'limit'->'destroy'->destroy_cmd->base_cmd
+destroy limit T L 
+destroy limit ip T L
+destroy limit ip6 T L
+destroy limit inet T L
+destroy limit netdev T L
+destroy limit bridge T L
+destroy limit arp T L
+
+destroy limit T handle 15
+destroy limit ip T handle 15
+destroy limit ip6 T handle 15
+destroy limit inet T handle 15
+destroy limit netdev T handle 15
+destroy limit bridge T handle 15
+destroy limit arp T handle 15
+
+destroy limit T L rate 1 /hour 
+destroy limit T L rate 1 / week
+destroy limit T L rate over 3600000/ day
+destroy limit T L rate until 1/second
+destroy limit T L rate 1/minute burst 5 packets
+destroy limit ip T L rate 1/ day
+destroy limit ip6 T L rate 1 / week
+destroy limit inet T L rate 1/second
+destroy limit netdev T L rate 1/minute 
+destroy limit bridge T L rate 1 /hour 
+destroy limit arp T L rate 1 /hour 
+
+# destroy map <set_spec>
+destroy map T M 
+destroy map ip T M 
+destroy map ip6 T M 
+destroy map inet T M 
+destroy map netdev T M 
+destroy map bridge T M 
+destroy map arp T M 
+
+# destroy quota <obj_spec>
+destroy quota T Q 
+destroy quota ip T Q
+destroy quota ip6 T Q
+destroy quota inet T Q
+destroy quota netdev T Q
+destroy quota bridge T Q
+destroy quota arp T Q
+
+# destroy quota <objid_spec>
+destroy quota T handle 15
+destroy quota ip T handle 15
+destroy quota ip6 T handle 15
+destroy quota inet T handle 123
+destroy quota netdev T handle 15
+#destroy quota inet T index 345  # not yet available
+#destroy quota inet T position 234  # not yet available
+destroy quota bridge T handle 15
+destroy quota arp T handle 15
+
+# destroy rule <ruleid_spec>
+destroy rule arp T C handle 16
+destroy rule bridge T C handle 16
+destroy rule filter output handle 5
+destroy rule filter output ip saddr 192.168.1.1 counter  # not implemented yet
+destroy rule inet T C handle 16
+destroy rule ip6 T C handle 16
+destroy rule ip T C handle 42
+destroy rule ip T handle 42
+destroy rule netdev T C handle 16
+destroy rule T C handle 42
+destroy rule T handle 42
+destroy secmark arp T handle 15
+destroy secmark arp T secmark_name
+destroy secmark bridge T handle 15
+destroy secmark bridge T secmark_name
+destroy secmark inet T handle 15
+destroy secmark inet T secmark_name
+destroy secmark ip6 T handle 15
+destroy secmark ip6 T secmark_name
+destroy secmark ip T handle 15
+destroy secmark ip T secmark_name
+destroy secmark netdev T handle 15
+destroy secmark netdev T secmark_name
+destroy secmark T handle 15
+destroy secmark T secmark_name 
+
+# destroy set <set_spec>
+destroy set T S
+destroy set ip T S
+destroy set ip6 T S
+destroy set inet T S
+destroy set netdev T S
+destroy set bridge T S
+destroy set arp T S
+
+# destroy set <setid_spec>
+destroy set T handle 123
+destroy set ip T handle 123
+destroy set inet T handle 42  # comment
+
+destroy synproxy arp T handle 15
+destroy synproxy arp T synproxy_name
+destroy synproxy bridge T handle 15
+destroy synproxy bridge T synproxy_name
+destroy synproxy inet T handle 15
+destroy synproxy inet T synproxy_name
+destroy synproxy ip6 T handle 15
+destroy synproxy ip6 T synproxy_name
+destroy synproxy ip T handle 15
+destroy synproxy ip T synproxy_name
+destroy synproxy netdev T handle 15
+destroy synproxy netdev T synproxy_name
+destroy synproxy T handle 15
+destroy synproxy T synproxy_name 
+
+
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
+
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
+
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
+

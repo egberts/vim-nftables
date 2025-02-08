@@ -9,14 +9,23 @@
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
 
-################################################################################
-# true negative test: properly hightlighted wrongly to show an error; 
-# so far, so good.
-################################################################################
-
-################################################################################
-# false negative test: highlighted wrongly; still has good content; oops.
-################################################################################
+# delete table <table_spec>
+# 'table'->delete_cmd->'delete'->base_cmd->line
+delete table T
+delete table last
+delete table ip T
+delete table ip6 T
+delete table inet T
+delete table netdev T
+delete table bridge T
+delete table arp T
+delete table handle 123
+delete table ip handle 123
+delete table ip6 handle 123
+delete table inet handle 123
+delete table netdev handle 123
+delete table bridge handle 123
+delete table arp handle 123
 
 # delete chain <chainid_spec>
 # common_block->chain_block->'{'->'chain'->delete_cmd->'delete'->base_cmd->line
@@ -47,49 +56,43 @@ delete chain bridge T handle 15
 delete chain arp T handle 15
 delete chain netdev T handle 15
 
-# delete counter <obj_spec>
-delete counter T CounterName
-delete counter ip T CounterName
-delete counter ip6 T CounterName
-delete counter inet T CounterName
-delete counter netdev T CounterName
-delete counter bridge T CounterName
-delete counter arp T CounterName
+# delete rule <ruleid_spec>
+delete rule T C handle 16
+delete rule last C handle 16
+delete rule T last handle 16
+delete rule last last handle 16
+delete rule arp T C handle 16
+delete rule bridge T C handle 16
+delete rule filter output handle 5
+delete rule filter output ip saddr 192.168.1.1 counter  # not implemented yet
+delete rule inet T C handle 16
+delete rule ip6 T C handle 16
+delete rule ip T C handle 42
+delete rule netdev T C handle 16
+delete rule T C handle 42
 
-# delete counter <objid_spec>
-delete counter netdev T handle 1
-#delete counter bridge T position 1  # not yet available
-#delete counter arp T index 1  # not yet available
-delete counter T CounterName index index_id
+# delete set <set_spec>
+delete set T S
+delete set ip T S
+delete set ip6 T S
+delete set inet T S
+delete set netdev T S
+delete set bridge T S
+delete set arp T S
 
-# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
-delete ct expectation
-delete ct expectation T Q 
-delete ct expectation ip T Q
-delete ct expectation ip6 T Q
-delete ct expectation inet T Q
-delete ct expectation netdev T Q
-delete ct expectation bridge T Q
-delete ct expectation arp T Q
+# delete set <setid_spec>
+delete set T handle 123
+delete set ip T handle 123
+delete set inet T handle 42  # comment
 
-delete ct helper T ct_id
-delete ct helper ip T ct_id
-delete ct helper ip6 T ct_id
-delete ct helper inet T ct_id
-delete ct helper netdev T ct_id
-delete ct helper bridge T ct_id
-delete ct helper arp T ct_id
-delete ct helper T { };
-delete ct helper T {}
-
-delete ct timeout
-delete ct timeout T ct_id
-delete ct timeout ip T ct_id
-delete ct timeout ip6 T ct_id
-delete ct timeout inet T ct_id
-delete ct timeout netdev T ct_id
-delete ct timeout bridge T ct_id
-delete ct timeout arp T ct_id
+# delete map <set_spec>
+delete map T M 
+delete map ip T M 
+delete map ip6 T M 
+delete map inet T M 
+delete map netdev T M 
+delete map bridge T M 
+delete map arp T M 
 
 # delete element <set_spec> <set_block_expr>
 delete element T M { 4.4.4.4 }
@@ -112,6 +115,15 @@ delete element bridge T M { elements = { element, element } ; }
 delete element arp T M { 4.4.4.4 }
 delete element arp T M { element, element }
 delete element arp T M { elements = { element, element } ; }
+
+# delete counter <obj_spec>
+delete counter T CounterName
+delete counter ip T CounterName
+delete counter ip6 T CounterName
+delete counter inet T CounterName
+delete counter netdev T CounterName
+delete counter bridge T CounterName
+delete counter arp T CounterName
 
 # 'delete' 'flowtable' <flowtable_spec>
 # common_block->flowtable_block->'{'->'flowtable'->delete_cmd->'delete'->base_cmd->line
@@ -139,6 +151,58 @@ delete flowtable inet T handle 15
 delete flowtable netdev T handle 15 
 delete flowtable bridge T handle 15 
 delete flowtable arp T handle 15 
+
+# delete counter <objid_spec>
+delete counter netdev T handle 1
+
+# delete quota <obj_spec>
+delete quota T Q 
+delete quota ip T Q
+delete quota ip6 T Q
+delete quota inet T Q
+delete quota netdev T Q
+delete quota bridge T Q
+delete quota arp T Q
+
+# delete quota <objid_spec>
+delete quota T handle 15
+delete quota ip T handle 15
+delete quota ip6 T handle 15
+delete quota inet T handle 123
+delete quota netdev T handle 15
+#delete quota inet T index 345  # not yet available
+#delete quota inet T position 234  # not yet available
+delete quota bridge T handle 15
+delete quota arp T handle 15
+
+# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
+delete ct helper T ct_id
+delete ct helper ip T ct_id
+delete ct helper ip6 T ct_id
+delete ct helper inet T ct_id
+delete ct helper netdev T ct_id
+delete ct helper bridge T ct_id
+delete ct helper arp T ct_id
+delete ct helper T { };
+delete ct helper T {}
+
+delete ct timeout
+delete ct timeout T ct_id
+delete ct timeout ip T ct_id
+delete ct timeout ip6 T ct_id
+delete ct timeout inet T ct_id
+delete ct timeout netdev T ct_id
+delete ct timeout bridge T ct_id
+delete ct timeout arp T ct_id
+
+delete ct expectation
+delete ct expectation T Q 
+delete ct expectation ip T Q
+delete ct expectation ip6 T Q
+delete ct expectation inet T Q
+delete ct expectation netdev T Q
+delete ct expectation bridge T Q
+delete ct expectation arp T Q
 
 #   'delete' 'limit' ( obj_spec | objid_spec ) 
 # limit_config->identifier->family_spec->table_spec->'limit'->'delete'->delete_cmd->base_cmd
@@ -170,47 +234,6 @@ delete limit netdev T L rate 1/minute
 delete limit bridge T L rate 1 /hour 
 delete limit arp T L rate 1 /hour 
 
-# delete map <set_spec>
-delete map T M 
-delete map ip T M 
-delete map ip6 T M 
-delete map inet T M 
-delete map netdev T M 
-delete map bridge T M 
-delete map arp T M 
-
-# delete quota <obj_spec>
-delete quota T Q 
-delete quota ip T Q
-delete quota ip6 T Q
-delete quota inet T Q
-delete quota netdev T Q
-delete quota bridge T Q
-delete quota arp T Q
-
-# delete quota <objid_spec>
-delete quota T handle 15
-delete quota ip T handle 15
-delete quota ip6 T handle 15
-delete quota inet T handle 123
-delete quota netdev T handle 15
-#delete quota inet T index 345  # not yet available
-#delete quota inet T position 234  # not yet available
-delete quota bridge T handle 15
-delete quota arp T handle 15
-
-# delete rule <ruleid_spec>
-delete rule arp T C handle 16
-delete rule bridge T C handle 16
-delete rule filter output handle 5
-delete rule filter output ip saddr 192.168.1.1 counter  # not implemented yet
-delete rule inet T C handle 16
-delete rule ip6 T C handle 16
-delete rule ip T C handle 42
-delete rule ip T handle 42
-delete rule netdev T C handle 16
-delete rule T C handle 42
-delete rule T handle 42
 delete secmark arp T handle 15
 delete secmark arp T secmark_name
 delete secmark bridge T handle 15
@@ -225,20 +248,6 @@ delete secmark netdev T handle 15
 delete secmark netdev T secmark_name
 delete secmark T handle 15
 delete secmark T secmark_name 
-
-# delete set <set_spec>
-delete set T S
-delete set ip T S
-delete set ip6 T S
-delete set inet T S
-delete set netdev T S
-delete set bridge T S
-delete set arp T S
-
-# delete set <setid_spec>
-delete set T handle 123
-delete set ip T handle 123
-delete set inet T handle 42  # comment
 
 delete synproxy arp T handle 15
 delete synproxy arp T synproxy_name
@@ -255,17 +264,44 @@ delete synproxy netdev T synproxy_name
 delete synproxy T handle 15
 delete synproxy T synproxy_name 
 
-# delete table <tableid_spec>
-delete table T
-delete table ip T
-delete table ip6 T
-delete table inet T
-delete table netdev T
-delete table bridge T
-delete table arp T
-delete table handle 4321  # comment
-delete table netdev handle 123
 
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
+
+delete rule 
+
+
+delete rule ; 
+
+
+delete rule  T 
+
+
+delete rule  T  C 
+
+
+delete rule  T  C  han
+
+delete rule  T  C  handle 
+
+
+delete map 
+
+
+delete map T 
+
+
+delete counter bridge T position 1  # not yet available
+
+delete counter arp T index 1  # not yet available
+
+delete counter T CounterName index index_id  # invalid: 'index' not supported
+
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
 
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.

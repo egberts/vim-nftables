@@ -128,10 +128,12 @@ create map ip6 myIp6Table myIp6Map { flags interval; elements = { ipv6_addr }; s
 create map inet myInetTable myInetMap { 
     flags interval; 
     size 1200; 
-    elements = { $inet_proto;  }  ;
+    elements = { $inet_proto;  }  
     elements = { inet_proto };  
     policy performance; 
-}
+};
+add rule T C
+
 ####create map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
 
 # create element <set_spec> <set_block_expr>

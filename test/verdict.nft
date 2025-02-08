@@ -22,11 +22,17 @@ tableid chainid return
 
 # verdict_map_stmt
 rule table_id chain_id vmap { }
-add rule table_id chain_id vmap 
+rule table_id chain_id vmap { } ;
+add rule table_id chain_id vmap  
+add rule table_id chain_id vmap; 
 
 add rule table_id chain_id vmap { }
+add rule table_id chain_id vmap { };
 add rule table_id chain_id vmap { }
+add rule table_id chain_id vmap { } ; 
 add rule table_id chain_id vmap at ABC
+add rule table_id chain_id vmap at ABC  ;
+
 
 
 ################################################################################

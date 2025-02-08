@@ -27,6 +27,7 @@ table A/
 table A\
 table A_
 table A.
+table A
 
 # base_cmd add_cmd 'table' table_spec family_spec family_spec_explicit
 add table filter

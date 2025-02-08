@@ -64,6 +64,7 @@ add rule <stmt>
 add set table_id chain_id set_id $v_\/.ariable
 add map table_id
 add flowtable table_id
+element table_id
 add element table_id
 add counter table_id
 add quota table_id
