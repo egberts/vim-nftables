@@ -5,6 +5,9 @@
 # base_cmd list_cmd
 #
 
+list 
+
+
 ################################################################################
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
@@ -289,7 +292,10 @@ list flowtable bridge table_id ft_id
 list flowtable arp table_id ft_id
 
 # obj_spec->'helper'->ct_obj_type->'ct'->list_cmd->base_cmd
-list ct helper table_id ct_id
+list ct helper table_id ct_id x
+list ct helper last ct_id
+list ct helper table_id last
+list ct helper last last
 list ct helper ip table_id ct_id
 list ct helper ip6 table_id ct_id
 list ct helper inet table_id ct_id
@@ -309,12 +315,14 @@ list ct timeout arp table_id ct_id
 
 # obj_spec->'timeout'->ct_cmd_type->'ct'->list_cmd->base_cmd
 list ct timeout table table_id
+list ct timeout table last
 list ct timeout table ip table_id
 list ct timeout table ip6 table_id
 list ct timeout table inet table_id
 list ct timeout table netdev table_id
 list ct timeout table bridge table_id
 list ct timeout table arp table_id
+list ct timeout table arp last
 
 # obj_spec->'expectation'->ct_obj_type->'ct'->list_cmd->base_cmd
 list ct expectation
@@ -328,21 +336,25 @@ list ct expectation arp table_id ct_id
 
 # obj_spec->'expectation'->ct_cmd_type->'ct'->list_cmd->base_cmd
 list ct expectation table table_id
+list ct expectation table last
 list ct expectation table ip table_id
 list ct expectation table ip6 table_id
 list ct expectation table inet table_id
 list ct expectation table netdev table_id
 list ct expectation table bridge table_id
 list ct expectation table arp table_id
+list ct expectation table arp last
 
 # obj_spec->'helpers'->ct_cmd_type->'ct'->list_cmd->base_cmd
 list ct helpers table table_id 
+list ct helpers table last 
 list ct helpers table ip table_id
 list ct helpers table ip6 table_id
 list ct helpers table inet table_id
 list ct helpers table netdev table_id
 list ct helpers table bridge table_id
 list ct helpers table arp table_id
+list ct helpers table arp last
 
 # basehook_spec->'hooks'->list_cmd->base_cmd
 list hooks 
@@ -451,10 +463,4 @@ list flowtables arp
 
 list sets  # premature EOS
 list meters  # premature EOS
-
-limit myIp6Table myIp6Limit rate 1  # premature EOS
-limit myIp6Table myIp6Limit rate 1 /  # premature EOS
-limit myIpTable myIpLimit rate over 3600000/  # premature EOS
-limit myInetTable myInetLimit rate until 1  # premature EOS
-limit myBridgeTable myBridgeLimit rate 1 /hour burst 11  # premature EOS
 
