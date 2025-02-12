@@ -41,25 +41,33 @@ table T { define my_var };
 table T { define my_var; };
 table T { define my_var ; };
 table T { define my_var ; } ; 
-
+T C counter
 # chain_block->'chain'->table_block->'table'->add_cmd->base_cmd->line
 table T { chain C { define my_var }; };
 # >table_block->'table'->add_cmd->base_cmd->line
-table T { define xyz = 1 ; define xyz = 1; };
-
+add table T { define xyz = 1 ; define xyz = 1; };
+counter T CT { define my_var; };
+add counter T CT { define my_var; };
 # common_block->flowtable_block->'{'->'flowtable'->add_cmd->'add'->base_cmd->line
+flowtable T FT { define my_var; };
 add flowtable T FT { define my_var; };
 # common_block->limit_block->'{'->'limit'->add_cmd->'add'->base_cmd->line
+limit T L { define my_var; };
 add limit T L { define my_var; };
 # common_block->set_block->'{'->'set'->add_cmd->'add'->base_cmd->line
+set T S { define my_var; };
 add set T S { define my_var; };
 # common_block->map_block->'{'->'map'->add_cmd->'add'->base_cmd->line
+map T M { define my_var; };
 add map T M { define my_var; };
 # common_block->quota_block->'{'->'quota'->add_cmd->'add'->base_cmd->line
+quota T Q { define my_var; };
 add quota T Q { define my_var; };
 # common_block->secmark_block->'{'->'secmark'->add_cmd->'add'->base_cmd->line
+secmark T SM { define my_var; };
 add secmark T SM { define my_var; };
 # common_block->secmark_block->'{'->'secmark'->add_cmd->'add'->base_cmd->line
+synproxy T SP { define my_var; };
 add synproxy T SP { define my_var; };
 
 # common_block->counter_block->'{'->'counter'->create_cmd->'create'->base_cmd->line

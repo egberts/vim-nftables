@@ -132,9 +132,21 @@ create map inet myInetTable myInetMap {
     elements = { inet_proto };  
     policy performance; 
 };
-add rule T C
+create map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
+create map inet myInetTable myInetMap { 
+    type mark; 
+    flags interval; 
+    elements = { inet_proto }; 
+    size 1200; 
+    policy performance; 
+};
 
-####create map inet myInetTable myInetMap { type mark; flags interval; elements = { inet_proto }; size 1200; policy performance; }
+
+# create flowtable <flowtable_spec> { <flowtable_block> }
+create flowtable myIpTable myIpFT { hook input priority 0; devices = { br0, eth0, eth1} ; }
+create flowtable ip myIpTable myIpFT { hook input priority 0; devices = { eth0, eth1 } ; }
+create flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { br0, eth0 } ; }
+create flowtable inet myInetTable myInetFT { hook input priority 0; devices = { br0, eth1 } ; }
 
 # create element <set_spec> <set_block_expr>
 #create element myIpTable myIpSet { element, element }
@@ -145,15 +157,10 @@ create element ip myIpTable myIpSet { 10.20.255.88/29 : goto group_114 }
 create element ip6 myIp6Table myIp6Set { 10.20.255.128/29 : goto group_114 }
 create element inet myInetTable myInetSet { 10.20.255.50/32 : "1:0xffd9" }
 
-# create flowtable <flowtable_spec> { <flowtable_block> }
-create flowtable myIpTable myIpFT { hook input priority 0; devices = { br0, eth0, eth1} ; }
-create flowtable ip myIpTable myIpFT { hook input priority 0; devices = { eth0, eth1 } ; }
-create flowtable ip6 myIp6Table myIp6FT { hook input priority 0; devices = { br0, eth0 } ; }
-create flowtable inet myInetTable myInetFT { hook input priority 0; devices = { br0, eth1 } ; }
-
 # create counter <obj_spec> close_scope_counter 
 # create counter <obj_spec> counter_obj counter_config close_scope_counter  
-create counter myIpTable https-filter
+create counter ip myIpTable https-filter
+create counter ip myIpTable https-filter
 create counter netdev myNetdevTable https-filter  
 create counter bridge myBridgeTable https-filter  
 create counter arp myArpTable https-filter  
@@ -246,6 +253,14 @@ create synproxy netdev myTable synproxy_obj mss 1593 wscale 1
 # true negative test: properly hightlighted wrongly to show an error; 
 # so far, so good.
 ################################################################################
+
+create 
+
+
+create oopsie
+
+create set T 
+
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.

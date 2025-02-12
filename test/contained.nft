@@ -18,30 +18,23 @@ redefine
 undefine
 
 # base_cmd
-add rule 
- replace
-create
-insert
-delete
-get
-list
-reset
-flush
-rename
-import
-export
-monitor
-describe
-destroy
-
-
-# base_cmd add_cmd
-table table\id
-table table/id
-table table_id
+ip
+replace rule
+create set
+insert T C xyz
+delete T C 
+get 
+list tables 
+reset 
+flush 
+rename 
+import 
+export 
+monitor 
+describe 
+destroy  T C 
 table table.id
-table table.id
-chain table/id
+ chain T C 
 rule <stmt>
 set table_id chain_id set_id $v_\/.ariable
 map table_id
@@ -53,7 +46,7 @@ ct table_id
 limit table_id
 secmark table_id
 synproxy table_id
-
+add xtable_id
 add table table\id
 add table table/id
 add table table_id
@@ -64,7 +57,6 @@ add rule <stmt>
 add set table_id chain_id set_id $v_\/.ariable
 add map table_id
 add flowtable table_id
-element table_id
 add element table_id
 add counter table_id
 add quota table_id
@@ -101,7 +93,7 @@ bytes
 ~
 cfi
 cgroup
-2cgroupv2
+cgroupv2
 chains
 checksum
 chunk
@@ -143,7 +135,9 @@ dynamic
 echo
 ecne
 ecn
-elements
+element 
+add element 
+add elements
 = /$/
 =
 error
@@ -169,6 +163,7 @@ fully-random
 fwd
 gateway
 gc-interval
+get
 goto
 group
 >
@@ -248,7 +243,7 @@ mss
 mtu
 name
 <>
-netdev
+netdev T C 
 network-hdr
 never
 new-cum-tsn

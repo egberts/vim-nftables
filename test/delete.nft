@@ -9,6 +9,9 @@
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
 
+
+delete table ;
+
 # delete table <table_spec>
 # 'table'->delete_cmd->'delete'->base_cmd->line
 delete table T
@@ -270,10 +273,277 @@ delete synproxy T synproxy_name
 # so far, so good.
 ################################################################################
 
+delete 
+
+
+delete something
+
+delete ;
+
+
+delete table not_family_but_table junk2 junk3
+
+delete table T C
+delete table ip T C
+delete table ip6 T C
+delete table inet T C
+delete table netdev T C
+delete table bridge T C
+delete table arp T C
+delete table handle ABCDEFGHIJ
+delete table ip handle 123
+delete table ip6 handle 123
+delete table inet handle 123
+delete table netdev handle 123
+delete table bridge handle 123
+delete table arp handle 123
+
+# delete chain <chainid_spec>
+# common_block->chain_block->'{'->'chain'->delete_cmd->'delete'->base_cmd->line
+delete chain T C
+delete chain ip T C
+delete chain ip6 T C
+delete chain inet T C
+delete chain netdev T C
+delete chain bridge T C
+delete chain arp T C
+
+delete chain T C { }
+delete chain ip T C {  }
+delete chain ip6 T C {  }
+delete chain inet T C {  }
+delete chain netdev T C {  }
+delete chain bridge T C {  }
+delete chain arp T C { }
+
+delete chain T C { define my_var; };
+
+delete chain T handle 123123
+delete chain ip T handle 15
+delete chain inet T handle 15
+delete chain inet T handle 42  # comment
+delete chain ip6 T handle 15
+delete chain bridge T handle 15
+delete chain arp T handle 15
+delete chain netdev T handle 15
+
+# delete rule <ruleid_spec>
+delete rule T C handle 16
+delete rule last C handle 16
+delete rule T last handle 16
+delete rule last last handle 16
+delete rule arp T C handle 16
+delete rule bridge T C handle 16
+delete rule filter output handle 5
+delete rule filter output ip saddr 192.168.1.1 counter  # not implemented yet
+delete rule inet T C handle 16
+delete rule ip6 T C handle 16
+delete rule ip T C handle 42
+delete rule netdev T C handle 16
+delete rule T C handle 42
+
+# delete set <set_spec>
+delete set T S
+delete set ip T S
+delete set ip6 T S
+delete set inet T S
+delete set netdev T S
+delete set bridge T S
+delete set arp T S
+
+# delete set <setid_spec>
+delete set T handle 123
+delete set ip T handle 123
+delete set inet T handle 42  # comment
+
+# delete map <set_spec>
+delete map T M 
+delete map ip T M 
+delete map ip6 T M 
+delete map inet T M 
+delete map netdev T M 
+delete map bridge T M 
+delete map arp T M 
+
+# delete element <set_spec> <set_block_expr>
+delete element T M { 4.4.4.4 }
+delete element T M { elements = { element, element }; }
+delete element ip T M { 4.4.4.4 }
+delete element ip T M { element, element }
+delete element ip T M { elements = { element, element } ; }
+delete element ip6 T M { 4.4.4.4 }
+delete element ip6 T M { element, element }
+delete element ip6 T M { elements = { element, element } ; }
+delete element inet T M { 10.0.0.1 }
+delete element inet T M { element, element }
+delete element inet T M { elements = { element, element } ; }
+delete element netdev T M { 10.0.0.1, 127.0.0.1 }
+delete element netdev T M { element, element }
+delete element netdev T M { elements = { element, element } ; }
+delete element bridge T M { 4.4.4.4 }
+delete element bridge T M { element, element }
+delete element bridge T M { elements = { element, element } ; }
+delete element arp T M { 4.4.4.4 }
+delete element arp T M { element, element }
+delete element arp T M { elements = { element, element } ; }
+
+# delete counter <obj_spec>
+delete counter T CounterName
+delete counter ip T CounterName
+delete counter ip6 T CounterName
+delete counter inet T CounterName
+delete counter netdev T CounterName
+delete counter bridge T CounterName
+delete counter arp T CounterName
+
+# 'delete' 'flowtable' <flowtable_spec>
+# common_block->flowtable_block->'{'->'flowtable'->delete_cmd->'delete'->base_cmd->line
+delete flowtable T FT 
+delete flowtable ip T FT 
+delete flowtable ip6 T FT 
+delete flowtable inet T FT 
+delete flowtable netdev T FT 
+delete flowtable bridge T FT 
+delete flowtable arp T FT 
+
+delete flowtable T FT { define my_var; };
+delete flowtable T FT { hook input priority 0; devices = { br0, eth0, eth1} ; }
+delete flowtable ip T FT { hook input priority 0; devices = { eth0, eth1 } ; }
+delete flowtable ip6 T FT { hook input priority 0; devices = { br0, eth0 } ; }
+delete flowtable inet T FT { hook input priority 0; devices = { br0, eth1 } ; }
+delete flowtable netdev T FT { flowtable_block }
+delete flowtable bridge T FT { hook input priority 0; devices = { br0, eth1 } ; }
+delete flowtable arp T FT { hook input priority 0; devices = { br0, eth1 } ; }
+
+delete flowtable T handle 15 
+delete flowtable ip T handle 15
+delete flowtable ip6 T handle 15 
+delete flowtable inet T handle 15 
+delete flowtable netdev T handle 15 
+delete flowtable bridge T handle 15 
+delete flowtable arp T handle 15 
+
+# delete counter <objid_spec>
+delete counter netdev T handle 1
+
+# delete quota <obj_spec>
+delete quota T Q 
+delete quota ip T Q
+delete quota ip6 T Q
+delete quota inet T Q
+delete quota netdev T Q
+delete quota bridge T Q
+delete quota arp T Q
+
+# delete quota <objid_spec>
+delete quota T handle 15
+delete quota ip T handle 15
+delete quota ip6 T handle 15
+delete quota inet T handle 123
+delete quota netdev T handle 15
+#delete quota inet T index 345  # not yet available
+#delete quota inet T position 234  # not yet available
+delete quota bridge T handle 15
+delete quota arp T handle 15
+
+# delete ct <ct_obj_type> <obj_spec> <ct_obj_alloc>
+delete ct helper T ct_id
+delete ct helper ip T ct_id
+delete ct helper ip6 T ct_id
+delete ct helper inet T ct_id
+delete ct helper netdev T ct_id
+delete ct helper bridge T ct_id
+delete ct helper arp T ct_id
+delete ct helper T { };
+delete ct helper T {}
+
+delete ct timeout
+delete ct timeout T ct_id
+delete ct timeout ip T ct_id
+delete ct timeout ip6 T ct_id
+delete ct timeout inet T ct_id
+delete ct timeout netdev T ct_id
+delete ct timeout bridge T ct_id
+delete ct timeout arp T ct_id
+
+delete ct expectation
+delete ct expectation T Q 
+delete ct expectation ip T Q
+delete ct expectation ip6 T Q
+delete ct expectation inet T Q
+delete ct expectation netdev T Q
+delete ct expectation bridge T Q
+delete ct expectation arp T Q
+
+#   'delete' 'limit' ( obj_spec | objid_spec ) 
+# limit_config->identifier->family_spec->table_spec->'limit'->'delete'->delete_cmd->base_cmd
+delete limit T L 
+delete limit ip T L
+delete limit ip6 T L
+delete limit inet T L
+delete limit netdev T L
+delete limit bridge T L
+delete limit arp T L
+
+delete limit T handle 15
+delete limit ip T handle 15
+delete limit ip6 T handle 15
+delete limit inet T handle 15
+delete limit netdev T handle 15
+delete limit bridge T handle 15
+delete limit arp T handle 15
+
+delete limit T L rate 1 /hour 
+delete limit T L rate 1 / week
+delete limit T L rate over 3600000/ day
+delete limit T L rate until 1/second
+delete limit T L rate 1/minute burst 5 packets
+delete limit ip T L rate 1/ day
+delete limit ip6 T L rate 1 / week
+delete limit inet T L rate 1/second
+delete limit netdev T L rate 1/minute 
+delete limit bridge T L rate 1 /hour 
+delete limit arp T L rate 1 /hour 
+
+delete secmark arp T handle 15
+delete secmark arp T secmark_name
+delete secmark bridge T handle 15
+delete secmark bridge T secmark_name
+delete secmark inet T handle 15
+delete secmark inet T secmark_name
+delete secmark ip6 T handle 15
+delete secmark ip6 T secmark_name
+delete secmark ip T handle 15
+delete secmark ip T secmark_name
+delete secmark netdev T handle 15
+delete secmark netdev T secmark_name
+delete secmark T handle 15
+delete secmark T secmark_name 
+
+delete synproxy arp T handle 15
+delete synproxy arp T synproxy_name
+delete synproxy bridge T handle 15
+delete synproxy bridge T synproxy_name
+delete synproxy inet T handle 15
+delete synproxy inet T synproxy_name
+delete synproxy ip6 T handle 15
+delete synproxy ip6 T synproxy_name
+delete synproxy ip T handle 15
+delete synproxy ip T synproxy_name
+delete synproxy netdev T handle 15
+delete synproxy netdev T synproxy_name
+delete synproxy T handle 15
+delete synproxy T synproxy_name 
+
+ delete quantum
+
 delete rule 
 
 
 delete rule ; 
+
+
+delete rule 0asddf 
 
 
 delete rule  T 
@@ -282,7 +552,7 @@ delete rule  T
 delete rule  T  C 
 
 
-delete rule  T  C  han
+delete rule  T  C  handy_dandy
 
 delete rule  T  C  handle 
 
@@ -303,7 +573,13 @@ delete counter T CounterName index index_id  # invalid: 'index' not supported
 # false negative test: highlighted wrongly; still has good content; oops.
 ################################################################################
 
+delete table bad-table-name
+delete table handle 123ABC
+delete table handle $ABC
+
+
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.
 ################################################################################
+
 

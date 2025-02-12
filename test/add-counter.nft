@@ -52,13 +52,13 @@ counter bridge T C;
 counter arp T C  ;  
 
 # Prototyping error highlighting here
-counter T C { packet 123 bytes 12345 }
-counter T C { packet 123 bytes 12345 }
-counter T last { packet 123 bytes 12345 };
+counter T C { packet 123 bytes 12345 } ;
+counter T C { packet 123 bytes 12345 } ;
+counter T last { packet 123 bytes 12345; } ;
 counter ip T C { packet 123 bytes 123; packet 123 bytes 123; };
 counter ip T C { 
-    include "include_counters_file.nft";
     packet 123 bytes 123 
+    include "include_counters_file.nft";
 };
 
 add counter T/T C
@@ -88,20 +88,14 @@ add rule filter input tcp dport 80 counter name \"http\"  # nftables manpage
 add rule filter input name tcp dport map { 80 : "http", 443 : "https" }  # nftables manpage
 
 delete counter table_id counter_id
-delete counter table_id counter_id handle handle_id
-delete counter table_id counter_id index index_id
 
 destroy counter table_id counter_id
-destroy counter table_id counter_id handle handle_id
-destroy counter table_id counter_id index index_id
 
 list counter table_id counter_id
-list counter table_id counter_id handle handle_id
-list counter table_id counter_id index index_id
+list counter table_id counter_id ;
 
 reset counter table_id counter_id
-reset counter table_id counter_id handle handle_id
-reset counter table_id counter_id index index_id
+reset counter table_id  chain_id  ; reset counter table_id2 chain_id2
 
 
 table inet x {  # from nftables manpage
@@ -169,7 +163,13 @@ counter ip
 counter ip ;
 
 
+add 
+
+
 add counter  
+
+
+add counter T      
 
 
 add counter T ;
@@ -182,11 +182,63 @@ add counter T
 
 add counter T C X
 
+delete 
+
+
+delete counter 
+
+
+delete counter table_id 
+
+
+destroy 
+
+
+destroy counter 
+
+
+destroy counter table_id 
+
+
+list 
+
+
+list counter 
+
+
+list counter table_id 
+
+
+reset 
+
+
+reset counter 
+
+
+reset counter ip 
+
+
+reset counter table_id 
+
+
+reset counter table_id  chain_id  x
+
+
+
+
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.
 ################################################################################
 
+delete counter table_id counter_id handle handle_id
+delete counter table_id counter_id index index_id
+destroy counter table_id counter_id handle handle_id
+destroy counter table_id counter_id index index_id
+list counter table_id counter_id handle handle_id
+list counter table_id counter_id index index_id
+reset counter table_id counter_id handle handle_id
+reset counter table_id counter_id index index_id
 
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.

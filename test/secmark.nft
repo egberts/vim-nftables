@@ -1,0 +1,143 @@
+#!/usr/sbin/nft -f
+# File: secmark.nft
+# Description: A test NFT file to exercise 'secmark' Vim syntax highlightings.
+#
+# base_cmd 'secmark' 
+# base_cmd add_cmd 'secmark' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_keyword_secmark
+#
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
+
+
+secmark table_id
+secmark myTable mySecMark 
+secmark obj_spec secmark_obj { secmark_block } close_scope_secmark
+secmark T SM { define my_var; };
+secmark T SM { typeof b.c.d.e.f : secmark  };
+secmark myTable sshtag { "system_u:object_r:ssh_server_packet_t:s0" }
+add secmark table_id
+add secmark myTable mySecMark 
+add secmark obj_spec secmark_obj { secmark_block } close_scope_secmark
+add secmark T SM { define my_var; };
+add secmark T SM { typeof b.c.d.e.f : secmark  };
+add secmark myTable sshtag { "system_u:object_r:ssh_server_packet_t:s0" }
+create secmark myTable mySecMark 'asdf \'asdd"asdfdf'
+create secmark myTable mySecMark 'asdf \'asddfasdfdf'
+create secmark myTable mySecMark 'a:;fasddfa()fdf' ;
+create secmark myTable mySecMark "asdf \"dfa[]fdf"
+create secmark myTable mySecMark "asdf \"dfa'dfdf"
+create secmark ip myTable mySecMark an unconstrained string
+create secmark ip myTable mySecMark an unconstrained string ;
+create secmark obj_spec secmark_obj secmark_config close_scope_secmark
+delete secmark T secmark_name 
+delete secmark table_name secmark_name 
+delete secmark ip table_name secmark_name
+delete secmark ip6 table_name secmark_name
+delete secmark inet table_name secmark_name
+delete secmark arp table_name secmark_name
+delete secmark bridge table_name secmark_name
+delete secmark netdev table_name secmark_name
+delete secmark T handle 15
+delete secmark table_name handle 15
+delete secmark ip table_name handle 15
+delete secmark ip6 table_name handle 15
+delete secmark inet table_name handle 15
+delete secmark arp table_name handle 15
+delete secmark bridge table_name handle 15
+delete secmark netdev table_name handle 15
+destroy secmark arp T handle 15
+destroy secmark arp T secmark_name
+destroy secmark bridge T handle 15
+destroy secmark bridge T secmark_name
+destroy secmark inet T handle 15
+destroy secmark inet T secmark_name
+destroy secmark ip6 T handle 15
+destroy secmark ip6 T secmark_name
+destroy secmark ip T handle 15
+destroy secmark ip T secmark_name
+destroy secmark netdev T handle 15
+destroy secmark netdev T secmark_name
+list secmark table ruleset_spec
+list secmark table table_name
+list secmark table_id secmark_id
+list secmark ip table_id secmark_id
+list secmark ip6 table_id secmark_id
+list secmark inet table_id secmark_id
+list secmark netdev table_id secmark_id
+list secmark bridge table_id secmark_id
+list secmark arp table_id secmark_id
+list secmarks 
+list secmarks ip 
+list secmarks ip6
+list secmarks inet 
+list secmarks netdev 
+list secmarks bridge 
+list secmarks arp 
+list secmarks table table_id
+list secmarks table ip table_id
+list secmarks table ip6 table_id
+list secmarks table inet table_id
+list secmarks table netdev table_id
+list secmarks table bridge table_id
+list secmarks table arp table_id
+
+add rule T C ct secmark
+add rule ip6 myTable myChain position 1 ct secmark set ip6 myIpTable myCTHchain { };
+add rule ip6 table_id myChain position 1 ct secmark zone set ip6 table_id myCTHchain { };
+
+
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good)
+################################################################################
+
+destroy 
+
+
+destroy     
+
+
+destroy secmark 
+
+
+destroy secmark T 
+
+
+destroy secmark T handle 
+
+
+destroy secmark ip7 T handle 15
+list 
+
+
+list secmark 
+
+
+list secmark ip 
+
+
+list secmark bad_table  
+
+
+list secmark bad_table secmark_name oopsie
+
+
+list secmark table ip table_name
+list secmark table ip6 table_name
+list secmark table inet table_name
+list secmark table arp table_name
+list secmark table bridge table_name
+list secmark table netdev table_name
+
+
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
+
+
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
+

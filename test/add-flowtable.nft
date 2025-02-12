@@ -10,19 +10,17 @@
 ################################################################################
 
 # base_cmd add_cmd 'flowtable'
-flowtable T 
-
 flowtable T F
 add flowtable T F
-add flowtable T F
+add flowtable T F ;
 
 add flowtable ip S F
-add flowtable ip6 S F 
+add flowtable ip6 S F  ;
 add flowtable inet S  F
 add flowtable netdev  S F
 add flowtable  bridge S F
 add  flowtable arp S F
- add flowtable arp S F
+ add flowtable arp S F ;
 
 add flowtable ip T F { hook b }
 add flowtable T F { devices = eth0 }
@@ -50,13 +48,22 @@ delete flowtable bridge table_id flowtable_id
 delete flowtable arp table_id flowtable_id 
 
 # flowtable_block->'{'->flowtable_spec->'flowtable'->'delete'->delete_cmd->base_cmd
-delete flowtable table_id flowtable_id { flowtable_block }
-delete flowtable ip table_id flowtable_id { flowtable_block }
-delete flowtable ip6 table_id flowtable_id { flowtable_block }
-delete flowtable inet table_id flowtable_id { flowtable_block }
-delete flowtable netdev table_id flowtable_id { flowtable_block }
-delete flowtable bridge table_id flowtable_id { flowtable_block }
-delete flowtable arp table_id flowtable_id { flowtable_block }
+delete flowtable table_id flowtable_id { hook "myhook"; devices = $MY_WAN; flags offload; counter }
+delete flowtable ip table_id flowtable_id { devices = $MY_DMZ }
+delete flowtable ip6 table_id flowtable_id { hook "ourhook" }
+delete flowtable inet table_id flowtable_id { flags offload }
+delete flowtable netdev table_id flowtable_id { counter }
+delete flowtable bridge table_id flowtable_id { hook "ushook"; devices = $WAN }
+delete flowtable arp table_id flowtable_id { 
+    include "MyInclude." ;
+    define A = 1 ;
+    redefine A = 2 ;
+    undefine A ;
+    hook "yourhook" ;
+    devices = { "eth0" } ;
+    flags offload ;
+    counter ;
+    }
 
 # flowtableid_spec->'flowtable'->'delete'->delete_cmd->base_cmd
 delete flowtable table_id handle 15 
@@ -126,6 +133,25 @@ flush flow table arp table_id flow_id
 # true negative test: properly hightlighted wrongly to show an error; 
 # so far, so good)
 ################################################################################
+
+flowtable T 
+
+
+add flowtable 
+
+
+add flowtable T 
+
+
+create flow table
+create flowtable ip  
+
+
+create flowtable X 
+
+
+create flowtable X 0asdf
+
 
 list flow table netdev table_id synproxy_id
 list flow table bridge table_id synproxy_id

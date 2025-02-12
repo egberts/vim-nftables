@@ -322,10 +322,18 @@ replace rule ip table_id chain_id sctp chunk asconf length
 # so far, so good.
 ################################################################################
 
+replace 
+
+
+replace rule 
+
+
 replace table 
 replace chain 
 replace map 
 replace set 
+
+replace rule asddf
 
 replace rule invalid_family_spec
 replace rule invalid{table_id} table_id chain_id handle 777

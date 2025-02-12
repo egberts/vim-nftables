@@ -36,3 +36,4 @@ add rule table_id chain_id dccp option 15 jkl
 # false positive test: looks highlighted correctly; has bad content; oops.
 ################################################################################
 
+add rule table_id chain_id dccp $MYVAR
