@@ -47,7 +47,7 @@ table T { comment "unique, uh?"; flags a, b, c; chain C { type ; }; };
 
 # nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_chain
 chain ip ABCD ;
-chain ABCD { define a = 1; undefine a };
+chain Table ABCD { define a = 1; undefine a };
 add chain
 add chain inet identifier
 add chain inet identifier

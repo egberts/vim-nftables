@@ -136,7 +136,7 @@ destroy flowtable bridge T FT
 destroy flowtable arp T FT 
 
 destroy flowtable T FT { define my_var; };
-destroy flowtable T FT { hook input priority 0; devices = { br0, eth0, eth1} ; }
+destroy flowtable T FT { hook input priority out+1; devices = { br0, eth0, eth1} ; hook input priority false }
 destroy flowtable ip T FT { hook input priority 0; devices = { eth0, eth1 } ; }
 destroy flowtable ip6 T FT { hook input priority 0; devices = { br0, eth0 } ; }
 destroy flowtable inet T FT { hook input priority 0; devices = { br0, eth1 } ; }

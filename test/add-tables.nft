@@ -195,6 +195,9 @@ table inet myInetTable { flags dormant; }
 # END OF WORK
 
 table xxxx { undefine abc; chain last { undefine abc; }; };
+
+
+
 table inet MyIpNet {
     chain MyForwardChain {
         type filter hook prerouting device wlan0 priority 1;
@@ -891,9 +894,16 @@ table xxxx { undefine abc; chain last { chain last; undefine abc; }; };  # oopsi
 # true negative test: properly hightlighted wrongly to show an error; 
 # so far, so good.
 ################################################################################
+table "*weirdname"  # allowable '*' but only inside double quote???
+table "$weirdname"  # allowable '$' but only inside double quote???
+table "#weirdname"  # allowable '#' but only inside double quote???
+
 table ip
 table ip6   
+
+
 table inet  #
+
 table bridge ;  
 table netdev  # intentionally invalid; invalid table identifier
 table arp  # intentionally invalid; invalid table identifier
@@ -925,9 +935,6 @@ table A!error
 # false negative test: highlighted wrongly; still has good content; oops.
 ################################################################################
 
-table "*weirdname"  # allowable '*' but only inside double quote???
-table "$weirdname"  # allowable '$' but only inside double quote???
-table "#weirdname"  # allowable '#' but only inside double quote???
 
 table xxxx { flags ,, b, c };  " oopsie
 table xxxx { flags a, b,  };  " oopsie

@@ -54,24 +54,7 @@ add limit arp myBridgeTable myBridgeLimit rate 1 /hour burst 1000000 bytes
 
 # limit_rate_pkts->obj_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
 # limit_rate_pkts->identifier->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
-add rule limit myIp6Table myIp6Limit rate 1 / week
-
-# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
-add rule limit myIpTable myIpLimit rate over 3600000/ day
-add rule limit myInetTable myInetLimit rate until 1/second
-
-# limit_rate_pkts->limit_config->identifier->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
-add rule limit myNetdevTable myNetdevLimit rate 1/minute burst 5 packets
-add rule limit myBridgeTable myBridgeLimit rate 1 /hour 
-
-# limit_config->obj_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
-# limit_config->identifier->family_spec->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
-add rule limit ip6 myIp6Table myIp6Limit rate 1 / week
-add rule limit ip myIpTable myIpLimit rate 1/ day
-add rule limit inet myInetTable myInetLimit rate 1/second
-add rule limit netdev myNetdevTable myNetdevLimit rate 1/minute 
-add rule limit bridge myBridgeTable myBridgeLimit rate 1 /hour 
-add rule limit arp myBridgeTable myBridgeLimit rate 1 /hour 
+add limit myIp6Table myIp6Limit rate 1 / week
 
 # [ add rule ] limit obj_spec limit_obj { limit_config } close_scope_limit
 # limit_block->'{'->identifier->family_spec->table_spec->'limit'->'rule'->'add'->add_cmd->base_cmd
@@ -182,19 +165,6 @@ list limits table arp table_id
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.
 ################################################################################
-
-add rule limit myTable myChain limit rate 1023000 mbytes/second
-add rule limit myTable myChain limit rate 1025000 mbytes/second burst 1023 mbytes
-add rule limit myTable myChain limit rate 1025 bytes/second burst 512 bytes
-add rule limit myTable myChain limit rate 1025 kbytes/second
-add rule limit myTable myChain limit rate 1025 kbytes/second burst 1023 kbytes
-add rule limit myTable myChain limit rate 1025 mbytes/second burst 1025 kbytes
-add rule limit myTable myChain limit rate 400/hour
-add rule limit myTable myChain limit rate 400/minute
-add rule limit myTable myChain limit rate over 1023/second burst 10 packets
-add rule limit myTable myChain limit rate over 400/week
-add rule limit myTable myChain limit rate over 40/day
-
 
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.

@@ -16,22 +16,75 @@ list flowtable inet myIpTable MySet
 # true negative test: properly hightlighted wrongly to show an error; 
 # so far, so good.
 ################################################################################
+list 
+
 
 list oopsie  # intentional invalid syntax
 list oopsie ;  # intentional invalid syntax
-list set myIpTable handle 123 # intentional syntax error
-list set inet myInetTable handle 123  # Intentional Syntax ERROR
+list set 
+
+
+list set myIpTable 
+
+
+list set inet 
+
+
+list flow tables 
+
+
 list flow tables arp  # intentional invalid; flowtables do not support ARP
 list flow tables bridge  # intentional invalid; flowtables do not support BRIDGE
 list flow tables netdev  # intentional invalid; flowtables do not support NETDEV
+
+list flow table 
+
+
 list flow table arp table_name identifier  # intentional invalid; flowtables do not support ARP
 list flow table bridge table_name identifier  # intentional invalid; flowtables do not support BRIDGE
 list flow table netdev table_name identifier  # intentional invalid; flowtables do not support NETDEV
+flush 
+
+
+flush chain 
+
+
+flush chain myIpTable 
+
+
+flush chain myIpTable myIpChain 
+flush chain myIpTable myIpChain ; 
 flush chain myIpTable myIpChain ; flush chain netdev myNetDev X; oopsie
+flush flow 
+flush flow table 
+
+
+flush flow table table_name 
+
+
+flush flow table table_name identifier  # intentional invalid; flowtable do not support ARP
+flush flow table table_name identifier  # intentional invalid; flowtable do not support ARP
+flush flow table arp 
+
+
+flush flow table arp table_name 
+
+
 flush flow table arp table_name identifier  # intentional invalid; flowtable do not support ARP
 flush flow table bridge table_name identifier  # intentional invalid; flowtable do not support BRIDGE
 flush flow table netdev table_name identifier  # flowtable do not support NETDEV
+
+list flowtable 
+
+
+list flowtable ip table 
+list flowtable arp 
+
+
 list flowtable arp table_name identifier  # intentional invalid; flowtable do not support ARP
+list flowtable arp table_name 
+
+
 list flowtable bridge table_name identifier  # intentional invalid; flowtable do not support BRIDGE
 list flowtable netdev table_name identifier  # intentional invalid; flowtable do not support NETDEV
 list flowtables arp  # intentional invalid; flowtable do not support ARP

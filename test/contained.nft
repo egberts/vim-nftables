@@ -25,14 +25,14 @@ insert T C xyz
 delete T C 
 get 
 list tables 
-reset 
-flush 
+reset counter T C
+flush table
 rename 
 import 
 export 
 monitor 
-describe 
-destroy  T C 
+describe  $A = 1
+destroy counter
 table table.id
  chain T C 
 rule <stmt>

@@ -101,17 +101,22 @@ destroy flowtable netdev table_id flowtable_id { flowtable_block }
 destroy flowtable bridge table_id flowtable_id { flowtable_block }
 destroy flowtable arp table_id flowtable_id { flowtable_block }
 
-# set_spec->'table'->'flow'->list_cmd->base_cmd
-list flow table table_id synproxy_id
-list flow table ip table_id synproxy_id
-list flow table ip6 table_id synproxy_id
-list flow table inet table_id synproxy_id
-
 # ruleset_spec->'tables'->'flow'->list_cmd->base_cmd
-list flow tables
 list flow tables ip
 list flow tables ip6
 list flow tables inet
+
+# set_spec->'table'->'flow'->list_cmd->base_cmd
+list flow table table_id synproxy_id
+list flow table last synproxy_id
+list flow table table_id last
+list flow table last last
+list flow table ip table_id synproxy_id
+list flow table ip last synproxy_id
+list flow table ip table_id last
+list flow table ip last last
+list flow table ip6 table_id synproxy_id
+list flow table inet table_id synproxy_id
 
 # ruleset_spec->'flowtables'->'list'->list_cmd->base_cmd
 list flowtables
@@ -119,7 +124,12 @@ list flowtables ip
 list flowtables ip6
 list flowtables inet
 
-# set_spec->'table'->'flow'->flush_cmd->base_cmd
+# flowtable_spec->'flowtable'->'list'->list_cmd->base_cmd
+list flowtable ip
+list flowtable ip6 T C
+
+
+# ruleset_spec->'tables'->'flow'->flush_cmd->base_cmd
 flush flow table table_id flow_id
 flush flow table ip table_id flow_id
 flush flow table ip6 table_id flow_id
@@ -153,6 +163,7 @@ create flowtable X
 create flowtable X 0asdf
 
 
+list flowtable
 list flow table netdev table_id synproxy_id
 list flow table bridge table_id synproxy_id
 list flow table arp table_id synproxy_id
@@ -162,6 +173,7 @@ list flow tables arp
 list flowtables netdev
 list flowtables bridge
 list flowtables arp
+
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.

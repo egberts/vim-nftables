@@ -47,9 +47,9 @@ insert rule T C {
     last used time_spec
 }
 # 'last'->last_stmt->stateful_stmt->stmt->rule_alloc->rule->replace_cmd
-replace T C handle 1 last
-replace T C handle 2 last never
-replace ip6 T C handle 3 last used
+replace rule T C handle 1 last
+replace rule T C handle 2 last never
+replace rule ip6 T C handle 3 last used
 
 ################################################################################
 # true negative test: properly hightlighted wrongly to show an error; 
