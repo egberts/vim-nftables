@@ -10,7 +10,6 @@
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
 
-
 secmark table_id
 secmark myTable mySecMark 
 secmark obj_spec secmark_obj { secmark_block } close_scope_secmark

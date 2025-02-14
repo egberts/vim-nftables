@@ -17,9 +17,10 @@ include ";;;;;;;;;;";
 include 'Fil"espec'
 include "Fil'espec"
 include "Filespec"
-include 'Filespec'    #
 
 include "Filespec" ;
+
+
 include "Filespec";   
 include "Filespec"  ;
 include "Filespec"  ;   
@@ -54,7 +55,7 @@ include "Filespec???<>|\~`!@#$%^&*()\=+{}] /;:,._0123abcXYZ"  ;   # inline comme
 # so far, so good.
 ################################################################################
 
-include Filespec  # intentional syntax error
+include Filespec  # intentional syntax error; missing quote-pair
 
 include 'Fil'espec'  # intentional syntax error; embedded single quote
 include "Fil"espec"  # intentional syntax error; embedded double quote
@@ -63,17 +64,20 @@ include "Filespec" extra stuff oppsie  # intentional syntax error
 include "Filespec"  oopsie  # intentional syntax error
 include "Filespec"  oopsie  ;  # intentional syntax error
 
-include '/home/device/Filespec"  # mismatched quotes
-include '/home/device/Filespec"  # mismatched quotes
-include "/home/device/Filespec'  # mismatched quotes
-include "/home/device/Filespec'  # mismatched quotes
-
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.
 ################################################################################
 
+include 'Filespec'    #
+
+
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.
 ################################################################################
+
+include '/home/device/Filespec"  # mismatched quotes
+include '/home/device/Filespec"  # mismatched quotes
+include "/home/device/Filespec'  # mismatched quotes
+include "/home/device/Filespec'  # mismatched quotes
 

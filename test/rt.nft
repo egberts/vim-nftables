@@ -9,19 +9,17 @@
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
 
-rt classid 
-rt nexthop 
-rt mtu 
-rt ipsec 
-rt ip classid 
-rt ip6 classid 
+add rule T C rt classid 
+add rule T C rt nexthop 
+add rule T C rt mtu 
+add rule T C rt ipsec 
 
-add rt classid 
-add rt nexthop 
-add rt mtu 
-add rt ipsec 
-add rt ip classid 
-add rt ip6 classid 
+
+add rule T C rt ip classid 
+
+
+add rule T C rt ip6 classid 
+
 
 
 ################################################################################

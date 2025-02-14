@@ -316,18 +316,13 @@ list flow table table_id synproxy_id
 list flow table ip table_id synproxy_id
 list flow table ip6 table_id synproxy_id
 list flow table inet table_id synproxy_id
-list flow table netdev table_id synproxy_id
-list flow table bridge table_id synproxy_id
-list flow table arp table_id synproxy_id
 
 # ruleset_spec->'tables'->'flow'->list_cmd->base_cmd
-list flowtable table_id ft_id
-list flowtable ip table_id ft_id
-list flowtable ip6 table_id ft_id
-list flowtable inet table_id ft_id
-list flowtable netdev table_id ft_id
-list flowtable bridge table_id ft_id
-list flowtable arp table_id ft_id
+list flowtable last 
+list flowtable table_id 
+list flowtable ip table_id 
+list flowtable ip6 table_id 
+list flowtable inet table_id 
 
 # obj_spec->'helper'->ct_obj_type->'ct'->list_cmd->base_cmd
 list ct helper table_id ct_id x
@@ -423,21 +418,69 @@ list hooks arp device arp5
 # so far, so good.
 ################################################################################
 
-list flow 
-
-
-list set arp MyTable MyChain ExtraIdentifier
-list map arp MyTable MyChain ExtraIdentifier
-list flow table MyFlow MyChain ExtraIdentifier
-list meter arp MyTable MyChain ExtraIdentifier
-######
 list 
 
 
+list table  # premature EOS
+
+list tables  # premature EOS
+
+list flow 
+
+
+list set 
+
+
+list set arp 
+
+
+list set arp MyTable 
+
+
+list set arp MyTable MyChain ExtraIdentifier
+
+list map 
+
+
+
+list map arp 
+
+
+list map arp MyTable 
+
+
+list map arp MyTable MyChain ExtraIdentifier
+
+list flow 
+
+
+list flow table 
+
+
+list flow table MyFlow 
+
+
+list flow table MyFlow MyChain ExtraIdentifier
+
+
+list meter 
+
+
+list meter arp 
+
+
+list meter arp MyTable 
+
+
+list meter arp MyTable MyChain ExtraIdentifier
+######
 list table 
 
 
 list table MyTable InvalidChain  # extra chain_id identifier
+list table ip 
+
+
 list table ip MyTable InvalidChain  # extra chain_id identifier
 list table arp MyTable InvalidChain  # extra chain_id identifier
 
@@ -466,211 +509,49 @@ list chain ip table_id
 
 
 list chain  # premature EOS
+list chain 
+
+
+list chain arp 
+
+
+list chain arp MyTable 
+
+
 list chain arp MyTable MyChain ExtraIdentifier
 list chain wrong_family_spec ip MyTable MyChain
 
 list sets  # premature EOS
+list sets table 
+
+
 list sets table table_name chain_name   # extraneous chain_name
+list sets table ip 
+
+
 list sets table ip table_name chain_name  # extraneous chain_name
 list sets table ip6 table_name chain_name  # extraneous chain_name
 list sets table inet table_name chain_name  # extraneous chain_name
 list sets table arp table_name chain_name  # extraneous chain_name
 
-list quotas ip
+list quotas invalid_family_spec
 list quotas table 
+
+
 list quotas table table_name extraneous
 list quotas table ip 
+
+
 list quotas table ip table_name extraneous
 
 
 list limits ip
-
-list synproxys table arp table_id xyz
-
-# set_spec->'set'->list_cmd->base_cmd
-list set table_id set_id
-list set ip table_id set_id
-list set ip6 table_id set_id
-list set inet table_id set_id
-list set netdev table_id set_id
-list set bridge table_id set_id
-list set arp table_id set_id
-
-# set_spec->'meter'->list_cmd->base_cmd
-list meter table_id meter_id
-list meter ip table_id meter_id
-list meter ip6 table_id meter_id
-list meter inet table_id meter_id
-list meter netdev table_id meter_id
-list meter bridge table_id meter_id
-list meter arp table_id meter_id
-
-# set_spec->'map'->list_cmd->base_cmd
-list map table_id map_id
-list map ip table_id map_id
-list map ip6 table_id map_id
-list map inet table_id map_id
-list map netdev table_id map_id
-list map bridge table_id map_id
-list map arp table_id map_id
-
-# obj_spec->'counter'->list_cmd->base_cmd
-list counter table_id counter_id
-list counter ip table_id counter_id
-list counter ip6 table_id counter_id
-list counter inet table_id counter_id
-list counter netdev table_id counter_id
-list counter bridge table_id counter_id
-list counter arp table_id counter_id
-
-# obj_spec->'quota'->list_cmd->base_cmd
-list quota table_id quota_id
-list quota ip table_id quota_id
-list quota ip6 table_id quota_id
-list quota inet table_id quota_id
-list quota netdev table_id quota_id
-list quota bridge table_id quota_id
-list quota arp table_id quota_id
-
-# obj_spec->'limit'->list_cmd->base_cmd
-list limit table_id limit_id
-list limit ip table_id limit_id
-list limit ip6 table_id limit_id
-list limit inet table_id limit_id
-list limit netdev table_id limit_id
-list limit bridge table_id limit_id
-list limit arp table_id limit_id
-
-# obj_spec->'secmark'->list_cmd->base_cmd
-list secmark table_id secmark_id
-list secmark ip table_id secmark_id
-list secmark ip6 table_id secmark_id
-list secmark inet table_id secmark_id
-list secmark netdev table_id secmark_id
-list secmark bridge table_id secmark_id
-list secmark arp table_id secmark_id
-
-# obj_spec->'synproxy'->list_cmd->base_cmd
-list synproxy table_id synproxy_id
-list synproxy ip table_id synproxy_id
-list synproxy ip6 table_id synproxy_id
-list synproxy inet table_id synproxy_id
-list synproxy netdev table_id synproxy_id
-list synproxy bridge table_id synproxy_id
-list synproxy arp table_id synproxy_id
-
-# ruleset_spec->'tables'->'flow'->list_cmd->base_cmd
-list flow tables 
-list flow tables ip
-list flow tables ip6
-list flow tables inet
-list flow tables netdev
-list flow tables bridge
-list flow tables arp
-
-# set_spec->'table'->'flow'->list_cmd->base_cmd
-list flow table table_id synproxy_id
-list flow table ip table_id synproxy_id
-list flow table ip6 table_id synproxy_id
-list flow table inet table_id synproxy_id
-list flow table netdev table_id synproxy_id
-list flow table bridge table_id synproxy_id
-list flow table arp table_id synproxy_id
-
-# ruleset_spec->'tables'->'flow'->list_cmd->base_cmd
-list flowtable table_id ft_id
-list flowtable ip table_id ft_id
-list flowtable ip6 table_id ft_id
-list flowtable inet table_id ft_id
-list flowtable netdev table_id ft_id
-list flowtable bridge table_id ft_id
-list flowtable arp table_id ft_id
-
-# obj_spec->'helper'->ct_obj_type->'ct'->list_cmd->base_cmd
-list ct helper table_id ct_id x
-list ct helper last ct_id
-list ct helper table_id last
-list ct helper last last
-list ct helper ip table_id ct_id
-list ct helper ip6 table_id ct_id
-list ct helper inet table_id ct_id
-list ct helper netdev table_id ct_id
-list ct helper bridge table_id ct_id
-list ct helper arp table_id ct_id
-
-# obj_spec->'timeout'->ct_obj_type->'ct'->list_cmd->base_cmd
-list ct timeout
-list ct timeout table_id ct_id
-list ct timeout ip table_id ct_id
-list ct timeout ip6 table_id ct_id
-list ct timeout inet table_id ct_id
-list ct timeout netdev table_id ct_id
-list ct timeout bridge table_id ct_id
-list ct timeout arp table_id ct_id
-
-# obj_spec->'timeout'->ct_cmd_type->'ct'->list_cmd->base_cmd
-list ct timeout table table_id
-list ct timeout table last
-list ct timeout table ip table_id
-list ct timeout table ip6 table_id
-list ct timeout table inet table_id
-list ct timeout table netdev table_id
-list ct timeout table bridge table_id
-list ct timeout table arp table_id
-list ct timeout table arp last
-
-# obj_spec->'expectation'->ct_obj_type->'ct'->list_cmd->base_cmd
-list ct expectation
-list ct expectation table_id ct_id
-list ct expectation ip table_id ct_id
-list ct expectation ip6 table_id ct_id
-list ct expectation inet table_id ct_id
-list ct expectation netdev table_id ct_id
-list ct expectation bridge table_id ct_id
-list ct expectation arp table_id ct_id
-
-# obj_spec->'expectation'->ct_cmd_type->'ct'->list_cmd->base_cmd
-list ct expectation table table_id
-list ct expectation table last
-list ct expectation table ip table_id
-list ct expectation table ip6 table_id
-list ct expectation table inet table_id
-list ct expectation table netdev table_id
-list ct expectation table bridge table_id
-list ct expectation table arp table_id
-list ct expectation table arp last
-
-# obj_spec->'helpers'->ct_cmd_type->'ct'->list_cmd->base_cmd
-list ct helpers table table_id 
-list ct helpers table last 
-list ct helpers table ip table_id
-list ct helpers table ip6 table_id
-list ct helpers table inet table_id
-list ct helpers table netdev table_id
-list ct helpers table bridge table_id
-list ct helpers table arp table_id
-list ct helpers table arp last
-
-# basehook_spec->'hooks'->list_cmd->base_cmd
-list hooks 
-list hooks ip
-list hooks ip6
-list hooks inet
-list hooks netdev
-list hooks bridge
-list hooks arp
-
-# basehook_device_name->basehook_spec->'hooks'->list_cmd->base_cmd
-list hooks ip device eth0
+list limits table 
 
 
-# basehook_device_name->ruleset_spec->basehook_spec->'hooks'->list_cmd->base_cmd
-list hooks ip device eth0
-list hooks ip6 device wlan1
-list hooks inet device vlan2
-list hooks netdev device net3
-list hooks bridge device br4
-list hooks arp device arp5
+list limits table table_name extraneous
+list limits table ip 
+
 
 ################################################################################
 # false negative test (highlighted wrongly; still has good content; oops)
@@ -679,10 +560,6 @@ list hooks arp device arp5
 ################################################################################
 # false positive test (looks highlighted correctly; has bad content; oops)
 ################################################################################
-
-list table  # premature EOS
-
-list tables  # premature EOS
 
 list tables  bridge
 
@@ -696,15 +573,6 @@ list flowtables arp
 
 list sets  # premature EOS
 list meters  # premature EOS
-
-# 'flowtables'->'list'->list_cmd->base_cmd
-list flowtables ip 
-
-
-list flowtables ip6 
-
-
-list flowtables inet 
 
 
 list flowtables netdev 

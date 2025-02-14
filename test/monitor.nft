@@ -65,6 +65,7 @@ monitor destroy trace
 
 monitor wierd
 
+monitor new chains json vm
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.

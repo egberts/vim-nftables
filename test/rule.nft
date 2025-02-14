@@ -90,8 +90,6 @@ table_id chain_id vmap at ABC
 tableid chainid match 
 
 # meter_stmt->stmt
-tableid chainid meter 
-
 # ip_hdr_spec->payload_stmt->stmt
 tableid chainid ip hdrlength
 
@@ -146,7 +144,8 @@ tableId chainId tproxy
 tableId chainId queue 
 
 # ct_stmt->stmt
-tableId chainId ct 
+tableId chainId ct over
+
 
 # dup_stmt->stmt
 tableId chainId dup 
@@ -161,13 +160,14 @@ tableId chainId set
 tableId chainId map 
 
 # synproxy_stmt->stmt
-tableId chainId synproxy 
+tableId chainId synproxy over
 
 # chain_stmt->stmt
 tableId chainId chain 
 
 # optstrip_stmt->stmt
 tableId chainId optstrip 
+
 
 # xt_stmt->stmt
 tableId chainId xt 
@@ -187,6 +187,9 @@ delete rule filter output ip saddr 192.168.1.1 counter  # not implemented yet
 # true negative test: properly hightlighted wrongly to show an error; 
 # so far, so good.
 ################################################################################
+
+tableid chainid meter 
+
 
 add rule T C index 1 comment "a comment quote"
 add rule T C index 1 comment "a comment quote"

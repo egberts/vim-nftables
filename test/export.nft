@@ -8,9 +8,10 @@
 ################################################################################
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
+
 export ruleset xml
-export ruleset vm json
 export ruleset json
+export ruleset vm json
 
 
 ################################################################################
@@ -18,9 +19,19 @@ export ruleset json
 # so far, so good.
 ################################################################################
 
-export ruleset json vm
 export ruleset vm xml
 export ruleset vm
+
+export 
+
+
+export rulset 
+
+
+export ruleset 
+
+
+export ruleset vm 
 
 
 ################################################################################
@@ -30,4 +41,6 @@ export ruleset vm
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.
 ################################################################################
+
+export ruleset json vm
 

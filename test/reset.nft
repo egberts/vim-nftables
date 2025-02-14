@@ -9,8 +9,7 @@
 # true positive test: properly hightlighted correctly; has good content; perfect
 ################################################################################
 
-# 'reset counters' <ruleset_spec>
-reset counters 
+
 # 'reset counters' <table_spec>
 reset counters MyIpTable MyChain
 reset counters ip MyIpTable MyChain
@@ -96,11 +95,6 @@ reset rules table T ;
 reset rules table a  ;
 reset rules table last  
 
-reset rules table  # missing table_id
-reset rules table;  # missing table_id
-reset rules table ;  # missing table_id
-reset rules table ;  # missing table_id
-reset rules table /  ;  # invalid table_id
 reset rules table myTable last # extraneous 'last' keyword
 reset rules table myTable myChain  # extraneous chain_id
 
@@ -126,18 +120,6 @@ reset rule ip T C handle 15
 reset rule ip T C index 15
 reset rule ip T C position 15
 
-reset rule  # premature EOS
-reset rule table_id  # premature EOS
-reset rule table_id chain_id # premature EOS
-reset rule ip  # premature EOS
-reset rule ip6  # premature EOS
-reset rule inet  # premature EOS
-reset rule netdev  # premature EOS
-reset rule bridge  # premature EOS
-reset rule arp  # premature EOS
-reset rule ip ipT    # premature EOS
-reset rule ip T C   # premature EOS
-reset rule ip T C offset 15  # wrong handle_spec
 
 
 ################################################################################
@@ -145,6 +127,14 @@ reset rule ip T C offset 15  # wrong handle_spec
 # so far, so good.
 ################################################################################
 
+# 'reset counters' <ruleset_spec>
+reset counters 
+
+
+reset rules table  # missing table_id
+reset rules table;  # missing table_id
+reset rules table ;  # missing table_id
+reset rules table ;  # missing table_id
 # 'reset' 'element' set_spec set_block_expr
 # 'reset' 'element' table_spec set_id set_block_expr
 # 'reset' 'element' family_spec table_id set_id set_block_expr
@@ -204,6 +194,21 @@ reset map inet table_id set_id handle 123
 reset map netdev table_id set_id handle 123
 reset map bridge table_id set_id handle 123
 reset map arp table_id set_id handle 123
+
+reset rule  # premature EOS
+reset rule table_id  # premature EOS
+reset rule table_id chain_id # premature EOS
+reset rule ip  # premature EOS
+reset rule ip6  # premature EOS
+reset rule inet  # premature EOS
+reset rule netdev  # premature EOS
+reset rule bridge  # premature EOS
+reset rule arp  # premature EOS
+reset rule ip ipT    # premature EOS
+reset rule ip T C   # premature EOS
+reset rule ip T C offset 15  # wrong handle_spec
+
+reset rules table /  ;  # invalid table_id
 
 
 ################################################################################

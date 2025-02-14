@@ -35,6 +35,7 @@ tableid chainid snat interval to ecn
 # stmt_expr->'to'->'prefix'->nat_stmt->stmt
 tableid chainid snat prefix to reset 
 
+
 # stmt_expr->keyword_expr->'prefix'->nat_stmt->stmt
 tableid chainid snat ip to last 
 tableid chainid snat ip to original : last

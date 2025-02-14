@@ -31,6 +31,7 @@ replace rule arp table_id chain_id handle 777     ;
 # ruleid_spec table_spec position_id
 replace rule ip table_id chain_id position 321 
 
+
 # ruleid_spec table_spec index_id
 replace rule ip table_id chain_id index 321  ;
 

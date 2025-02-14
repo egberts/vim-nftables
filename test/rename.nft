@@ -29,6 +29,19 @@ rename chain ip6 myTable myChain new_identifier x
 # TODO rename counters (nft_base_cmd_rename extension)
 rename counters 
 
+rename chain 
+
+
+rename chain ip 
+
+
+rename chain ip6 myTable 
+
+
+rename chain inet myTable myChain 
+
+
+rename chain netdev myTable myChain identifier extrajunk
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.

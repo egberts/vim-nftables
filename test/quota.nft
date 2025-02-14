@@ -81,6 +81,8 @@ list quota arp myTable quota_name
 
 
 list quotas 
+
+
 list quotas ip
 list quotas ip6
 list quotas inet
@@ -106,6 +108,8 @@ reset quota arp tablename chainname
 
 reset quotas 
 reset quotas MyIpTable 
+
+
 reset quotas ip MyIpTable 
 reset quotas ip6 MyIpTable 
 reset quotas inet MyIpTable 
@@ -154,117 +158,95 @@ quota
 quota T 
 
 
-quota example quota_name { over 100 mbytes used 0 bytes }
-quota ip T Q over 123
-quota ip myIpfilter http-quota over 25 mbytes
-quota ip6 myIpfilter http-quota until 525 kbytes
-quota inet myIpfilter http-quota over 25 mbytes
-quota netdev myIpfilter http-quota over 25 mbytes;
-quota bridge myIpfilter http-quota over 25 mbytes
-quota arp myIpfilter http-quota over 25 mbytes
+quota example 
 
-create quota filter http-quota { over 25 mbytes };
-create quota filter http-quota over 25 mbytes
-create quota filter ssh-quota { 10 kbytes }
-create quota ip myIpfilter http-quota over 25 mbytes
-create quota ip6 myIpfilter http-quota until 525 kbytes
-create quota inet myIpfilter http-quota over 25 mbytes
-create quota netdev myIpfilter http-quota over 25 mbytes;
-create quota bridge myIpfilter http-quota over 25 mbytes
-create quota arp myIpfilter http-quota over 25 mbytes
 
-delete quota table_name handle 15
-delete quota table_name quota_name 
-delete quota ip table_name handle 15
-delete quota ip table_name index 15
-delete quota ip table_name quota_name
-delete quota ip6 table_name handle 15
-delete quota ip6 table_name quota_name
-delete quota inet table_name quota_name
-delete quota inet myInetFilter handle 123
-delete quota inet myInetFilter index 345
+quota ip 
+
+
+quota ip myIpfilter 
+
+
+create 
+
+
+create quota 
+
+
+create quota filter 
+
+
+delete 
+
+
+delete quota 
+
+
+delete quota ip 
+
+
+delete quota ip table_name 
+
+
 delete quota inet myInetFilter position 234
-delete quota netdev table_name handle 15
-delete quota netdev table_name quota_name
-delete quota bridge table_name handle 15
-delete quota bridge table_name quota_name
-delete quota arp table_name handle 15
-delete quota arp table_name quota_name
+
+delete quota netdev table_name handle 
+
+
+list 
+
+
+list quota 
+
 
 list quota quota_name 
 
 
-list quota myInetTable myInetChain
-list quota myTable quota_name
-list quota ip myIpTable myIpChain
-list quota ip myTable quota_name
-list quota ip6 myIp6Table myIp6Chain
-list quota ip6 myTable quota_name
-list quota inet myInetTable myInetChain
-list quota inet myTable quota_name
-list quota netdev myNetdevTable myNetdevChain
-list quota netdev myTable quota_name
-list quota bridge myBridgeTable myBridgeChain
-list quota bridge myTable quota_name
-list quota arp myArpTable myArpChain
-list quota arp myTable quota_name
+list quota ip 
+
+
+list quota ip myTable 
 
 
 list quotas 
-list quotas ip
-list quotas ip6
-list quotas inet
-list quotas netdev
-list quotas bridge
-list quotas arp
-list quotas table myIpTable
-list quotas table ip myIpTable
-list quotas table ip6 myIp6Table
-list quotas table inet myInetTable
-list quotas table netdev table_name
-list quotas table bridge myBridgeTable
-list quotas table arp myArpTable
 
-list quota
 
-reset quota;
-reset quota ip
-reset quota ip6
-reset quota inet
-reset quota netdev
-reset quota bridge
-reset quota arp
+list quotas table 
+
+
+list quotas table ip 
+
+
+reset quota 
+
+
+reset quota ip 
+
 
 reset quota myIpTable 
 
 
-reset quotas bridge MyIpTable MyChain
-reset quotas table arp MyIpTable MyChain
+reset quota myIpTable myChain extra
 
-reset quota myIpTable myIpFilter
-reset quota myIpTable myFilter ;
-reset quota ip tablename chainname
-reset quota ip6 tablename chainname
-reset quota inet tablename chainname
-reset quota netdev tablename chainname
-reset quota bridge tablename chainname
-reset quota arp tablename chainname
 
 reset quotas 
-reset quotas MyIpTable 
-reset quotas ip MyIpTable 
-reset quotas ip6 MyIpTable 
-reset quotas inet MyIpTable 
-reset quotas netdev MyIpTable 
-reset quotas bridge MyIpTable
-reset quotas arp MyIpTable 
-reset quotas table myIpFilter
-reset quotas table ip myIpFilter
-reset quotas table ip6 MyIpTable 
-reset quotas table inet MyIpTable 
-reset quotas table netdev myIpFilter
-reset quotas table bridge MyIpTable 
-reset quotas table arp myIpFilter
+
+
+reset quotas bridge 
+
+
+reset quotas bridge MyIpTable 
+
+
+reset quotas table 
+
+
+reset quotas table arp 
+
+
+reset quotas table arp MyIpTable 
+
+
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.
