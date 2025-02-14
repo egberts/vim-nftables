@@ -4817,11 +4817,6 @@ syn cluster nft_c_add_cmd_rule_position
 " obj_spec->'synproxy'->list_cmd->base_cmd->line
 "    nft_list_cmd_keyword_synproxy_obj_spec
 
-" flowtable_identifier->'flowtable'->table_block->'{'->'table'->add_cmd->base_cmd->line
-" flowtable_identifier->'flowtable'->table_block->'{'->'table'->create_cmd->base_cmd->line
-hi link   nft_add_create_cmd_table_block_keyword_flowtable_flowtable_identifier nftHL_Flowtable
-syn match nft_add_create_cmd_table_block_keyword_flowtable_flowtable_identifier "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{0,63}" skipwhite contained
-
 " flowtableid_spec->'flowtable'->destroy_cmd->'destroy'->base_cmd->line
 " flowtableid_spec->'flowtable'->delete_cmd->'delete'->base_cmd->line
 syn cluster nft_c_delete_destroy_cmd_flowtableid_spec
@@ -6623,10 +6618,6 @@ syn match nft_base_cmd_reset_rules "rules" skipwhite contained
 \    nft_reset_cmd_keyword_rules_keyword_chain,
 \    nft_Error
 
-" base_cmd 'reset' 'quota'
-hi link nft_base_cmd_reset_quota nftHL_Action
-syn match nft_base_cmd_reset_quota "quota" skipwhite contained
-
 " base_cmd 'reset' 'counter' obj_spec
 " base_cmd 'reset' 'counter'/'quota' table_id chain_id
 hi link   nft_base_cmd_reset_counter_quota_obj_spec_id_chain nftHL_Chain
@@ -7263,7 +7254,7 @@ syn match nft_list_cmd_keyword_flow_keyword_tables_ruleset_spec_family_spec_expl
 " base_cmd [ 'list' ] [ 'flow' ] [ 'tables' ] ruleset_spec
 " ruleset_spec->'tables'->list_cmd->'list'->line
 hi link   nft_list_cmd_keyword_flow_keyword_table_set_spec_family_spec_identifier_string nftHL_Identifier
-syn match nft_list_cmd_keyword_flow_keyword_table_set_spec_family_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{1,63}" skipwhite contained
+syn match nft_list_cmd_keyword_flow_keyword_table_set_spec_family_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{0,63}" skipwhite contained
 
 " base_cmd [ 'list' ] [ 'flow' ] [ 'tables' ] ruleset_spec
 " ruleset_spec->'table'->list_cmd->'list'->line
@@ -7277,7 +7268,7 @@ syn match nft_list_cmd_keyword_flow_keyword_tables_ruleset_spec_family_spec_expl
 " *************** BEGIN 'list flow table' **************
 " base_cmd [ 'list' ] [ 'flow' ] [ 'table' ] set_spec identifier
 hi link   nft_list_cmd_keyword_flow_keyword_table_set_spec_identifier_string nftHL_Identifier
-syn match nft_list_cmd_keyword_flow_keyword_table_set_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{1,63}" skipwhite contained
+syn match nft_list_cmd_keyword_flow_keyword_table_set_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{0,63}" skipwhite contained
 
 " base_cmd [ 'list' ] [ 'flow' ] [ 'table' ] set_spec identifier
 hi link   nft_list_cmd_keyword_flow_keyword_table_set_spec_identifier_keyword_last nftHL_Action
@@ -7286,7 +7277,7 @@ syn match nft_list_cmd_keyword_flow_keyword_table_set_spec_identifier_keyword_la
 " base_cmd [ 'list' ] [ 'flow' ] [ 'table' ] set_spec
 " string->identifier->table_spec->set_spec->'table'->list_cmd->'list'->base_cmd->line
 hi link   nft_list_cmd_keyword_flow_keyword_table_set_spec_table_spec_identifier_string nftHL_Identifier
-syn match nft_list_cmd_keyword_flow_keyword_table_set_spec_table_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{1,63}" skipwhite contained
+syn match nft_list_cmd_keyword_flow_keyword_table_set_spec_table_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{0,63}" skipwhite contained
 \ nextgroup=
 \    nft_list_cmd_keyword_flow_keyword_table_set_spec_identifier_keyword_last,
 \    nft_list_cmd_keyword_flow_keyword_table_set_spec_identifier_string
@@ -7761,23 +7752,94 @@ syn match nft_base_cmd_keyword_counter "\vcounter\ze " skipwhite contained
 \    nft_UnexpectedEOS
 " ***************** END base_cmd 'counter' *****************
 
-" ******************* BEGIN base_cmd 'secmark' *************
+" ******************* BEGIN base_cmd 'add quota' *************
+hi link   nft_add_cmd_quota_cmd_obj_spec_identifier_string nft_Identifier
+syn match nft_add_cmd_quota_cmd_obj_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{0,63}" skipwhite contained
+
+hi link   nft_add_cmd_quota_cmd_obj_spec_identifier_string_unknown nftHL_Error
+syn match nft_add_cmd_quota_cmd_obj_spec_identifier_string_unknown "\v[a-zA-Z][-a-zA-Z0-9\\\/_\.\-]{0,63}" skipwhite contained
+
+hi link   nft_add_cmd_quota_cmd_obj_spec_identifier_keyword_last nftHL_Action
+syn match nft_add_cmd_quota_cmd_obj_spec_identifier_keyword_last "last" skipwhite contained
+
+hi link   nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_string_unknown nftHL_Error
+syn match nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_string_unknown "\v[a-zA-Z][a-zA-Z0-9\\\/_\.\-]{0,63}" skipwhite contained
+
+hi link   nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_string nftHL_Identifier
+syn match nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{0,63}" skipwhite contained
+\ nextgroup=
+\    nft_add_cmd_quota_cmd_obj_spec_identifier_keyword_last,
+\    nft_add_cmd_quota_cmd_obj_spec_identifier_string,
+\    nft_add_cmd_quota_cmd_obj_spec_identifier_string_unknown,
+
+hi link   nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_keyword_last nftHL_Action
+syn match nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_keyword_last "last" skipwhite contained
+\ nextgroup=
+\    nft_quota_add_cmd_cmd_obj_spec_identifier_keyword_last,
+\    nft_quota_add_cmd_cmd_obj_spec_identifier_string,
+
+hi link   nft_add_cmd_quota_cmd_obj_spec_table_spec_family_spec_explicit nftHL_Family
+syn match nft_add_cmd_quota_cmd_obj_spec_table_spec_family_spec_explicit "\v(ip6?|inet|netdev|bridge|arp)" skipwhite contained
+\ nextgroup=
+\    nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_keyword_last,
+\    nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_string_unknown,
+\    nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_string,
+
 " 'quota'->add_cmd->'add'->base_cmd->line
 hi link   nft_base_cmd_add_cmd_keyword_quota nftHL_Command
 syn match nft_base_cmd_add_cmd_keyword_quota "quota" skipwhite contained
 \ nextgroup=
-\    @nft_c_add_cmd_keyword_quota_obj_spec,  " TODO
+\    nft_add_cmd_quota_cmd_obj_spec_table_spec_family_spec_explicit,
+\    nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_keyword_last,
+\    nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_string_unknown,
+\    nft_add_cmd_quota_cmd_obj_spec_table_spec_identifier_string,
+" ******************* END base_cmd 'add quota' *************
+
+" ******************* BEGIN base_cmd 'quota' *************
+hi link   nft_quota_cmd_obj_spec_identifier_string nft_Identifier
+syn match nft_quota_cmd_obj_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{0,63}" skipwhite contained
+
+hi link   nft_quota_cmd_obj_spec_identifier_keyword_last nftHL_Action
+syn match nft_quota_cmd_obj_spec_identifier_keyword_last "last" skipwhite contained
+
+hi link   nft_quota_cmd_obj_spec_table_spec_identifier_string nftHL_Identifier
+syn match nft_quota_cmd_obj_spec_table_spec_identifier_string "\v[a-zA-Z][a-zA-Z0-9\\\/_\.]{0,63}" skipwhite contained
+\ nextgroup=
+\    nft_quota_cmd_obj_spec_identifier_keyword_last,
+\    nft_quota_cmd_obj_spec_identifier_string,
 \    nft_UnexpectedSemicolon,
-\    nft_UnexpectedEOS
+\    nft_UnexpectedEOS,
+\    nft_Error
+
+hi link   nft_quota_cmd_obj_spec_table_spec_identifier_keyword_last nftHL_Action
+syn match nft_quota_cmd_obj_spec_table_spec_identifier_keyword_last "last" skipwhite contained
+\ nextgroup=
+\    nft_quota_cmd_obj_spec_identifier_keyword_last,
+\    nft_quota_cmd_obj_spec_identifier_string,
+\    nft_UnexpectedSemicolon,
+\    nft_UnexpectedEOS,
+\    nft_Error
+
+hi link   nft_quota_cmd_obj_spec_table_spec_family_spec_explicit nftHL_Family
+syn match nft_quota_cmd_obj_spec_table_spec_family_spec_explicit "\v(ip6?|inet|netdev|bridge|arp)" skipwhite contained
+\ nextgroup=
+\    nft_quota_cmd_obj_spec_table_spec_identifier_keyword_last,
+\    nft_quota_cmd_obj_spec_table_spec_identifier_string,
+\    nft_UnexpectedSemicolon,
+\    nft_UnexpectedEOS,
+\    nft_Error
 
 " 'quota'->add_cmd->base_cmd->line
 hi link   nft_base_cmd_keyword_quota nftHL_Command
-syn match nft_base_cmd_keyword_quota "\vquota\ze " skipwhite contained
-"\ nextgroup=
-"\    @nft_c_add_cmd_keyword_quota_obj_spec,  " TODO
-"\    nft_UnexpectedSemicolon,
-"\    nft_UnexpectedEOS
-" ******************* END base_cmd 'secmark' *************
+syn match nft_base_cmd_keyword_quota "quota" skipwhite contained
+\ nextgroup=
+\    nft_quota_cmd_obj_spec_table_spec_identifier_keyword_last,
+\    nft_quota_cmd_obj_spec_table_spec_identifier_string,
+\    nft_quota_cmd_obj_spec_table_spec_family_spec_explicit,
+\    nft_quota_cmd_obj_spec_table_spec_identifier_string,
+\    nft_UnexpectedSemicolon,
+\    nft_UnexpectedEOS,
+" ******************* END base_cmd 'quota' *************
 
 " ******************* BEGIN base_cmd 'secmark' *************
 " 'secmark'
@@ -8915,8 +8977,8 @@ syn cluster nft_c_base_cmd
 \    nft_base_cmd_keyword_export,
 \    nft_base_cmd_keyword_limit,
 \    nft_base_cmd_keyword_flush,
-\    nft_base_cmd_keyword_quota,
 \    nft_base_cmd_keyword_reset,
+\    nft_base_cmd_keyword_quota,
 \    nft_base_cmd_keyword_table,
 \    nft_base_cmd_keyword_list,
 \    nft_base_cmd_keyword_rule,
@@ -8926,7 +8988,7 @@ syn cluster nft_c_base_cmd
 \    nft_base_cmd_keyword_add,
 \    nft_base_cmd_keyword_ct,
 \    nft_add_cmd_rule_position_family_spec_explicit,
-\    nft_base_cmd_rule_position_table_spec_wildcard
+\    nft_base_cmd_rule_position_table_spec_wildcard,
 
 """"""""""" base_cmd END """""""""""""""""""""""""""""""""""""""""""""""""
 
