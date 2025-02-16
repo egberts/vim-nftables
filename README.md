@@ -1,9 +1,10 @@
-# vim-nftables
+# Nftables Vim Syntax Highlighter
 
-VIM Syntax for NFTABLES.
+For Linux nftables configuration files, a syntax highlighter for Vim-class editors.
 
-# Version v1.1 #
-Highlighting for Linux `nftables` in Vim editor is now available.  
+Here's a screenshot using vim `default` color and `set background=dark`:
+
+[nftables vim syntax highlight](egberts/vim-nftables/doc/screenshot.png)
 
 Pretty solid except for:
 - `stmt` in code blocks
