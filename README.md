@@ -10,6 +10,11 @@ Pretty solid except for:
 - `stmt` in code blocks
 - `expr` in ad-hoc location
 
+Install
+-------
+See [INSTALL](https://github.com/egberts/vim-nftables/blob/master/INSTALL.md)
+on how to install this Vim syntax to your local Vim settings.
+
 This VIM syntax proactively highlights typo errors in RED for:
 
 * nftables configuration file and 
@@ -43,11 +48,6 @@ Debugging Vim Syntax
 --------------------
 If you are bold enough to try your hand on debugging Vim syntax file,
 see my [DEBUG.md](https://github.com/egberts/vim-syntax-bind-named/blob/master/DEBUG.md) on how to debug a Vim syntax file (for the Bind9 named.conf configuration file).
-
-Install
--------
-See [INSTALL](https://github.com/egberts/vim-nftables/blob/master/INSTALL.md)
-on how to install this Vim syntax to your local Vim settings.
 
 To Vim Developers
 -----------------
