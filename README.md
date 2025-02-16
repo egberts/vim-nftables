@@ -4,7 +4,7 @@ For Linux nftables configuration files, a syntax highlighter for Vim-class edito
 
 Here's a screenshot using vim `default` color and `set background=dark`:
 
-![nftables vim syntax highlight](egberts/vim-nftables/doc/screenshot.png)
+![nftables vim syntax highlight](doc/screenshot.png)
 
 Pretty solid except for:
 - `stmt` in code blocks
