@@ -2,7 +2,7 @@
 
 For Linux nftables configuration files, a syntax highlighter for Vim-class editors.
 
-Here's a screenshot using vim `default` color and `set background=dark`:
+Here's a screenshot using vim `colorscheme default` and `set background=dark`:
 
 ![nftables vim syntax highlight](doc/screenshot.png)
 
