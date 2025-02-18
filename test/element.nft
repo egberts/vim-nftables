@@ -1,0 +1,177 @@
+#!/usr/sbin/nft -f
+# File: element.nft
+# Description: A test NFT file to exercise 'element' m syntax highlightings.
+#
+# base_cmd add_cmd 'element' 
+# base_cmd create_cmd 'element' 
+# base_cmd destroy_cmd 'element' 
+# base_cmd delete_cmd 'element' 
+# base_cmd get_cmd 'element' 
+# base_cmd reset_cmd 'element' 
+#
+################################################################################
+# true positive test: properly hightlighted correctly; has good content; perfect
+################################################################################
+
+# base_cmd add_cmd 'set'
+
+# set_expr->set_block_expr->'element'->add_cmd->base_cmd->line
+element T C { };
+element ip T C { };
+element ip6 T C { };
+element inet T C { };
+element netdev T C { };
+element bridge T C { };
+element arp T C { };
+# variable_expr->set_block_expr->'element'->add_cmd->base_cmd->line
+element T C { };
+element ip T C $MY_ELEMENT
+
+# set_expr->set_block_expr->'element'->add_cmd->'add'->base_cmd->line
+add element T C { };
+# variable_expr->set_block_expr->'element'->add_cmd->'add'->base_cmd->line
+add element T C $MY_ELEMENT
+
+# set_expr->set_block_expr->'element'->create_cmd->'create'->base_cmd->line
+create element T C { };
+# variable_expr->set_block_expr->'element'->create_cmd->'create'->base_cmd->line
+create element T C $MY_ELEMENT
+
+# set_expr->set_block_expr->'element'->destroy_cmd->'destroy'->base_cmd->line
+destroy element T C { };
+# variable_expr->set_block_expr->'element'->destroy_cmd->'destroy'->base_cmd->line
+destroy element T C $MY_ELEMENT
+
+# set_expr->set_block_expr->'element'->get_cmd->'get'->base_cmd->line
+get element T C { };
+# variable_expr->set_block_expr->'element'->get_cmd->'get'->base_cmd->line
+get element T C $MY_ELEM!NT
+
+# set_expr->set_block_expr->'element'->reset_cmd->'reset'->base_cmd->line
+reset element T C { };
+# variable_expr->set_block_expr->'element'->reset_cmd->'reset'->base_cmd->line
+reset element T C $MY_ELEMENT
+
+
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error;
+# so far, so good)
+################################################################################
+
+# set_block_expr->'element'->add_cmd->base_cmd->line
+element 
+
+
+element T 
+
+
+element ip 
+
+
+element T C 
+
+
+
+# set_block_expr->'element'->add_cmd->'add'->base_cmd->line
+add element 
+
+
+add element T 
+
+
+add element T C
+
+
+
+# set_block_expr->'element'->create_cmd->'create'->base_cmd->line
+create 
+
+
+create element 
+
+
+create element T  
+
+
+create element T C 
+
+
+
+# set_block_expr->'element'->destroy_cmd->'destroy'->base_cmd->line
+destroy 
+
+
+destroy element 
+
+
+destroy element T 
+
+
+
+# set_block_expr->'element'->get_cmd->'get'->base_cmd->line
+get 
+
+
+get element 
+
+
+get element T 
+
+
+get element T E 
+
+
+
+# set_block_expr->'element'->reset_cmd->'reset'->base_cmd->line
+reset 
+
+
+reset element 
+
+
+reset element T 
+
+
+reset element T C 
+
+
+
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
+
+
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
+
+element T C & 
+element T C | 
+element T C ( 
+element T C ^  
+
+add element T C &
+add element T C |
+add element T C (
+add element T C ^
+
+create element T C &
+create element T C |
+create element T C (
+create element T C ^
+
+destroy element T C &
+destroy element T C |
+destroy element T C (
+destroy element T C ^
+
+get element T C &
+get element T C |
+get element T C (
+get element T C ^
+
+reset element T C &
+reset element T C |
+reset element T C (
+reset element T C ^
+

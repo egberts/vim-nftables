@@ -125,12 +125,13 @@ table ip6 myIp6Table { flags dormant; }
 table inet myInetTable { flags dormant; }
  table inet myInetTable { flags dormant; }
 
-add chain inet T C { type filter hook input priority 0 }
+add chain inet T C { policy type filter hook input priority 0 }
  add chain inet T C { type filter hook input priority 0 }
 
 table inet base_table {
   chain input_filter {
     type filter hook input priority 0;
+    policy drop
     flags offload;
     devices = $MYVARIABLE;
     devices = $MYVARIABLE;   
@@ -198,6 +199,7 @@ table inet filter {
   }
 
   chain base_filter {
+    type filter hook input priority 200; 
     counter jump drop_filter
     ct state vmap {
       established: accept,
@@ -380,9 +382,6 @@ table inet filter {
     ip saddr @external_ssh_clients ip daddr @external_ssh_servers counter accept comment "Allow these users to SSH to specified external servers"
     ip saddr @ssh_clients counter accept comment "Allow this set to SSH anywhere, including the router itself"
     skuid 1000 ip daddr @external_ssh_servers counter accept comment "Allow SSH traffic from UID 1000 to allowed external servers"
-  }
-  chain base_filter {
-    tcp dport @ssh_ports counter jump ssh_filter
   }
 }
 
@@ -572,7 +571,9 @@ map filter ports { type inet_service : ipv4_addr ; }
 # /* empty */ element <set_spec> set_block_expr  # without the 'add' keyword
 # Bison: ELEMENT set_spec set_block_expr 
 define MEAT = "drop"
-element filter blackhole $MEAT ;
+element filter blackhole $MEAT 
+
+
 # Bison: ELEMENT set_spec set_block_expr set_block_alloc { set_block } 
 element filter blackhole { 192.168.0.1, 192.168.0.10 }
 ###element myIpTable myIpMap { elements = { ipv4_addr }; }

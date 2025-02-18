@@ -1,0 +1,4 @@
+egrep ' (region|match) ' nftables-new.vim | awk  '{print $3}' | sed 's/,//' | sort -u > defined-words.txt
+grep -e '^\\ ' nftables-new.vim | grep -v contains= | grep -v nextgroup= | awk '{print $2}'| sed 's/\@//' | sed 's/,//' | sort -u > used-words.txt
+
+diff -y -W180 defined-words.txt used-words.txt

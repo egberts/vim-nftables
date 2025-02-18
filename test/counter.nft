@@ -10,6 +10,11 @@
 ################################################################################
 
 counter table_id counter_id
+counter last counter_id
+counter table_id last
+counter last last
+ counter table_id counter_id  
+    counter ip table_id counter_id
 
 # 'counter' as a statement ('stmt')
 add counter table_id counter_id   
@@ -47,15 +52,20 @@ counter T
 
 counter T ; 
 
+counter ip6 
+
+
 add set T S { counter marshmellows }
 add set T S { counter bytes mss }
 add set T S { counter packets once }
-add rule table_id chain_id set add { counter at  }
 
 
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.
 ################################################################################
+
+add rule table_id chain_id set add { $MYVAR counter at  }
+
 
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.

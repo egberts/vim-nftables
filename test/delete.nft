@@ -73,6 +73,29 @@ delete rule ip6 T C handle 16
 delete rule ip T C handle 42
 delete rule netdev T C handle 16
 delete rule T C handle 42
+delete rule T C ip saddr 127.0.0.1
+delete rule T C ct l3proto set $MYMAP map { *eth0 }
+delete rule T C ct proto set 1 / 1
+delete rule T C ct mark set 1-1
+delete rule T C ct state set ether 12:23:34:45:56:67  # keyword_expr
+delete rule T C ct direction set ip 127.0.0.1  # keyword_expr
+delete rule T C ct status set vlan 1  # keyword_expr
+delete rule T C ct expiration set arp  # keyword_expr
+delete rule T C ct helper set dnat  # keyword_expr
+delete rule T C ct saddr set ecn  # keyword_expr
+delete rule T C ct daddr set reset  # keyword_expr
+delete rule T C ct proto-src set destroy  # keyword_expr
+delete rule T C ct proto-dst set original  # keyword_expr
+delete rule T C ct label set reply  # keyword_expr
+delete rule T C ct event set label  # keyword_expr
+delete rule T C ct secmark set last  # keyword_expr
+delete rule T C ct id set
+delete rule T C ct bytes set
+delete rule T C ct packets set
+delete rule T C ct avgpkt set
+delete rule T C ct zone set
+delete rule T C ct original set
+delete rule T C ct reply set last 
 
 # delete set <set_spec>
 delete set T S
@@ -283,14 +306,14 @@ delete ;
 
 delete table not_family_but_table junk2 junk3
 
-delete table T C
-delete table ip T C
-delete table ip6 T C
-delete table inet T C
-delete table netdev T C
-delete table bridge T C
-delete table arp T C
-delete table handle ABCDEFGHIJ
+delete table T unexpected_chain
+delete table ip T unexpected_chain
+delete table ip6 T unexpected_chain
+delete table inet T unexpected_chain
+delete table netdev T unexpected_chain
+delete table bridge T unexpected_chain
+delete table arp T unexpected_chain
+delete table handle invalid_number
 delete table ip handle 123
 delete table ip6 handle 123
 delete table inet handle 123
@@ -317,6 +340,12 @@ delete chain bridge T C {  }
 delete chain arp T C { }
 
 delete chain T C { define my_var; };
+delete chain T C { 
+    # comment
+    tcp sport 123
+    udp sport 123
+    devices = { eth0 };
+}
 
 delete chain T handle 123123
 delete chain ip T handle 15
@@ -366,9 +395,8 @@ delete map bridge T M
 delete map arp T M 
 
 # delete element <set_spec> <set_block_expr>
-delete element T M { 4.4.4.4 }
 delete element T M { elements = { element, element }; }
-delete element ip T M { 4.4.4.4 }
+delete element ip T M { 4.4.4.4; } ;
 delete element ip T M { element, element }
 delete element ip T M { elements = { element, element } ; }
 delete element ip6 T M { 4.4.4.4 }

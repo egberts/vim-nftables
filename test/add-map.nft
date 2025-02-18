@@ -83,7 +83,9 @@ add map T C { elements = 1:00:1 }
 map ip T C { typeof b };
 map T C { typeof a.b.c.d.e.f };
 
-add map T C { typeof a : interval g.h };
+# online comment
+
+add map T C { typeof a : interval g.h };  # online comment
 add map T C { typeof a : interval .i };
 add map T C { typeof b.c.d.e.f : i.j };
 add map T C { typeof b.c.d.e.f : counter  };

@@ -34,8 +34,8 @@ add rule ip6 filter input handle 2
 add rule arp T C index 3
 add rule inet T C position 4
 add rule bridge T C position 55555
-add rule netdev T C position 6
-add rule netdev Tabcdef Charger position 6
+add rule netdev T C position 6  # inline comment
+add rule netdev Tabcdef Charger position 6 comment "My comment string"
 
 # ct_key_dir_optional->ct_key->ct_stmt
 add rule ip6 myTable myChain position 1 ct l3proto set ip6 myIpTable myCTHchain { };

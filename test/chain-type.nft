@@ -13,10 +13,23 @@ chain T C { ip protocol jump C2 }
 
 add chain T C { ip protocol jump C2 }
 
+add chain ip T C { ip protocol jump C2 }
+
 table T {
+
+    chain C {
+        ip protocol jump C2
+    }  ;
+    chain C {
+        ip protocol jump C2
+    } 
     chain C {
         ip protocol jump C2
     }
+    chain C {
+        ip protocol jump C2
+    }
+
 }
 
 ################################################################################
