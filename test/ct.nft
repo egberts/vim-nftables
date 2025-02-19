@@ -552,13 +552,13 @@ destroy ct helper table_id { };
 
 
 # ct_expr
-table_id myChain position 1 ct helper set ip6 table_id myCTHchain { };
-table_id myChain position 1 ct original set ip table_id myCTHchain { };
-table_id myChain position 1 ct reply set inet table_id myCTHchain { };
+T C position 1 ct helper set ip6 table_id myCTHchain { };
+T C position 1 ct original set ip table_id myCTHchain { };
+T C position 1 ct reply set inet table_id myCTHchain { };
 
-ip6 table_id myChain position 1 ct helper set ip6 table_id myCTHchain { };
-ip6 table_id myChain position 1 ct original set ip table_id myCTHchain { };
-ip6 table_id myChain position 1 ct reply set inet table_id myCTHchain { };
+ip6 T C position 1 ct helper set ip6 table_id myCTHchain { };
+ip6 T C position 1 ct original set ip table_id myCTHchain { };
+ip6 T C position 1 ct reply set inet table_id myCTHchain { };
 
 rule ip6 table_id myChain position 1 ct helper set ip6 table_id myCTHchain { };
 rule ip6 table_id myChain position 1 ct original set ip table_id myCTHchain { };
@@ -673,6 +673,7 @@ add rule ct count over 15
 # complex
 ##########################################################################
 table inet raw {  # nftables manpage
+  table inet raw
   chain prerouting {
       type filter hook prerouting priority raw;
       ct zone set iif map { "eth1" : 1, "veth1" : 2 }

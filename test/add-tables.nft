@@ -243,9 +243,6 @@ table netdev A {
     };
 
 
-
-
-
     chain b { }
 }
 table netdev A {
@@ -262,7 +259,7 @@ table netdev NETDEV_TABLE {
     chain ingress_filter_netdev_lo { 
         type filter hook ingress device lo priority -100; policy accept
         udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
-    };
+    }
     chain red_ingress_netdev_eth0 { 
         # You'll get a cryptic error if 'device eth0' is missing after 'chain'
         type filter hook ingress device eth0 priority -100; 
@@ -275,12 +272,13 @@ table netdev NETDEV_TABLE {
 table bridge workstation_bridge {
     chain workstn_bridge_filter_input {
         type filter hook input priority -200;
-        ct state established,related accept # handle 4
         policy accept;
+        ct state established,related accept # handle 4
         ct helper ftp-standard {
             type "ftp" protocol tcp
         }
-    }
+        type filter hook output priority -200;
+    } 
     chain workstn_bridge_filter_output {
         type filter hook output priority -200;
         policy accept;
@@ -894,11 +892,12 @@ table xxxx { undefine abc; chain last { chain last; undefine abc; }; };  # oopsi
 # true negative test: properly hightlighted wrongly to show an error; 
 # so far, so good.
 ################################################################################
+
 table "*weirdname"  # allowable '*' but only inside double quote???
 table "$weirdname"  # allowable '$' but only inside double quote???
 table "#weirdname"  # allowable '#' but only inside double quote???
 
-table ip
+table ip 
 table ip6   
 
 
