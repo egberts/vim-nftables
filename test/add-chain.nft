@@ -1,0 +1,1035 @@
+#!/usr/sbin/nft -f
+# File: all-tables.nft
+# Description: A test NFT file to exercise 'add table' Vim syntax highlightings.
+#
+# Identifiers begin with an alphabetic character (a-z,A-Z), 
+# followed by zero or more alphanumeric characters (a-z,A-Z,0-9) 
+# and the characters slash (/), backslash (\), underscore (_) 
+# and dot (.). 
+#
+# Identifiers using different characters or clashing with a 
+# keyword need to be enclosed in double quotes (").  
+#
+# base_cmd add_cmd 'table' 
+# nft_line/nft_base_cmd/nft_base_cmd_add/nft_base_cmd_add_table/nft_add_table_chain_block policy_spec
+#
+################################################################################
+# true positive test (properly hightlighted correctly; has good content; perfect
+################################################################################
+
+table A
+table Z
+table a
+table z
+table a0
+table z0
+table A/
+table A\
+table A_
+table A.
+table A
+
+# base_cmd add_cmd 'table' table_spec family_spec family_spec_explicit
+add table filter
+
+table T  # that one creates an empty table
+# base_cmd add_cmd 'table' table_spec identifier <STRING>
+table xxxx
+# base_cmd add_cmd 'table' table_spec identifier 'last'
+table last
+
+# base_cmd add_cmd 'table' table_spec table_block
+table T { }
+table T { } ; #
+table inet xxxx { };
+table bridge xxxx { };
+table netdev xxxx { };
+table arp xxxx { };
+
+table my.IpTable
+table my/IpTable
+add table my/IpTable
+add table my\IpTable    # defaults to 'ip' family
+table my./_IpTable
+add table my./_IpTable
+table my.IpTable
+add table my.IpTable
+add table my_./\IpTable    # defaults to 'ip' family
+
+# base_cmd add_cmd 'table' table_spec table_block common_block 'include'
+table T {
+    include "file"
+}
+# base_cmd add_cmd 'table' table_spec table_block common_block 'define'
+table T { define A = 1 }
+table T { 
+    define A = 1 
+    define A = 1 ;
+    define last = 1
+    define last = 1 ;
+    define A = {} ;
+}
+# base_cmd add_cmd 'table' table_spec table_block common_block 'redefine'
+table T { redefine A = 1 }
+table T { redefine A = 1; }
+table T { 
+    redefine A = 1
+    redefine A = 1 ;
+}
+# base_cmd add_cmd 'table' table_spec table_block common_block 'undefine'
+table T {
+    undefine A
+    undefine B 
+}
+table xxxx { undefine abc ; }
+table xxxx { undefine abc ; } ; 
+
+# base_cmd add_cmd 'table' table_spec table_block table_options 'comment'
+# base_cmd add_cmd 'table' table_spec table_block 'comment' string
+table T { 
+    comment Hello
+    comment Hello
+    comment Hello
+    comment Hello 
+} 
+table bridge T { comment 'Hello world!' }
+table T { comment "Hello world!" }
+table T { comment *Hello world!* }
+table netdev xxxx { comment "test" } ;
+table xxxx { comment 'test' };
+table T { comment *Hello world!* ;  }
+table arp xxxx { comment test;  };
+
+# base_cmd add_cmd 'table' table_spec table_block 'policy' 'offload'
+# base_cmd add_cmd 'table' table_spec table_block hook_spec 'type' 
+# base_cmd add_cmd 'table' table_spec table_block 'flags' flag_spec
+table T {flags member_1}
+table T {flags member_1;}
+table T {flags member_1;};
+table T {flags member_1 ;}
+table T {flags member_1; }
+table T {flags member_1 ; }
+table T {flags member_1 ;};
+table T {flags member_1; };
+table T {flags member_1 ; };
+table T { flags member_1 }
+table T { flags member_1; }
+table T {flags member_2,member_3}
+table T { flags member_2, member_3 }
+table T { flags member_1; } ;
+table T { flags member_2,member_3} ; 
+table T { flags member_2, member_3 } ; 
+# base_cmd add_cmd 'table' table_spec table_block { table_options ';' }
+table T { flags member_1 } ;
+table ip xxxx { flags a, b, c};
+table xxxx { ; flags a, b, c; comment "new stuff"; };
+table T { flags a, b, c; chain C { type ; }; };
+
+table T {
+    # common_block
+    include "/directory/subdirectory/filename.filetype";
+    define A = 1
+    redefine A = 2
+    undefine A
+    # table_option
+    flags a, b, c
+    comment Hello
+}
+
+
+# base_cmd add_cmd 'table' table_spec table_block 'chain' chain_block
+table T {
+    chain C {
+    }
+}
+
+table T {
+    chain C {
+    }
+}
+
+# base_cmd add_cmd 'table' table_spec table_block 'rule' rule
+
+######################
+table T { comment "unique, uh?"; flags a, b, c; chain C { type ; }; };
+table xxxx {
+    comment test;
+    include "add-more-table-xxxx.nft";
+};
+
+table T { chain last }
+table T { chain last; }
+table T { chain last; };
+table xxxx { 
+    chain last  
+}
+table xxxx { 
+    chain last; };
+table T { chain C }
+table T { chain C };
+table T { chain C ; } ;
+table T { chain C ; } ;
+table T { chain C { }; };
+table T { chain C { }; chain D { }; };
+add table T { 
+    chain C {
+        comment asdf 
+    }; 
+    chain D { }; 
+};
+
+
+# nft_line/nft_c_base_cmd/nft_base_cmd_add/nft_add_table_spec
+add table ip T { ip chain C { type ; }; } # comment ;   # supposed to be highlighted (incomplete type)
+add table ip T { ip chain C { type ; }; } ;   # supposed to be highlighted (incomplete type)
+table T { chain C { type filter hook ingress device $MY_DEVICE ; }; };
+table T { chain C { type filter hook ingress device $MY_DEVICE ; }; };
+table T { chain C { type filter hook ingress devices = $MY_DEVICE ; }; };
+table T { chain C { type filter hook ingress devices = $MY_DEVICE }; };
+table T { chain C { type filter hook ingress devices = { a }; }; };
+table T { chain C { type filter hook ingress devices = { $a }; }; };
+table ip MyTable { chain C { type filter hook ingress devices = { a }; };
+table T { chain C { type filter hook ingress device eth0 priority 256 }; };
+table T { chain C { type filter hook ingress device eth0 priority 1; } };
+table T { chain C { type filter hook ingress device eth0 priority 1; } };
+add table T { chain C { type filter hook ingress device eth0 priority 1; }; };
+
+table T { chain C { policy $MYPOLICY; };};
+table T { chain C { policy drop; };};
+table T { chain C { policy accept; };};
+table T { chain C { flags offload; }; };
+table T { chain C { comment "asdf" ;  }; };
+table T { chain C { rule define = 1; comment "asdf" ;  }; };
+table T { chain C { devices=$MYDEVICE;  }; };
+table T { chain C { devices =$MYDEVICE;  }; };
+table T { chain C { devices= $MYDEVICE;  }; };
+table T { chain C { xxx devices = $MYDEVICE;  }; };
+table T { chain C { xxx devices = { $MYDEVICE,$SECONDDEVICE,"br0" }  }; };
+
+table myIpTable { flags dormant; }
+table netdev myNetdev { flags dormant; }
+table bridge myBridge { flags dormant; }
+table arp myArpTable { flags dormant; }
+table ip myIpTable { flags dormant; }
+table ip6 myIp6Table { flags dormant; }
+table inet myInetTable { flags dormant; }
+# END OF WORK
+
+table xxxx { undefine abc; chain last { undefine abc; }; };
+
+
+
+table inet MyIpNet {
+    chain MyForwardChain {
+        type filter hook prerouting device wlan0 priority 1;
+        flags offload;
+        policy drop;
+        policy accept;
+    }
+    flags a, b, c
+    comment "unique"
+};
+
+
+
+
+table xxxx { chain last {
+    undefine abc;
+    include "file";
+    define a = 123;
+}; };
+table arp A0b_._/RP_TABLE {
+    chain ARP_INPUT_FILTER {
+        define a = 123;
+        type filter hook input priority table_id;
+        policy drop;
+        counter log drop
+    }
+    chain ARP_INPUT_FILTER {
+        type filter hook prerouting priority 0;
+        policy drop;
+        counter log return
+    }
+    chain workstation_arp_filter_output {
+        type filter hook output priority 0;
+        policy drop;
+        counter log drop
+    }
+}
+table netdev A {
+    chain a { 
+        type filter hook ingress device lo priority -100; policy accept
+        chain a { type };
+        udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    };
+
+
+    chain b { }
+}
+table netdev A {
+    chain a { };
+    chain b { };
+    chain c { };
+}
+table netdev A {
+    chain a { }; chain b { }; chain c { };
+}
+
+table inet filter {
+	chain input {
+		type filter hook input priority 0; policy drop;
+
+		ip protocol icmp icmp type echo-request limit rate over 1/minute burst 4 packets  drop
+		ip6 nexthdr icmpv6 icmpv6 type echo-request limit rate over 1/minute burst 4 packets drop
+
+		# ct state {established, related} accept
+		ct state invalid drop
+
+		iifname lo accept
+
+		ip protocol icmp accept
+		ip6 nexthdr icmpv6 accept
+
+	}
+}
+
+table netdev NETDEV_TABLE {
+    # mind the NIC, it must exists
+    chain ingress_filter_netdev_lo { 
+        type filter hook ingress device lo priority -100; policy accept
+        udp dport 53 ether type 0x8006 ether saddr aa:bb:cc:dd:ff:ee ether daddr numgen inc mod 2 ; map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    };
+    chain red_ingress_netdev_eth0 { 
+        # You'll get a cryptic error if 'device eth0' is missing after 'chain'
+        type filter hook ingress device eth0 priority -100; 
+        policy accept;
+
+        # tcp dport 80 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set jhash ip saddr . tcp sport mod 2 map { 0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+        udp dport 53 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    }
+}
+table bridge workstation_bridge {
+    chain workstn_bridge_filter_input {
+        type filter hook input priority -200;
+        policy accept;
+        ct state established,related accept # handle 4
+        ct helper ftp-standard {
+            type "ftp" protocol tcp
+        }
+        type filter hook output priority -200;
+    } 
+    chain workstn_bridge_filter_output {
+        type filter hook output priority -200;
+        policy accept;
+    }
+
+    chain workstn_bridge_filter_forward {
+        type filter hook forward priority -200;
+        # default drop on all bridge forwarding
+        policy drop;
+
+        oif eth0 ip protocol icmp icmp type echo-request accept
+        iif eth0 ip protocol icmp icmp type echo-reply accept
+        counter log drop
+    }
+}
+table inet INET_TABLE {
+  define interface_name2 = "br0"
+    chain workstation_inet_filter_input {
+        # Things that make this chain unique (input, filter)
+        type filter hook input priority 0;
+        policy drop;
+        iif lo accept
+        # Things that make this chain unique ('eth0', input, filter)
+        # meta iifname != $interface_name2 drop;  # workstation wants all intfs
+        # Let things back in if they've been established before new firewall
+        ct state established,related accept;
+        #  DNS 
+        tcp dport 53 counter accept 
+        udp dport 53 counter accept 
+        #  Multicast DNS 
+        tcp dport 5353 counter accept
+        # RFC 6092 - Simple Security in IPv6 Gateway CPE
+        # recommends that the DEFAULT
+        #   operating mode for residential IPv6 simple security be to treat
+        #   Generic Packet Tunneling [RFC2473] and similar protocols as opaque
+        #   transport layers, i.e., inbound tunnel initiations are denied and
+        #   outbound tunnel initiations are accepted.
+
+        # To facilitate the use of IPsec in support of IPv6
+        # mobility, the Internet Key Exchange (IKE) protocol [RFC5996] and the
+        # Host Identity Protocol (HIP) [RFC5201] should also be permitted in
+        # the DEFAULT operating mode.
+
+        #  Workstation
+        icmp type {
+            destination-unreachable, 
+            time-exceeded, 
+            parameter-problem
+        } counter accept
+
+        # Router/Gateway
+        icmp type {
+            destination-unreachable, 
+            redirect, 
+            time-exceeded, 
+            parameter-problem, 
+            router-advertisement, 
+            router-solicitation
+            } counter accept
+
+        # All ICMP
+        icmp type {
+            echo-reply, 
+            destination-unreachable, 
+            source-quench, redirect, 
+            echo-request, 
+            time-exceeded, 
+            parameter-problem, 
+            timestamp-request, 
+            timestamp-reply, 
+            info-request, 
+            info-reply, 
+            address-mask-request, 
+            address-mask-reply, 
+            router-advertisement, 
+            router-solicitation
+            } counter accept
+
+        tcp dport 25 counter accept    # smtp
+        tcp dport 465 counter accept   # submission
+        # SSH server
+        tcp dport ssh counter accept 
+        
+        tcp dport 514 counter accept    # syslog
+        tcp dport 6514 counter accept   # secured syslog
+
+        tcp dport 80 counter accept 
+        tcp dport 443 counter accept 
+
+        # IP-specific
+        # meta ip goto workstation_inet_filter_input_ip
+        # meta ip6 goto workstation_inet_filter_input_ip6
+        # meta vlan goto workstation_inet_filter_input_vlan
+        # meta arp goto workstation_inet_filter_input_arp
+
+        # Just in case that someone screws up our 'policy drop'
+
+        # multi-family reject, using the icmpx keyword
+        counter log reject with icmpx type admin-prohibited
+    };
+    # ARP filter input
+    chain workstation_arp_filter_input {
+        counter log reject
+    }
+    # ARP filter output
+    chain workstation_arp_filter_output {
+        #  Multicast DNS 
+        tcp dport 5353 counter accept
+        #  DNS 
+        tcp dport 53 counter accept 
+        udp dport 53 counter accept 
+
+        #  Workstation
+        icmp type {
+            destination-unreachable, 
+            time-exceeded, 
+            parameter-problem
+            } counter accept
+
+        # Router/Gateway
+        icmp type {
+            destination-unreachable, 
+            redirect, 
+            time-exceeded, 
+            parameter-problem, 
+            router-advertisement, 
+            router-solicitation
+            } counter accept
+
+        # All ICMP
+        icmp type {
+            echo-reply, 
+            destination-unreachable, 
+            source-quench, redirect, 
+            echo-request, 
+            time-exceeded, 
+            parameter-problem, 
+            timestamp-request, 
+            timestamp-reply, 
+            info-request, 
+            info-reply, 
+            address-mask-request, 
+            address-mask-reply, 
+            router-advertisement, 
+            router-solicitation
+            } counter accept
+
+        tcp dport 25 counter accept    # smtp
+        tcp dport 465 counter accept   # submission
+        # SSH server
+        tcp dport ssh counter accept 
+
+        tcp dport 514 counter accept    # syslog
+        tcp dport 6514 counter accept   # secured syslog
+
+        tcp dport 80 counter accept 
+        tcp dport 443 counter accept 
+
+        counter log reject
+    }
+    #IPv6 filtering
+    chain workstation_ip6_filter_input {
+        counter log reject
+    }
+    #IPv6 filtering
+    chain workstation_inet_filter_input_ip6 {
+        counter log reject
+    }
+    #IPv6 filtering
+    chain workstation_inet_filter_input_ip6 {
+        counter log reject
+    }
+}
+table ip workstn_ip_nat {
+    chain workstn_ip_nat_postrouting {
+        type nat hook postrouting priority 0;
+        #Likewise, in iptables NAT (source NAT):
+        # % iptables -t nat -A POSTROUTING -s 192.168.1.1 -j SNAT --to-source 1.1.1.1
+        # % iptables -t nat -A POSTROUTING -s 192.168.2.2 -j SNAT --to-source 2.2.2.2
+        # % iptables -t nat -A POSTROUTING -s 192.168.3.3 -j SNAT --to-source 3.3.3.3
+
+        # Translated to a nftables one-liner:
+
+        # snat ip saddr map { 
+        #     192.168.1.1 : 1.1.1.1, 
+        #     192.168.2.2 : 2.2.2.2, 
+        #     192.168.3.3 : 3.3.3.3 
+       #  }
+    }
+}
+table inet raw {
+    chain prerouting {
+        type filter hook prerouting priority -300;
+        ct zone set iif map { "eth1" : 1, "veth1" : 2 }
+    };
+    chain output {
+        type filter hook output priority -300;
+        ct zone set oif map { "eth1" : 1, "veth1" : 2 }
+    }
+}
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        ct state established,related accept # handle 4
+        ip saddr 10.1.1.1 tcp dport ssh accept # handle 5
+    }
+}
+
+
+
+
+
+
+
+
+
+
+table ip my_filter_table {
+    set my_connlimit {
+        type ipv4_addr
+        size 65535
+        flags dynamic
+    }
+
+    chain my_output_chain {
+        type filter hook output priority filter; policy accept;
+        ct state new add @my_connlimit { ip daddr ct count over 20 } counter packets 0 bytes 0 drop
+   }
+}
+
+table ip filter {
+    set myset {
+        type inet_service
+        flags timeout
+        elements = { http expires 9s}
+    }
+
+    chain input {
+        type filter hook input priority 0; policy accept;
+        update @myset { tcp dport timeout 1m }
+    }
+}
+
+table ip filter {
+    set myset {
+        type ipv4_addr
+        elements = { 1.1.1.1 }
+    }
+
+    chain input {
+        type filter hook input priority 0; policy accept;
+        add @myset { ip saddr }
+    }
+}
+
+table inet myfilter {
+    set myset {
+        type ipv4_addr
+        flags timeout
+        elements = { 10.0.0.1 timeout 10s expires 8s}
+    }
+}
+
+# fw.basic
+table ip filter {
+    chain input {
+        type filter hook input priority 0;
+        # accept traffic originated from us
+        ct state established,related accept
+        # accept any localhost traffic
+        iif lo accept
+        # count and drop any other traffic
+        counter drop
+    }
+}
+
+# fw6.basic
+table ip6 filter {
+    chain input {
+        type filter hook input priority 0;
+        # accept any localhost traffic
+        iif lo accept
+        # accept traffic originated from us
+        ct state established,related accept
+        # accept neighbour discovery otherwise connectivity breaks
+        icmpv6 type { nd-neighbor-solicit, echo-request, nd-router-advert, nd-neighbor-advert } accept
+        # count and drop any other traffic
+        counter drop
+    }
+}
+
+# fw.inet.basic
+table inet filter {
+    chain input {
+        type filter hook input priority 0;
+        # accept any localhost traffic
+        iif lo accept
+        # accept traffic originated from us
+        ct state established,related accept
+        # accept neighbour discovery otherwise connectivity breaks
+        ip6 nexthdr icmpv6 icmpv6 type { nd-neighbor-solicit, echo-request, nd-router-advert, nd-neighbor-advert } accept
+        # count and drop any other traffic
+        counter drop
+    }
+}
+
+table inet filter {
+    chain global {
+        ct state established,related accept
+        ct state invalid drop
+        ip protocol icmp accept
+        ip6 nexthdr icmpv6 accept
+        udp dport 53 accept
+    }
+    set myset_ipv4 {
+        type ipv4_addr;
+        elements = { $server1_ipv4 , $workstation1_ipv4 }
+    }
+    set myset_ipv6 {
+        type ipv6_addr;
+        elements = { $server1_ipv6 , $workstation1_ipv6 }
+    }
+    chain dmz_in {
+        # your rules for traffic to your dmz servers
+        ip saddr @myset_ipv4
+        ip6 saddr @myset_ipv6
+    }
+    chain dmz_out {
+        # your rules for traffic from the dmz to internet
+    }
+    chain lan_in {
+        # your rules for traffic to your LAN nodes
+    }
+    chain lan_out {
+        # your rules for traffic from the LAN to the internet
+    }
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+        jump global
+        oifname vmap { $nic_dmz : jump dmz_in , $nic_lan : jump lan_in }
+        oifname $nic_inet iifname vmap { $nic_dmz : jump dmz_out , $nic_lan : jump lan_out }
+    }
+    chain input {
+        type filter hook input priority 0 ; policy drop;
+        jump global
+        # your rules for traffic to the firewall here
+    }
+    chain output {
+        type filter hook output priority 0 ; policy drop;
+        jump global
+        # your rules for traffic originated from the firewall itself here
+    }
+}
+
+# Port Knocking Example #1
+table inet portknock {
+    set clients_ipv4 {
+        type ipv4_addr
+        flags timeout
+    }
+    set clients_ipv6 {
+        type ipv6_addr
+        flags timeout
+    }
+    set candidates_ipv4 {
+        type ipv4_addr . inet_service
+        flags timeout
+    }
+    set candidates_ipv6 {
+        type ipv6_addr . inet_service
+        flags timeout
+    }
+    chain input {
+        type filter hook input priority -10; policy accept;
+
+        iifname "lo" return
+
+        tcp dport 123 add @candidates_ipv4 {ip  saddr . 234 timeout 1s}
+        tcp dport 123 add @candidates_ipv6 {ip6 saddr . 234 timeout 1s}
+        tcp dport 234 ip  saddr . tcp dport @candidates_ipv4 add @candidates_ipv4 {ip  saddr . 345 timeout 1s}
+        tcp dport 234 ip6 saddr . tcp dport @candidates_ipv6 add @candidates_ipv6 {ip6 saddr . 345 timeout 1s}
+        tcp dport 345 ip  saddr . tcp dport @candidates_ipv4 add @candidates_ipv4 {ip  saddr . 456 timeout 1s}
+        tcp dport 345 ip6 saddr . tcp dport @candidates_ipv6 add @candidates_ipv6 {ip6 saddr . 456 timeout 1s}
+        tcp dport 456 ip  saddr . tcp dport @candidates_ipv4 add @clients_ipv4 {ip  saddr timeout 10s} log prefix "Successful portknock: "
+        tcp dport 456 ip6 saddr . tcp dport @candidates_ipv6 add @clients_ipv6 {ip6 saddr timeout 10s} log prefix "Successful portknock: "
+        tcp dport $guarded_ports ip  saddr @clients_ipv4 counter accept
+        tcp dport $guarded_ports ip6 saddr @clients_ipv6 counter accept
+        tcp dport $guarded_ports ct state established,related counter accept
+        tcp dport $guarded_ports counter reject with tcp reset
+    }
+}
+
+# Port Knocking Example #2
+table ip Inet4 {
+    set Knocked_1 {
+        type ipv4_addr
+        flags timeout
+        timeout 10s
+        gc-interval 4s
+    }
+    set Knocked_2 {
+        type ipv4_addr
+        flags timeout
+        timeout 10s
+        gc-interval 4s
+    }
+    set Knocked_3 {
+        type ipv4_addr
+        flags timeout
+        timeout 10s
+        gc-interval 4s
+    }
+    set Knocked_4 {
+        type ipv4_addr
+        flags timeout
+        timeout 2m
+        gc-interval 4s
+    }
+
+    chain Knock_1 {
+        set add ip saddr @Knocked_1
+    }
+    chain Unknock_1 {
+        set update ip saddr timeout 0s @Knocked_1
+    }
+    chain Knock_2 {
+        set update ip saddr timeout 0s @Knocked_1
+        set add ip saddr @Knocked_2
+    }
+    chain Unknock_2 {
+        set update ip saddr timeout 0s @Knocked_2
+    }
+    chain Knock_3 {
+        set update ip saddr timeout 0s @Knocked_2
+        set add ip saddr @Knocked_3
+    }
+    chain Unknock_3 {
+        set update ip saddr timeout 0s @Knocked_3
+    }
+    chain Knock_4 {
+        set update ip saddr timeout 0s @Knocked_3
+        set add ip saddr @Knocked_4 log prefix "Port-Knock accepted: "
+    }
+    chain RefreshKnock {
+        set update ip saddr timeout 2m @Knocked_4
+    }
+    chain PortKnock {
+        ct state new ip saddr @Knocked_4 goto RefreshKnock
+        tcp dport 456 ct state new ip saddr @Knocked_3 goto Knock_4
+        tcp dport 345 ct state new ip saddr @Knocked_3 return
+        ip saddr @Knocked_3 ct state new goto Unknock_3
+        tcp dport 345 ct state new ip saddr @Knocked_2 goto Knock_3
+        tcp dport 234 ct state new ip saddr @Knocked_2 return
+        ip saddr @Knocked_2 ct state new goto Unknock_2
+        tcp dport 234 ct state new ip saddr @Knocked_1 goto Knock_2
+        tcp dport 123 ct state new ip saddr @Knocked_1 return
+        ip saddr @Knocked_1 ct state new goto Unknock_1
+        tcp dport 123 ct state new goto Knock_1
+    }
+    chain FilterIn {
+        type filter hook input priority 0
+        policy drop
+
+        # allow established/related connections
+        ct state established,related accept
+
+        # early drop of invalid connections
+        ct state invalid drop
+
+        # allow from loopback
+        meta iif lo accept
+
+        # allow icmp
+        ip protocol icmp accept
+
+        # port-knocking
+        jump PortKnock
+
+        # misc. filtering
+        # ...
+    }
+
+    chain FilterOut {
+        type filter hook output priority 0
+        policy accept
+    }
+}
+
+# Classification to tc structure
+table ip filter {
+   map subnet_map {
+       type ipv4_addr : verdict
+       flags interval
+       elements = { 10.20.255.48/29 : goto group_114, 10.20.255.88/29 : goto group_114,
+                    10.20.255.128/29 : goto group_114 }
+   }
+   set priority_set {
+       type ipv4_addr
+       flags interval
+       elements = { 8.8.8.8, 8.8.4.4 }
+   }   
+   map group_114 {
+       type ipv4_addr : classid
+       flags interval
+       elements = { 10.20.255.50 : 1:ffd8, 10.20.255.90 : 1:ffd5,
+                     10.20.255.130 : 1:ffd2 }
+   }
+   map group_114_prio {
+       type ipv4_addr : classid
+       flags interval
+       elements = { 10.20.255.50 : 1:ffd9, 10.20.255.90 : 1:ffd6,
+                     10.20.255.130 : 1:ffd3 }
+   }   
+   chain forward {
+       type filter hook forward priority filter; policy accept;
+       meta priority none ip daddr vmap @subnet_map counter packets 0 bytes 0
+       meta priority none ip saddr vmap @subnet_map counter packets 0 bytes 0
+       ip daddr 192.168.0.0/16 meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "total - "
+       ip saddr 192.168.0.0/16 meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "total - "
+       ip daddr 10.0.0.0/8 meta priority none meta priority set 1:ffff counter packets 38931 bytes 2926076 log prefix "total - "
+       ip saddr 10.0.0.0/8 meta priority none meta priority set 1:ffff counter packets 14 bytes 1064 log prefix "total - "
+       meta priority none meta priority set 1:2 counter packets 0 bytes 0 log prefix "non_shaped - "
+   }
+   chain input {
+       type filter hook input priority filter; policy accept;
+       meta priority none meta priority set 1:2 counter packets 419381 bytes 45041195
+   }
+   chain output {
+       type filter hook output priority filter; policy accept;
+       meta priority none meta priority set 1:2 counter packets 507779 bytes 51809859
+   }
+   chain group_114 {
+       meta priority none ip saddr @priority_set meta priority set ip daddr map @group_114_prio counter packets 0 bytes 0
+       meta priority none ip daddr @priority_set meta priority set ip saddr map @group_114_prio counter packets 0 bytes 0
+       meta priority none meta priority set ip daddr map @group_114 counter packets 0 bytes 0
+       meta priority none meta priority set ip saddr map @group_114 counter packets 0 bytes 0
+       meta priority none meta priority set 1:ffff counter packets 0 bytes 0 log prefix "group_114 - "
+   }
+}
+
+# Will count all udp port 5060 packets towards the 
+# quota and drop all packets once the quota hits 
+# its "over 100 mbytes" threshold.
+table inet foo {
+    quota example { over 100 mbytes used 0 bytes }
+
+    chain dropafterquota {
+        type filter hook postrouting priority 0; policy accept;
+        udp port 5060 quota name "example" drop
+    }
+}
+table ip x {
+    chain c {
+        ct timeout set saddr map {
+            192.168.0.14 :"policy1"
+        }
+    }
+    ct timeout "policy1" {
+        protocol tcp
+        timeouts = {
+            established: 120s
+            fin_wait: 30;
+        }
+    }
+}
+
+table firewall {
+  chain incoming {
+    type filter hook input priority 0; policy drop;
+
+    # established/related connections
+    ct state established,related accept
+
+    # loopback interface
+    iifname lo accept
+
+    # icmp
+    icmp type echo-request accept
+
+    # open tcp ports: sshd (22), httpd (80)
+    tcp dport { ssh, http } accept
+  }
+}
+
+table ip6 firewall {
+  chain incoming {
+    type filter hook input priority 0; policy drop;
+
+    # established/related connections
+    ct state established,related accept
+
+    # invalid connections
+    ct state invalid drop
+
+    # loopback interface
+    iifname lo accept
+
+    # icmp
+    # routers may also want: mld-listener-query, nd-router-solicit
+    icmpv6 type { echo-request, nd-neighbor-solicit } accept
+
+    # open tcp ports: sshd (22), httpd (80)
+    tcp dport { ssh, http } accept
+  }
+}
+
+table xxxx { undefine abc; chain last { chain last; undefine abc; }; };  # oopsie
+
+
+################################################################################
+# true negative test: properly hightlighted wrongly to show an error; 
+# so far, so good.
+################################################################################
+
+table "*weirdname"  # allowable '*' but only inside double quote???
+table "$weirdname"  # allowable '$' but only inside double quote???
+table "#weirdname"  # allowable '#' but only inside double quote???
+
+table ip 
+table ip6   
+
+
+table inet  #
+
+table bridge ;  
+table netdev  # intentionally invalid; invalid table identifier
+table arp  # intentionally invalid; invalid table identifier
+table ip {  };
+
+table 0   # invalid identifier (started with non-letter)
+table 0abc   # invalid identifier (started with non-letter)
+table /abc   # invalid identifier (started with non-letter)
+table \abc   # invalid identifier (started with non-letter)
+table _abc   # invalid identifier (started with non-letter)
+table .abc   # invalid identifier (started with non-letter)
+
+table T { devices = eth0 }
+
+table T { chain C { type filter hook ingress ; }; };  # incomplete
+table T { chain C { type filter hook ingress devices ; }; };  # incomplete
+table T { chain C { type filter hook ingress devices = ; }; };  # incomplete
+
+table T { chain C { type filter hook ingress device eth0 priority ; }; };  # incomplete
+
+table T { chain C { devices =    $eth0,$ABC,$DEF;  }; };
+table T { chain C { devices ={ $MYVARIABLE; } } }
+table T { chain C { devices ={ MYVARIABLE } } }
+table T { chain C { devices = MYVARIABLE } }
+table T { chain C { devices = $MYVARIABLE } }
+
+table A!error
+
+
+################################################################################
+# false negative test: highlighted wrongly; still has good content; oops.
+################################################################################
+
+
+table xxxx { flags ,, b, c };  " oopsie
+table xxxx { flags a, b,  };  " oopsie
+table ip6 xxxx { flags , a, b };  " oopsie
+table xxxx { chain 'MyIpNet' { chain }; };
+table xxxx { chain "MyIpNet" { chain }; };
+
+table T { chain C { devices =$eth0,$DEV1  } }
+table T { chain C { devices =x$eth0  } }
+table T { chain C { devices = x$eth0  } }
+table T { chain C { devices      =     not_a_variable  } }
+table T { chain C { devices      =     x$eth0  } }
+table T { chain C { devices =eth0  } }
+table T { chain C { devices = eth0;  } }
+table T { chain C { devices = { eth0; }  } }
+
+table T { chain C { devices = { eth0 } # comment
+    }  # comment
+}  # comment
+table T { chain C { devices = { eth0 } ; # comment
+    }; # comment
+}; # comment
+table T { chain C { devices = { eth0 } }; };
+
+
+################################################################################
+# false positive test: looks highlighted correctly; has bad content; oops.
+################################################################################
+
+table T { chain C { type filter ; }; };  # incomplete
+
+table xxxx { chain MyIpNet {
+    chain last;  # oopsie
+    };
+};
+
+table @TX
+table A @# @   # invalid character
+table A# { };   # invalid character
+table A$ { };   # invalid character
+table A%   # invalid character
+table A^   # invalid character
+table A&   # invalid character
+table A*   # invalid character
+table A(   # invalid character
+table A)   # invalid character
+table A-   # invalid character
+table A+   # invalid character
+table A=   # invalid character
+table A[   # invalid character
+table A]   # invalid character
+table A<   # invalid character
+table A>   # invalid character
+table A,   # invalid character
+table A?   # invalid character
+table A|   # invalid character
+table A:   # invalid character
+

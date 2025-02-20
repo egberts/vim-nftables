@@ -422,9 +422,6 @@ list
 
 
 list table  # premature EOS
-
-list tables  # premature EOS
-
 list flow 
 
 
@@ -460,7 +457,8 @@ list flow table
 list flow table MyFlow 
 
 
-list flow table MyFlow MyChain ExtraIdentifier
+list flow table MyFlow last ExtraIdentifier 
+list flow table MyFlow MyChain ExtraIdentifier 
 
 
 list meter 
@@ -487,17 +485,10 @@ list table arp MyTable InvalidChain  # extra chain_id identifier
 list tables ip6 ; list tables oopsie; 
 
 
-list meters  # premature EOS
-
-list flowtables 
-
-
-list flowtables  # premature EOS
 list flowtables netdev   # non-supporting family_spec
 list flowtables bridge  # non-supporting family_spec
 list flowtables arp  # non-supporting family_spec
 
-list maps  # premature EOS
 
 list chain 
 
@@ -521,7 +512,6 @@ list chain arp MyTable
 list chain arp MyTable MyChain ExtraIdentifier
 list chain wrong_family_spec ip MyTable MyChain
 
-list sets  # premature EOS
 list sets table 
 
 
@@ -534,7 +524,6 @@ list sets table ip6 table_name chain_name  # extraneous chain_name
 list sets table inet table_name chain_name  # extraneous chain_name
 list sets table arp table_name chain_name  # extraneous chain_name
 
-list quotas invalid_family_spec
 list quotas table 
 
 
@@ -545,12 +534,125 @@ list quotas table ip
 list quotas table ip table_name extraneous
 
 
-list limits ip
 list limits table 
 
 
 list limits table table_name extraneous
 list limits table ip 
+
+
+list secmarks table 
+
+
+list secmarks table table_name extraneous
+list secmarks table ip 
+
+
+list synproxys table 
+
+
+list synproxys table table_name extraneous
+list synproxys table ip 
+
+
+list set table 
+
+
+list set tableId setId x
+
+
+list meter
+list meter T 
+
+
+list meter T C X
+
+
+list map
+list map T 
+
+
+list map T C X
+
+
+list counter
+list counter T 
+
+
+list counter T C X
+
+
+list quota
+list quota T 
+
+
+list quota T C X
+
+
+list limit
+list limit T 
+
+
+list limit T C X
+
+
+list secmark
+list secmark T 
+
+
+list secmark T C X
+
+
+list flow
+list flow invalid
+list flow tables invalid_spec
+list flow tables invalid_spec XXXX
+list flow table 
+
+
+list flow table T 
+
+
+list flow table T S x
+
+
+list flowtable 
+
+
+list flowtable T 
+
+
+list flowtable T F xxx
+
+
+list flowtable ip T 
+
+
+list ct 
+
+
+list ct helper 
+
+
+list ct helper T 
+
+
+list ct helper T O xxx
+
+list ct timeout 
+
+
+list ct timeout T 
+
+
+list ct timeout T O xxx
+list ct expectation 
+
+
+list ct expectation T 
+
+
+list ct expectation T O xxx
 
 
 ################################################################################
@@ -561,18 +663,9 @@ list limits table ip
 # false positive test (looks highlighted correctly; has bad content; oops)
 ################################################################################
 
-list tables  bridge
-
-list chains  # premature EOS
-
-list ruleset  # premature EOS
-
 list flowtables netdev
 list flowtables bridge
 list flowtables arp
-
-list sets  # premature EOS
-list meters  # premature EOS
 
 
 list flowtables netdev 

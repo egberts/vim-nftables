@@ -357,8 +357,7 @@ ct helper ip table_id ct_id {
 };
 
 # ct helper <obj_spec> '{' type <quoted_str> protocol <ct_l4protoname> '}'
-ct helper table_id T { type "sip" protocol tcp; l3proto ip; }
-ct helper table_id T { l3proto ip; type "sip" protocol tcp; }
+ct helper table_id { type "sip" protocol tcp; l3proto ip; }
 ct helper ip table_id cth { type "sip" protocol tcp; l3proto ip; }
 ct helper ip6 table_id cth { type "sip" protocol tcp; l3proto ip; }
 ct helper inet table_id cth { type "sip" protocol tcp; l3proto ip; }
@@ -371,6 +370,29 @@ ct helper netdev table_id cth { type "sip" protocol tcp; l3proto ip; }
 # Bison: ct helper <obj_spec> '{' <ct_helper_block> }
 # Bison: ct helper <table_spec> '{' <ct_helper_block> }
 # Bison: ct helper <family_spec> <table_id> '{' <ct_helper_block> }
+# Syntax: obj_spec->'helper'->'ct'->add_cmd->base_cmd
+ct helper ip table_id ct_id l3proto zone set ip6 table_id { };
+ct helper ip6 table_id ct_id l3proto type sip zone set ip6 { };
+ct helper inet table_id ct_id l3proto zone set ip6 table_id { };
+ct helper netdev table_id ct_id l3proto zone set ip6 table_id { };
+ct helper bridge table_id ct_id l3proto zone set ip6 table_id { };
+ct helper arp table_id ct_id l3proto zone set ip6 table_id { };
+
+# obj_spec->'helper'->'ct'->'rule'->add_cmd->base_cmd
+rule ct helper ip table_id ct_id l3proto zone set ip6 table_id { };
+rule ct helper ip6 table_id ct_id l3proto type sip zone set ip6 { };
+rule ct helper inet table_id ct_id l3proto zone set ip6 table_id { };
+rule ct helper netdev table_id ct_id l3proto zone set ip6 table_id { };
+rule ct helper bridge table_id ct_id l3proto zone set ip6 table_id { };
+rule ct helper arp table_id ct_id l3proto zone set ip6 table_id { };
+
+# 'helper'->'ct'->'rule'->'add'->add_cmd->base_cmd
+add rule ct helper ip table_id l3proto zone set ip6 table_id { };
+add rule ct helper ip6 table_id l3proto type sip zone set ip6 { };
+add rule ct helper inet table_id l3proto zone set ip6 table_id { };
+add rule ct helper netdev table_id l3proto zone set ip6 table_id { };
+add rule ct helper bridge table_id l3proto zone set ip6 table_id { };
+add rule ct helper arp table_id l3proto zone set ip6 table_id { };
 #
 add rule table_id chain_id { ct helper ip table_id type l3proto zone set ip6 { }; }
 
@@ -379,12 +401,7 @@ add rule table_id chain_id { ct helper ip table_id type l3proto zone set ip6 { }
 
 # ct timeout obj_spec ct_obj_alloc '{' ct_timeout_block '}' close_scope_ct
 ct timeout  l3proto zone set ip6 table_id { };
-ct timeout table_id ctt { 
-    policy protocol udp; l3proto ip; 
-    policy = { 
-        unreplied : 15, replied : 12 
-    }; 
-}
+ct timeout table_id ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 ct timeout netdev myNetdevTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 ct timeout bridge myBridgeTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
 ct timeout arp myArpTable ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
@@ -404,16 +421,11 @@ table ip filter {  # nftables manpage
         l3proto ip
         policy = { established: 120, close: 20 }
     }
-    flags myflag;
 
     chain output {
         type filter hook output priority filter; policy accept;
         ct timeout set "customtimeout"
     }
-    ct timeout customtimeout {
-        protocol tcp
-        l3proto ip
-        policy = { established: 120 }
 }
 
 # Bison: ADD CT EXPECTATION obj_spec ct_obj_alloc '{' ct_expect_block '}' close_scope_ct

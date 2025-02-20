@@ -153,18 +153,6 @@ add flowtable
 add flowtable T 
 
 
-add flowtable ip T F 
-
-
-add flowtable ip T F { oopsie; counter } 
-add flowtable ip T F { counter; oopsie } 
-add flowtable ip T F { oopsie; devices = { eth0, wlan7; } }; 
-add flowtable ip T F { devices = { eth0, wlan7; }; notvalid}; 
-add flowtable ip T F { flags offload; oopsie; hook output priority 13; } 
-add flowtable ip T F { hook oopsie output priority 13 } 
-add flowtable ip T F { hook output oopsie priority 13 } 
-add flowtable ip T F { hook output priority oopsie 13 } 
-add flowtable ip T F { hook output priority 13 oopsie } 
 create flow table
 create flowtable ip  
 

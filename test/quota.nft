@@ -10,7 +10,6 @@
 ################################################################################
 
 # quota statements
-add quota filter http_quota 25 mbytes
 add quota filter http_quota over 25 mbytes
 add quota last http_quota over 25 mbytes
 add quota filter last over 25 mbytes
@@ -28,7 +27,7 @@ quota T Q over 123
 quota table1 last over 123
 quota last quota2 over 123
 quota last last over 123
-quota T example { over 100 mbytes used 0 bytes }
+quota example { over 100 mbytes used 0 bytes }
 quota ip T Q over 123
 quota ip myIpfilter http-quota over 25 mbytes
 quota ip6 myIpfilter http-quota until 525 kbytes
