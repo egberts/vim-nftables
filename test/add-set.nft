@@ -10,6 +10,9 @@
 ################################################################################
 
 # base_cmd add_cmd 'set'
+# 'set'->add_cmd->base_cmd->line
+# 'set'->add_cmd->'add'->base_cmd->line
+add set T C { };
 
 add set T C { counter }
 add set T C { counter bytes 2048 }
@@ -59,6 +62,9 @@ add set T S { comment "A comment string" }
 add set T S { comment 'A comment string' }
 add set T S { comment single-word }
 
+# 'set'->set_expr
+
+# 'set'->set_stmt
 
 ################################################################################
 # true negative test: properly hightlighted wrongly to show an error;
@@ -110,7 +116,7 @@ set T C ; # comment
 set TC ;
 # comment
 
-set T S
+set T S 
 set T S 
 set T      S
 set T S  # comment

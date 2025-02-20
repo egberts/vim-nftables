@@ -135,8 +135,8 @@ table xxxx {
     comment test;
     include "add-more-table-xxxx.nft";
 };
-
-table T { chain last }
+table T { flags mine; };
+table T { chain last } 
 table T { chain last; }
 table T { chain last; };
 table xxxx { 
