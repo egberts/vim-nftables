@@ -104,6 +104,7 @@ table arp xxxx { comment test;  };
 # base_cmd add_cmd 'table' table_spec table_block hook_spec 'type' 
 # base_cmd add_cmd 'table' table_spec table_block 'flags' flag_spec
 table T {flags member_1}
+
 table T {flags member_1;}
 table T {flags member_1;};
 table T {flags member_1 ;}

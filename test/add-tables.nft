@@ -175,8 +175,11 @@ add table T {
 };
 
 # base_cmd add_cmd 'table' table_spec table_block 'set' set_block
-table T { set last { } }
 table T { set S { } }
+table last { set S { } }
+table T { set last { } }
+table last { set last { } }
+table ip last { set S { } }
 table ip T { set S { } }
 table ip6 T { set S { } }
 table inet T { set S { } }
@@ -192,12 +195,6 @@ table T {
         undefine A
     }
 }
-table T { set S { flags constant,interval,timeout,dynamic } }
-table T { set S { timeout 15 } }
-table T { set S { gc-interval 15 } }
-table T { set S { policy performance } }
-table T { set S { policy memory } }
-table T { set S { size 123 } }
 table T { set S { typeof A.B : interval 15 } }
 table T { set S { type string : } }
 table T { set S { type mark : interval mark.time } }
@@ -205,15 +202,44 @@ table T { set S { type dscp : ecn.classid } }
 table T { set S { type ecn : } }
 table T { set S { type classid : } }
 table T { set S { type time : } }
+table T { set S { flags constant,interval,timeout,dynamic } }
+table T { set S { timeout 15 } }
+table T { set S { gc-interval 15 } }
+table T { set S { timeout 15; gc-interval 15 } }
 table T { set S { counter } }
-table T { set S { quota } }
-table T { set S { limit } }
-table T { set S { secmark } }
-table T { set S { synproxy } }
-table T { set S { counter; quota; limit; secmark; synproxy } }
+table T { set S { counter bytes 123 } }
+table T { set S { counter packets 123 } }
+table T { set S { counter packets 123 bytes 123 } }
+table T { set S { counter bytes 123 packets 123 } }
+table T { set S { limit rate 123 } }
+table T { set S { limit rate over 123 } }
+table T { set S { limit rate until 123 } }
+table T { set S { quota over 123 bytes } }
+table T { set S { quota over 123 string } }
+table T { set S { quota over 123 bytes used 123 bytes } }
+table T { set S { quota over 123 string used 123 string } }
+table T { set S { quota until 123 bytes } }
+table T { set S { quota until 123 string } }
+table T { set S { quota until 123 bytes used 123 bytes } }
+table T { set S { quota until 123 string used 123 string } }
+table T { 
+    set S { 
+        counter; 
+        quota; 
+        limit } 
+}
+table T { set S { ct count 123 } }
+table T { set S { ct count over 123 } }
+table T { set S { last } }
+table T { set S { last used never } }
+table T { set S { last used 4h15m20s } }
+table T { set S { policy performance } }
+table T { set S { policy memory } }
+table T { set S { size 123 } }
 table T { set S { comment Hello } }
+table T { set S { elements = $VARIABLE } }
 table T { set S { elements = { a, b, c } } }
-table T { set S { automerge } }
+table T { set S { auto-merge } }
 table ip filter {
     set myset {
         type inet_service
@@ -239,16 +265,19 @@ table inet filter {
 }
 
 # base_cmd add_cmd 'table' table_spec table_block 'map' map_block
-table T { map M { } }
-table ip T { map M { } }
-table ip6 T { map M { } }
-table inet T { map M { } }
-table netdev T { map M { } }
-table bridge T { map M { } }
-table arp T { map M { } }
-# base_cmd add_cmd 'table' table_spec table_block 'map' map_block common_block
+table T { map S { } }
+table last { map S { } }
+table T { map last { } }
+table last { map last { } }
+table ip last { map S { } }
+table ip T { map S { } }
+table ip6 T { map S { } }
+table inet T { map S { } }
+table netdev T { map S { } }
+table bridge T { map S { } }
+table arp T { map S { } }
 table T { 
-    map M {
+    chain S {
         # common_block
         include "/directory/subdirectory/filename.filetype"
         define A = 1
@@ -256,27 +285,74 @@ table T {
         undefine A
     }
 }
-table T { map M { timeout 15 } }
-table T { map M { gc-interval 15 } }
-table T { map M { flags constant,interval,timeout,dynamic } }
-table T { map M { comment Hello } }
-table T { map M { policy performance } }
-table T { map M { policy memory } }
-table T { map M { size 123 } }
-table T { map M { typeof A.B : interval 15 } }
-table T { map M { type string : } }
-table T { map M { type mark : interval mark.time } }
-table T { map M { type dscp : ecn.classid } }
-table T { map M { type ecn : } }
-table T { map M { type classid : } }
-table T { map M { type time : } }
-table T { map M { counter } }
-table T { map M { quota } }
-table T { map M { limit } }
-table T { map M { secmark } }
-table T { map M { synproxy } }
-table T { map M { counter; quota; limit; secmark; synproxy } }
-table T { map M { elements = { a, b, c } } }
+table T { map S { typeof A.B : interval 15 } }
+table T { map S { type string : } }
+table T { map S { type mark : interval mark.time } }
+table T { map S { type dscp : ecn.classid } }
+table T { map S { type ecn : } }
+table T { map S { type classid : } }
+table T { map S { type time : } }
+table T { map S { flags constant,interval,timeout,dynamic } }
+table T { map S { timeout 15 } }
+table T { map S { gc-interval 15 } }
+table T { map S { timeout 15; gc-interval 15 } }
+table T { map S { counter } }
+table T { map S { counter bytes 123 } }
+table T { map S { counter packets 123 } }
+table T { map S { counter packets 123 bytes 123 } }
+table T { map S { counter bytes 123 packets 123 } }
+table T { map S { limit rate 123 } }
+table T { map S { limit rate over 123 } }
+table T { map S { limit rate until 123 } }
+table T { map S { quota over 123 bytes } }
+table T { map S { quota over 123 string } }
+table T { map S { quota over 123 bytes used 123 bytes } }
+table T { map S { quota over 123 string used 123 string } }
+table T { map S { quota until 123 bytes } }
+table T { map S { quota until 123 string } }
+table T { map S { quota until 123 bytes used 123 bytes } }
+table T { map S { quota until 123 string used 123 string } }
+table T { 
+    map S { 
+        counter; 
+        quota; 
+        limit } 
+}
+table T { map S { ct count 123 } }
+table T { map S { ct count over 123 } }
+table T { map S { last } }
+table T { map S { last used never } }
+table T { map S { last used 4h15m20s } }
+table T { map S { policy performance } }
+table T { map S { policy memory } }
+table T { map S { size 123 } }
+table T { map S { comment Hello } }
+table T { map S { elements = $VARIABLE } }
+table T { map S { elements = { a, b, c } } }
+table T { map S { auto-merge } }
+table ip filter {
+    map mymap {
+        type inet_service
+        flags timeout
+        elements = { http expires 9s}
+    }
+}
+table ip filter {
+    map mymap {
+        type ipv4_addr
+        elements = { 1.1.1.1 }
+    }
+}
+table inet filter {
+    map myset_ipv4 {
+        type ipv4_addr;
+        elements = { $server1_ipv4 , $workstation1_ipv4 }
+    }
+    map myset_ipv6 {
+        type ipv6_addr;
+        elements = { $server1_ipv6 , $workstation1_ipv6 }
+    }
+}
 
 # base_cmd add_cmd 'table' table_spec table_block 'flowtable' flowtable_block
 table T { 
