@@ -25,7 +25,7 @@ table T {
 
 table T {
     chain C {
-        type filter hook input priority 0; policy DROP;
+        type filter hook input priority 0; policy drop;
     }
     chain C1 {
         type filter hook input priority $MY_PRIORITY; policy DROP ;
@@ -64,6 +64,13 @@ table T {
     }
 }
 
+table T {
+    chain C2 {
+        # 'priority out 5' is a valid setting
+        type filter hook input device eth0 priority out 5; policy $MY_POLICY
+    }
+}
+
 ################################################################################
 # true negative test (properly hightlighted wrongly to show an error; 
 # so far, so good.
@@ -82,13 +89,6 @@ set T C S { };
 ################################################################################
 # false negative test: highlighted wrongly; still has good content; oops.
 ################################################################################
-
-table T {
-    chain C2 {
-        # 'priority out 5' is a valid setting
-        type filter hook input device eth0 priority out 5; policy $MY_POLICY
-    }
-}
 
 ################################################################################
 # false positive test: looks highlighted correctly; has bad content; oops.

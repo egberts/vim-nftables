@@ -175,6 +175,60 @@ table netdev filter {
 
     # Drop XMAS packets.
     tcp flags & (fin|syn|rst|psh|ack|urg) == fin|syn|rst|psh|ack|urg counter drop
+    tcp option at echo,1,2 counter drop
+    tcp option at eol,1,2 counter drop
+    tcp option at fastopen,1,2 counter drop
+    tcp option at md5sig,1,2 counter drop
+    tcp option at mptcp,1,2 counter drop
+    tcp option at mss,1,2 counter drop
+    tcp option at nop,1,2 counter drop
+    tcp option at timestamp,1,2 counter drop
+    tcp option at window,1,2 counter drop
+    tcp option at num,1,2 counter drop
+    tcp option at echo,123,123 counter drop
+    tcp option echo counter drop
+    tcp option echo 1 counter drop
+    tcp option eol counter drop
+    tcp option eol 1 counter drop
+    tcp option fastopen counter drop
+    tcp option fastopen 1 counter drop
+    tcp option md5sig counter drop
+    tcp option md5sig 1 counter drop
+    tcp option mptcp & (fin|syn|rst|psh|ack|urg) == fin|syn|rst|psh|ack|urg counter drop
+    tcp option mptcp subtype ,1,2 & (fin|syn|rst|psh|ack|urg) == fin|syn|rst|psh|ack|urg counter drop
+    tcp option mss counter drop
+    tcp option mss 1 counter drop
+    tcp option num counter drop
+    tcp option num 1 counter drop
+    tcp option nop counter drop
+    tcp option nop 1 counter drop
+    tcp option sack counter drop
+    tcp option sack 1 counter drop
+    tcp option sack0  counter drop
+    tcp option sack0 1 counter drop
+    tcp option sack1 counter drop
+    tcp option sack1 1 counter drop
+    tcp option sack2 counter drop
+    tcp option sack2 1 counter drop
+    tcp option sack3 counter drop
+    tcp option sack3 1 counter drop
+    tcp option sack-permitted counter drop
+    tcp option sack-permitted 1 counter drop
+    tcp option timestamp counter drop
+    tcp option timestamp tsecr 123123 counter drop
+    tcp option timestamp tsval 123123 counter drop
+    tcp option window counter drop
+    tcp option window 1 counter drop
+    tcp sport
+    tcp dport
+    tcp sequence 
+    tcp ackseq 
+    tcp doff 
+    tcp reserved 
+    tcp flags 
+    tcp windows 
+    tcp checksum 
+    tcp urgptr 
 
     # Drop NULL packets.
     tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 counter drop
@@ -453,12 +507,12 @@ table inet nat {
 
 table netdev filter {
   set blocked_ipv4 {
+    auto-merge
     169.254.0.0/16,
     224.0.0.0/3,
     240.0.0.0/5
   }
   # fix the last two IPs overlapping
-  auto-merge
 }
 
 table netdev filter {
@@ -1669,7 +1723,7 @@ replace rule ip myTable myChain handle 1 counter
 # CREATE (create_cmd)
 #  create is similar to the add command, but returns 
 #  an error if the chain already exists.
-create table myIpTable MyChain 
+create table myIpTable 
 create table bridge myBridge  
 create table arp myArpTable  
 create table ip myIpTable  
@@ -2660,7 +2714,7 @@ list map ip6 myIp6Table myIp6Map
 list map inet myInetTable myInetMap 
 
 # list ct helpers table <table_spec>
-list ct helpers table 
+list ct helpers table    # missing table name
 list ct helpers table myIpTable
 list ct helpers table netdev myNetdevTable
 list ct helpers table bridge myBridgeTable

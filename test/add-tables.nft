@@ -329,7 +329,6 @@ table T { map S { size 123 } }
 table T { map S { comment Hello } }
 table T { map S { elements = $VARIABLE } }
 table T { map S { elements = { a, b, c } } }
-table T { map S { auto-merge } }
 table ip filter {
     map mymap {
         type inet_service

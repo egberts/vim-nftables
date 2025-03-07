@@ -1,0 +1,13 @@
+Encountered duplicate pathway to
+
+tcpopt_hdr_expr_option
+
+  MSS 
+  MSS  LENGTH (via tcp_hdr_option_type)
+  MSS SIZE (via tcp_hdr_option_kind_and_field->tcp_hdr_option_type)
+
+  WINDOW 
+  WINDOW  LENGTH (via tcp_hdr_option_type)
+  WINDOW COUNT  (via tcp_hdr_option_kind_and_field->tcp_hdr_option_type)
+
+
