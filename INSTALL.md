@@ -42,7 +42,7 @@ See the Highlightings
 To see highlighting in action, use the enclosed test file for highlighting of `nftables` configuration file:
 
 ```bash
-vim vim-nftables/test/all-syntaxes.nft
+vim vim-nftables/test/all-syntaxes-good.nft
 ```
 
 
