@@ -260,7 +260,6 @@ table arp A0b_._/RP_TABLE {
 table netdev A {
     chain a { 
         type filter hook ingress device lo priority -100; policy accept
-        chain a { type };
         udp dport 53 ether type 0x8006 ether saddr set aa:bb:cc:dd:ff:ee ether daddr set numgen inc mod 2 map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
     };
 

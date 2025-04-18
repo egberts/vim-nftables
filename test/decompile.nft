@@ -1,0 +1,12 @@
+
+
+add chain nat prerouting { type nat hook prerouting priority -100; }
+nat LIBVIRT_PRT snat ip to last
+
+table nat {
+    chain LIBVIRT_PRT {
+        type nat hook prerouting priority -5;
+        # stmt_expr->'dnat'->nat_stmt->stmt
+        dnat ip to last;
+    };
+};

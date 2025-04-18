@@ -1,0 +1,26 @@
+
+# https://wiki.nftables.org/wiki-nftables/index.php/Performing_Network_Address_Translation_(NAT)
+add table nat
+add chain nat postrouting { type nat hook postrouting priority 100 ; }
+add rule nat postrouting ip saddr 192.168.1.0/24 oif eth0 snat to 1.2.3.4
+add rule inet nat postrouting snat ip to 10.0.0.2/31
+add rule inet nat postrouting snat ip to 10.0.0.4-10.0.0.127
+add rule inet nat postrouting ip protocol tcp snat ip to 10.0.0.1-10.0.0.100:3000-4000
+add table nat
+add chain nat prerouting { type nat hook prerouting priority -100; }
+add rule nat prerouting iif eth0 tcp dport { 80, 443 } dnat to 192.168.1.120
+add rule nat postrouting masquerade
+add rule nat prerouting redirect
+add rule nat prerouting tcp dport 22 redirect to 2222
+add rule nat output tcp dport 853 redirect to 10053
+add rule nat postrouting masquerade random,persistent
+add rule nat postrouting ip saddr 192.168.1.0/24 oif eth0 snat to 1.2.3.4 fully-random
+add rule inet nat prerouting dnat ip to 10.0.0.2
+add rule inet nat prerouting dnat ip6 to feed::c0fe
+table inet raw {
+	chain prerouting {
+		type filter hook prerouting priority raw; policy accept;
+		ip protocol tcp ip  daddr set 192.168.1.100 tcp dport set 10 notrack
+		ip6 nexthdr tcp ip6 daddr set fe00::1       tcp dport set 10 notrack
+	}
+}

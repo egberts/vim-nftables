@@ -1,0 +1,47 @@
+
+
+nat_stmt 'dnat'|'snat'
+
+  stmt_expr  EOS
+     [ nf_nat_flags ]  EOS
+     ':' 
+         stmt_expr  EOS
+             [ nf_nat_flags ]  EOS
+  ':'
+      stmt_expr  EOS
+         [ nf_nat_flags ]  EOS
+
+  'to'
+      stmt_expr  EOS
+         [ nf_nat_flags ]  EOS
+         ':' 
+             stmt_expr  EOS
+                 [ nf_nat_flags ]  EOS
+      ':'
+          stmt_expr  EOS
+             [ nf_nat_flags ]  EOS
+
+  'interval'|'prefix'
+      'to'
+          stmt_expr  EOS
+             [ nf_nat_flags ]  EOS
+
+  'ip'|'ip6'
+      'to'
+          stmt_expr  EOS
+             [ nf_nat_flags ]  EOS
+             ':' 
+                 stmt_expr  EOS
+                     [ nf_nat_flags ]  EOS
+      ADDR
+          '.'
+              PORT
+                  'to'
+                      stmt_expr  EOS
+                         [ nf_nat_flags ]  EOS
+      'interval'|'prefix'
+          'to'
+              stmt_expr  EOS
+                 [ nf_nat_flags ]  EOS
+
+

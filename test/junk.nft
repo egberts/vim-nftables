@@ -1,0 +1,15 @@
+
+
+table netdev NETDEV_TABLE {
+    # mind the NIC, it must exists
+    chain ingress_filter_netdev_lo {
+        type filter hook ingress device lo priority -100; policy accept
+        udp dport 53 ether type 0x8006 ether saddr aa:bb:cc:dd:ff:ee ether daddr numgen inc mod 2 ; 
+        map {  0 : ca:fe:ba:be:00:00, 1: de:ad:be:ef:00:00 } fwd to eth0;
+    };
+    chain red_ingress_netdev_eth0 {
+        # You'll get a cryptic error if 'device eth0' is missing after 'chain'
+        type filter hook ingress device eth0 priority -100;
+        policy accept;
+    };
+};

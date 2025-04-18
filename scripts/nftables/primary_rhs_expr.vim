@@ -1,24 +1,20 @@
-" Vim syntax file for nftables configuration file
+" Vim syntax file for primary_rhs_expr node of nftables configuration file
 " Language:     nftables configuration file
 " Maintainer:   egberts <egberts@github.com>
-" Revision:     1.1
-" Initial Date: 2020-04-24
-" Last Change:  2025-01-19
+" Revision:     1.0
+" Initial Date: 2025-03-14
+" Last Change:
+" Parent script: syntax/nftables.vim
 " Filenames:    nftables.conf, *.nft
-" Location:     https://github.com/egberts/vim-nftables
+" Location:     https://github.com/egberts/vim-nftables/scripts
 " License:      MIT license
 " Remarks:
 " Bug Report:   https://github.com/egberts/vim-nftables/issues
+" Global variables:
+"    PRIMARY_RHS_EXPR - groupname to use for this instantiation of primary_rhs_expr
 "
 "  WARNING:  Do not add online comments using a double-quote, it ALTERS patterns
 "
-"
-"  ~/.vimrc flags used:
-"
-"      g:nftables_syntax_disabled, if exist then entirety of this file gets skipped
-"      g:nftables_debug, extra outputs
-"      g:nftables_colorscheme, if exist, then 'nftables.vim' colorscheme is used
-""
 "  This syntax supports both ANSI 256color and ANSI TrueColor (16M colors)
 "
 "  For ANSI 16M TrueColor:
@@ -60,3 +56,35 @@
 " syntax/nftables.vim is called before ftdetect/nftables.vim
 " syntax/nftables.vim is called before ftplugin/nftables.vim
 " syntax/nftables.vim is called before indent/nftables.vim
+
+
+" relational_op->relational-expr
+hi link   nft_relational_op nftHL_Operator
+syn match nft_relational_op "\v(eq|neq|lt[e]|gt[e]|not)" skipwhite contained
+\ nextgroup=
+\    nft_list_rhs_expr,
+\    @nft_c_rhs_expr,
+\    @nft_c_basic_rhs_expr
+" basic_rhs_expr must be the last 'contains=' entry
+"     as its exclusive_or_rhs_expr->and_rhs_expr->shift_rhs_expr->primary_rhs_expr->symbol_expr
+"     uses <string> which is a (wildcard)
+
+" primary_rhs_expr_block->primary_rhs_expr->(basic_expr|shift_rhs_expr)
+hi link   nft_primary_rhs_expr_block nftHL_BlockDelimiters
+syn region nft_primary_rhs_expr_block start="{" end="}" skipwhite contained
+\ contains=
+\    @nft_c_basic_rhs_expr
+
+" keyword_expr->(primary_rhs_expr|primary_stmt_expr|symbol_stmt_expr)
+hi link   nft_primary_rhs_expr_keywords nftHL_Command
+syn match nft_primary_rhs_expr_keywords "/v(tcp|udp[lite]|esp|ah|icmp[6]|igmp|gre|comp|dccp|sctp|redirect)" skipwhite contained
+
+" primary_rhs_expr->(basic_expr|shift_rhs_expr)
+syn cluster nft_primary_rhs_expr
+\ contains=
+\    @nft_c_symbol_expr,
+\    nft_integer_expr,
+\    @nft_c_boolean_expr,
+\    nft_keyword_expr,
+\    nft_primary_rhs_expr_keywords,
+\    nft_primary_rhs_expr_block

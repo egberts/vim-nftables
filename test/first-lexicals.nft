@@ -1,0 +1,79 @@
+# What this nftables is expected for the first non-space character
+#
+# base_cmd is also a good candidate for its Vim syntax sync.
+
+# base_cmd
+flowtable T F { counter ; flags offload ; devices = eth0 };
+counter table_id counter_id { packets 5 bytes 1500 } ;
+describe numgen inc mod 256
+replace rule ip table_id chain_id vlan type
+synproxy table_ID
+element ip T C $MY_ELEMENT
+destroy chain T C { define my_var; };
+monitor rules vm json
+create chain inet myInetTable myInetChain { type filter hook input device eth0 priority 0; policy accept; }
+secmark myTable sshtag { "system_u:object_r:ssh_server_packet_t:s0" }
+insert rule netdev T C handle 123
+delete flowtable T FT { hook input priority 0; devices = { br0, eth0, eth1} ; }
+rename chain arp myTable myChain identifier
+chain T C { ip protocol jump C2 }
+import ruleset xml
+export ruleset vm json
+limit arp myBridgeTable myBridgeLimit rate 1 /hour burst 1000000 bytes
+flush set netdev table_id set_id
+reset quotas table arp MyIpTable MyChain
+create quota netdev myIpfilter http-quota over 25 mbytes;
+table T {
+    # common_block
+    include "/directory/subdirectory/filename.filetype";
+    define A = 1
+    redefine A = 2
+    undefine A
+    # table_option
+    flags a, b, c
+    comment Hello
+};
+list synproxys table arp table_id
+rule
+get element T S { flags constant; flags interval; flags timeout; flags dynamic };
+map T C { flags constant; flags interval; flags timeout; flags dynamic };
+set T S { gc-interval 1:00:1 }
+add map T C { flags constant; flags interval; flags timeout; flags dynamic };
+ct timeout table_id ctt { protocol udp; l3proto ip; policy = { unreplied : 15, replied : 12 }; }
+ip
+ip6
+inet
+netdev
+bridge
+arp
+table_ID chain_ID
+;  # semicolon with comment line 
+|  # handled by basic_rhs_expr inside stmt and expr
+~  # caret are handled by exclusive_or_rhs_expr inside stmt and expr
+&  # those ampersand goes inside stmt, handled by and_rhs_expr inside stmt and expr
+0invalid_tableID
+!logic_not_allowed
+(paranthesis_not_allowed)
+!
+@
+$
+%
+^
+*
+_
++
+`
+-
+=
+[
+]
+\
+:
+"
+'
+<
+>
+,
+.
+?
+/

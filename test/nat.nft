@@ -52,6 +52,91 @@ tableid chainid snat ip to original : last persistent
 tableid chainid snat ip to original : last persistent,random
 tableid chainid snat ip to original : last persistent,random,fully-random
 
+table tableID {
+    chain chainID {
+        # stmt_expr->'dnat'->nat_stmt->stmt
+        dnat stmt_expr;
+        # nat_flags->stmt_expr->'dnat'->nat_stmt->stmt
+        dnat stmt_expr random;
+        dnat stmt_expr fully-random;
+        dnat stmt_expr persistent;
+        dnat stmt_expr random,persistent;
+        # stmt_expr->':'->'dnat'->nat_stmt->stmt
+        dnat : stmt_expr;
+        # nat_flags->stmt_expr->':'->'dnat'->nat_stmt->stmt
+        dnat : stmt_expr random;
+        dnat : stmt_expr fully-random;
+        dnat : stmt_expr persistent;
+        dnat : stmt_expr persistent,fully-random;
+        # nat_flags->stmt_expr->':'->stmt_expr->'dnat'->nat_stmt->stmt
+        dnat stmt_expr : stmt_expr;
+        dnat stmt_expr : stmt_expr random;
+        dnat stmt_expr : stmt_expr fully-random;
+        dnat stmt_expr : stmt_expr persistent;
+        dnat stmt_expr : stmt_expr persistent,random;
+        # stmt_expr->'to'->'dnat'->nat_stmt->stmt
+        dnat to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'dnat'->nat_stmt->stmt
+        dnat to stmt_expr nat_flags;
+        # stmt_expr->':'->'to'->'dnat'->nat_stmt->stmt
+        dnat to : stmt_expr;
+        # nat_flags->stmt_expr->':'->'to'->'dnat'->nat_stmt->stmt
+        dnat to : stmt_expr nat_flags;
+        # stmt_expr->':'->stmt_expr->'to'->'dnat'->nat_stmt->stmt
+        dnat to stmt_expr : stmt_expr;
+        # nat_flags->stmt_expr->':'->stmt_expr->'to'->'dnat'->nat_stmt->stmt
+        dnat to stmt_expr : stmt_expr nat_flags;
+        # stmt_expr->'to'->'interval'->'dnat'->nat_stmt->stmt
+        dnat interval to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'interval'->'dnat'->nat_stmt->stmt
+        dnat interval to stmt_expr nat_flags;
+        # stmt_expr->'to'->'prefix'->'dnat'->nat_stmt->stmt
+        dnat prefix to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'prefix'->'dnat'->nat_stmt->stmt
+        dnat prefix to stmt_expr nat_flags;
+        # stmt_expr->'to'->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip to stmt_expr nat_flags;
+        # stmt_expr->':'->stmt_expr->'to'->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip to stmt_expr : stmt_expr;
+        # nat_flags->stmt_expr->':'->stmt_expr->'to'->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip to stmt_expr : stmt_expr nat_flags;
+        # stmt_expr->'to'->PORT->'.'->ADDR->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip addr . port to stmt_expr;
+        # nat_flags->stmt_expr->'to'->PORT->'.'->ADDR->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip addr . port to stmt_expr nat_flags;
+        # stmt_expr->'to'->'interval'->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip interval to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'interval'->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip interval to stmt_expr nat_flags;
+        # stmt_expr->'to'->'prefix'->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip prefix to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'prefix'->'ip'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip prefix to stmt_expr nat_flags;
+        # stmt_expr->'to'->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 to stmt_expr nat_flags;
+        # stmt_expr->':'->stmt_expr->'to'->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 to stmt_expr : stmt_expr;
+        # nat_flags->stmt_expr->':'->stmt_expr->'to'->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 to stmt_expr : stmt_expr nat_flags;
+        # stmt_expr->'to'->PORT->'.'->ADDR->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 addr . port to stmt_expr;
+        # nat_flags->stmt_expr->'to'->PORT->'.'->ADDR->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 addr . port to stmt_expr nat_flags;
+        # stmt_expr->'to'->'interval'->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 interval to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'interval'->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 interval to stmt_expr nat_flags;
+        # stmt_expr->'to'->'prefix'->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 prefix to stmt_expr;
+        # nat_flags->stmt_expr->'to'->'prefix'->'ip6'->key_proto->'dnat'->nat_stmt->stmt
+        dnat ip6 prefix to stmt_expr nat_flags;
+    };
+};
+
 
 ################################################################################
 # true negative test: properly hightlighted wrongly to show an error;

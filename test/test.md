@@ -1,0 +1,46 @@
+
+tcp_hdr_option_type
+  ECHO 
+  EOL 
+  FASTOPEN 
+  MD5SIG 
+  MPTCP 
+  MSS 
+  NOP 
+  SACK_PERM 
+  TIMESTAMP 
+  WINDOW 
+  SACK 
+  SACK0 
+  SACK1 
+  SACK2 
+  SACK3
+  NUM
+
+
+tcp_hdr_option_kind_and_field:
+  MSS SIZE
+  SACK left|right 
+  SACK0 left|right 
+  SACK1 left|right 
+  SACK2 left|right 
+  SACK3 left|right 
+  WINDOW COUNT 
+  TIMESTAMP TSVAL|TSECR 
+  ECHO  LENGTH
+  EOL  LENGTH
+  FASTOPEN  LENGTH
+  MD5SIG  LENGTH
+  MPTCP  LENGTH
+  MSS  LENGTH
+  NOP  LENGTH
+  SACK_PERM  LENGTH
+  TIMESTAMP  LENGTH
+  WINDOW  LENGTH
+  SACK  LENGTH
+  SACK0  LENGTH
+  SACK1  LENGTH
+  SACK2  LENGTH
+  SACK3 LENGTH
+  NUM LENGTH
+  MPTCP SUBTYPE
