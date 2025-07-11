@@ -1,10 +1,13 @@
 # Nftables Vim Syntax Highlighter
 
+Highlight your NFTABLES files!  In VIM/NeoVIM editors, I have got those here.
+
 For Linux nftables configuration files, a syntax highlighter for Vim-class editors.
 
 Here's a screenshot using vim `colorscheme default` and `set background=dark`:
 
 ![nftables vim syntax highlight](doc/screenshot.png)
+![Example](test/nftables.gif "Example")
 
 Pretty solid except for:
 - `stmt` in code blocks
@@ -20,7 +23,7 @@ This VIM syntax proactively highlights typo errors in RED for:
 * nftables configuration file and 
 * nftables script file
 
-![Example](test/nftables.gif "Example")
+
 
 
 Files having `nft` in 1st-line shebang will activate the `syntax nftables`.
