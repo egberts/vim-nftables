@@ -1,6 +1,6 @@
 This file covers 'experts' who contributed to the current and working syntax set of the netfilter's nftables.
 
-NFTABLES Syntax "Experts" by Specialty
+NFTABLES Syntax "Experts" by NFT userspace Specialty
 --------------------------------------
 
 Confirmed domain expert on NFT syntaxes:
@@ -9,6 +9,7 @@ Confirmed domain expert on NFT syntaxes:
 * [Pablo Neira Ayuso](pablo@netfilter.org), iface, hash expression
 * [Mate Eckl](ecklm94@gmail.com), socket expression
 * [Arturo Borrero Gonzalez](arturo@netfilter.org), monitor
+* [Phil Sutter](phil@nwl.cc), JSON parser corrections, test reliability improvements for various inputs and edge conditions
 
 Unconfirmed domain expert on NFT syntaxes:
 * [Eric Leblond](eric@regit.org), libnftables
