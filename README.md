@@ -1,3 +1,11 @@
+# (ARCHIVED SOON) - Visit [egberts/vim-syntax-nftables](https://github.com/egberts/vim-syntax-nftables)
+
+Due to integration of other maintainers' 5-year-old `nftables` highlighter, I've opted to fork away from his repository and claim the MIT License.
+
+Besides, mine is now 3,200% bigger coverage of netfilter/nftables/nft script syntax highlighting.
+
+Visit [egberts/vim-syntax-nftables](https://github.com/egberts/vim-syntax-nftables)
+
 # Nftables Vim Syntax Highlighter
 
 Highlight your NFTABLES files!  In VIM/NeoVIM editors, I have got those here.
