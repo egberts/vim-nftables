@@ -780,6 +780,7 @@ REFERENCE
 * [Chomsky Normal Form](https://en.wikipedia.org/wiki/Chomsky_normal_form)
 * [Context-Sensitive Grammar (CSG) and Language (CSL)](https://www.geeksforgeeks.org/context-sensitive-grammar-csg-and-language-csl/)
 * [Relationship between Grammar and Language](https://www.geeksforgeeks.org/relationship-between-grammar-and-language/?ref=oin_asr12)
+* [Peter Jenk's BNF variants](https://www.cs.man.ac.uk/~pjj/bnf/ebnf.html) comparison list
 * [Removal of Ambiguity Converting An Ambiguous Grammar into Unambiguous Grammar](https://www.geeksforgeeks.org/removal-of-ambiguity-converting-an-ambiguos-grammar-into-unambiguos-grammar/?ref=oin_asr4)
 * [Applications of Various Automata](https://www.geeksforgeeks.org/applications-of-various-automata/)
 * [Automatic syntax highlighter generation](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/autohighlight/final-paper.pdf), Allen, S. T.; Williams, S. R., December 9, 2005
